@@ -1,6 +1,6 @@
 import type { FactorResult, ParsedPage } from "../types.js";
 
-const ATTRIBUTION_RE = /according to ([A-Z][\w.]+(?: [A-Z][\w.]+)*)|(?:says|said|notes|explains|warns)\s+((?:Dr\.|Prof\.)? ?[A-Z][a-z]+ [A-Z][a-z]+)/g;
+const ATTRIBUTION_RE = /[Aa]ccording to (?:the )?([A-Z][\w.]+(?: (?:of )?[A-Z][\w.]+)*)|(?:says|said|notes|explains|warns)\s+((?:Dr\.|Prof\.|Professor)? ?[A-Z][a-z]+ [A-Z][a-z]+)/g;
 const INSTITUTION_RE = /\b(university|institute|journal of|study published|clinical trial|academy of|association of|\.gov|pubmed)\b/i;
 const CREDENTIALS_RE = /\b(Dr\.|PhD|MD|professor|board-certified|dermatologist|researcher)\b/;
 
