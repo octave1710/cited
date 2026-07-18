@@ -81,6 +81,16 @@ export function parse(html: string, url?: string): ParsedPage {
     }
   });
 
+  const orderedLists: string[][] = [];
+  $("ol").each((_, el) => {
+    const items = $(el)
+      .find("li")
+      .map((_, li) => clean($(li).text()))
+      .get()
+      .filter(Boolean);
+    if (items.length) orderedLists.push(items);
+  });
+
   const blockquotes: string[] = [];
   $("blockquote").each((_, el) => {
     const t = clean($(el).text());
@@ -112,5 +122,6 @@ export function parse(html: string, url?: string): ParsedPage {
     blockquotes,
     outboundLinks,
     sameAsLinks: collectSameAs(jsonLd),
+    orderedLists,
   };
 }

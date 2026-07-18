@@ -1,6 +1,6 @@
 import type { FactorResult, ParsedPage } from "../types.js";
 
-const QUESTION_RE = /^(what|how|why|when|where|which|who|can|does|do|is|are|should)\b|[?]\s*$/i;
+export const QUESTION_RE = /^(what|how|why|when|where|which|who|can|does|do|is|are|should)\b|[?]\s*$/i;
 const FILLER_RE = /^(in this (article|guide|post)|welcome|when it comes to|there are many|nowadays|it('|’)s no secret)/i;
 
 /** H2/H3 phrased as questions, first sentence = the answer, passages that stand alone. */

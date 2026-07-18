@@ -27,6 +27,8 @@ export interface ParsedPage {
   blockquotes: string[];
   outboundLinks: { href: string; text: string }[];
   sameAsLinks: string[];
+  /** Items of each <ol> on the page (HowTo detection). */
+  orderedLists: string[][];
 }
 
 export interface FactorResult {
