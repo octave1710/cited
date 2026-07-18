@@ -1,0 +1,19 @@
+{
+  "name": "cited",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CITED — AEO page auditor and multi-market content engine (Precis case)",
+  "scripts": {
+    "test": "vitest run",
+    "audit": "tsx cli.ts audit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
+  }
+}

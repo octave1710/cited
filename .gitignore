@@ -1,0 +1,6 @@
+node_modules/
+.env
+MASTER_PROMPT.md
+*.db
+.next/
+dist/
