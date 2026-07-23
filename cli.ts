@@ -1,11 +1,21 @@
 import { readFileSync } from "node:fs";
 import { parse, audit, generateFixes, generateSchemas, FACTORS, GATE_FACTOR } from "./engine/index.js";
+import { getLLM } from "./adapters/llm.js";
+import { fanout, userQueries } from "./querylab/fanout.js";
+import { toLabDoc } from "./querylab/detect.js";
+import { runLab } from "./querylab/run.js";
 
-const [cmd, file, rankArg] = process.argv.slice(2);
-if (!["audit", "fixes", "schema"].includes(cmd) || !file) {
+try {
+  process.loadEnvFile(); // .env is optional; env vars already set win over it
+} catch {}
+
+const [cmd, file, ...rest] = process.argv.slice(2);
+if (!["audit", "fixes", "schema", "querylab"].includes(cmd) || !file) {
   console.log("Usage: tsx cli.ts <audit|fixes|schema> <page.html> [googleRank]");
+  console.log('       tsx cli.ts querylab <target.html> <competitor.html> <competitor.html> --topic "..." [--queries "q1;q2;..."]');
   process.exit(1);
 }
+const rankArg = cmd === "audit" ? rest[0] : undefined;
 
 const page = parse(readFileSync(file, "utf8"));
 const result = audit(page, { googleRank: rankArg ? Number(rankArg) : undefined });
@@ -53,4 +63,36 @@ if (cmd === "schema") {
   }
   for (const w of warnings) console.log(`<!-- WARNING: ${w} -->`);
   console.log();
+}
+
+if (cmd === "querylab") {
+  const [c1, c2] = rest; // positional: competitors come right after the target
+  const flag = (name: string) => {
+    const i = rest.indexOf(`--${name}`);
+    return i >= 0 ? rest[i + 1] : undefined;
+  };
+  const topic = flag("topic");
+  const queriesArg = flag("queries");
+  if (!c1 || !c2 || (!topic && !queriesArg)) {
+    console.log('querylab needs 2 competitor files and --topic "..." (or --queries "q1;q2;...")');
+    process.exit(1);
+  }
+  const queries = queriesArg ? userQueries(queriesArg.split(";")) : fanout(topic!);
+  const target = toLabDoc(file, page);
+  const competitors = [c1, c2].map((f) => toLabDoc(f, parse(readFileSync(f, "utf8"))));
+  const llm = getLLM();
+
+  const STATUS_ICON = { cited: "✅ CITED", paraphrased: "◐ PARAPHRASED (used without credit)", absent: "✗ ABSENT" };
+  runLab(target, competitors, queries, llm).then((run) => {
+    console.log(`\nCITED Query Lab — ${target.title}`);
+    console.log(`engine: ${run.llm} · vs ${competitors.map((c) => c.title).join(" · ")}`);
+    console.log("─".repeat(72));
+    for (const v of run.verdicts) {
+      console.log(`\n"${v.query.text}" (${v.query.source})`);
+      console.log(`  ${STATUS_ICON[v.status]}`);
+      if (v.citedDocs.length) console.log(`  engine cited: ${v.citedDocs.join(", ")}`);
+      if (v.status === "paraphrased") console.log(`  our facts in the answer, uncredited: ${v.matchedMarkers.join(", ")}`);
+    }
+    console.log(`\n${"─".repeat(72)}\nTARGET CITED: ${run.citedCount}/${run.total} queries\n`);
+  });
 }

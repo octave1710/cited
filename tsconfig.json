@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["engine", "cli.ts"]
+  "include": ["engine", "adapters", "querylab", "cli.ts"]
 }
