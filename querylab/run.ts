@@ -2,11 +2,14 @@ import type { LLMClient } from "../adapters/llm.js";
 import { detect } from "./detect.js";
 import type { LabDoc, LabQuery, LabRun, QueryVerdict } from "./types.js";
 
-const SYSTEM = `You are an AI answer engine. Answer the user's question using ONLY the numbered sources provided.
-Cite a source inline as [1], [2] or [3] immediately after each claim it supports.
-Only cite a source when it directly supports the sentence; do not cite sources that merely mention the topic.
-Prefer sources with specific, attributed, recent information. Keep the answer under 150 words.
-If no source answers the question, say so without citations.`;
+// Citation slots are scarce on real answer engines (1-3 citations picked from
+// dozens of candidate pages). With only 3 docs in context the engine must be
+// forced to be selective, or it citess everything and measures nothing.
+const SYSTEM = `You are an AI answer engine. Sources compete to be cited and citation slots are scarce.
+Answer the user's question using ONLY the numbered sources provided.
+Cite AT MOST 2 sources, inline as [n]. Pick only the sources with the most specific, attributed, recent information for THIS question.
+Never cite a source that is vague, undated, or redundant with a better source. If two sources support the same claim, cite only the stronger one.
+Keep the answer under 120 words. If no source answers the question, say so without citations.`;
 
 function userPrompt(docs: LabDoc[], query: string): string {
   const sources = docs.map((d, i) => `[${i + 1}] ${d.title}\n${d.excerpt}`).join("\n\n");
