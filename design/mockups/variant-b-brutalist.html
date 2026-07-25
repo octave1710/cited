@@ -160,14 +160,28 @@ body{
    ============================================================ */
 
 .hero{
+  position:relative;
   min-height:calc(100vh - var(--bar-h));
   display:grid;
-  grid-template-columns:minmax(0,44%) minmax(0,56%);
+  grid-template-columns:minmax(0,46%) minmax(0,54%);
   border-bottom:1px solid var(--rule);
+  overflow:hidden;
+}
+
+/* the ruled grid + graph run edge to edge behind the whole hero */
+.hero__stage{ position:absolute; inset:0; z-index:0; }
+
+/* light scrim only: the grid must stay visible under the copy, the clusters live right */
+.hero__scrim{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:linear-gradient(90deg,
+    rgba(5,5,5,0.62) 0%, rgba(5,5,5,0.44) 36%, rgba(5,5,5,0) 60%);
 }
 
 .hero__left{
-  padding:56px var(--pad) 40px var(--gutter);
+  position:relative;
+  z-index:2;
+  padding:52px var(--pad) 38px var(--gutter);
   display:flex;
   flex-direction:column;
   border-right:1px solid var(--rule);
@@ -208,6 +222,23 @@ body{
   padding-top:30px;
 }
 
+/* the three zeros, filling the left column with data instead of dead space */
+.zeros{
+  margin-top:40px;
+  max-width:430px;
+}
+.zeros__h{ display:block; padding-bottom:12px; }
+.zeros__r{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 30px 48px;
+  gap:14px;
+  align-items:baseline;
+  border-top:1px solid var(--rule);
+  padding:12px 0;
+}
+.zeros__r span:nth-child(2),
+.zeros__r span:nth-child(3){ text-align:right; }
+
 .stats{
   margin-top:auto;
   padding-top:44px;
@@ -230,30 +261,30 @@ body{
 
 /* ---- canvas panel ---- */
 
+/* label layer only — the canvas itself is the full-bleed stage behind */
 .hero__vis{
   position:relative;
-  min-height:520px;
-  background:
-    linear-gradient(180deg, #060606 0%, #040404 100%);
+  z-index:2;
 }
 #net{ display:block; width:100%; height:100%; }
 
 .vis__tag{
   position:absolute;
-  top:22px;
-  left:26px;
+  top:24px;
+  right:26px;
   display:flex;
   gap:18px;
 }
+/* anchored right so the bottom band reads as one block instead of floating mid-void */
 .vis__legend{
   position:absolute;
   bottom:22px;
-  left:26px;
+  left:auto;
   right:26px;
   display:flex;
   gap:34px;
   align-items:flex-end;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
 }
 .legend__item{
   display:flex;
@@ -514,6 +545,9 @@ body{
 <!-- ============================ 1 — HERO ============================ -->
 <section class="hero">
 
+  <div class="hero__stage"><canvas id="net"></canvas></div>
+  <div class="hero__scrim"></div>
+
   <div class="hero__left">
     <div class="kicker">
       <span class="mono-sm">TARGET / SINGLE URL / RUN 001</span>
@@ -527,6 +561,25 @@ body{
     <div class="actions">
       <a class="btn btn--primary" href="#">RUN FIX PLAN</a>
       <a class="btn" href="#">EXPORT LEDGER</a>
+    </div>
+
+    <div class="zeros">
+      <span class="mono-sm meta zeros__h">ZERO-SCORING FACTORS / HALF THE TOTAL WEIGHT</span>
+      <span class="zeros__r">
+        <span class="mono-sm">SOURCED QUOTES</span>
+        <span class="mono-sm red">0</span>
+        <span class="mono-sm meta">20%</span>
+      </span>
+      <span class="zeros__r">
+        <span class="mono-sm">QUANTIFIED SPECIFICITY</span>
+        <span class="mono-sm red">0</span>
+        <span class="mono-sm meta">18%</span>
+      </span>
+      <span class="zeros__r">
+        <span class="mono-sm">OFF-SITE AUTHORITY</span>
+        <span class="mono-sm red">0</span>
+        <span class="mono-sm meta">12%</span>
+      </span>
     </div>
 
     <div class="stats">
@@ -546,8 +599,6 @@ body{
   </div>
 
   <div class="hero__vis">
-    <canvas id="net"></canvas>
-
     <div class="vis__tag">
       <span class="mono-sm">CITATION GRAPH</span>
       <span class="mono-sm meta">QUERY SET N=5</span>
@@ -721,10 +772,12 @@ body{
   var INK = '236,235,231';
   var RED = '255,59,59';
 
+  /* The canvas is now the full hero width, so cluster x sits in the right half only
+     (copy owns the left) and r is scaled down to keep the same spread in pixels. */
   var clusters = [
-    { x: 0.63, y: 0.26, count: 9, glow: 1.00, r: 0.15, label: 'SOURCE CLUSTER 01' },
-    { x: 0.34, y: 0.57, count: 8, glow: 0.92, r: 0.14, label: 'SOURCE CLUSTER 02' },
-    { x: 0.76, y: 0.74, count: 7, glow: 0.34, r: 0.12, label: 'SOURCE CLUSTER 03' }
+    { x: 0.755, y: 0.23, count: 9, glow: 1.00, r: 0.082, label: 'SOURCE CLUSTER 01' },
+    { x: 0.615, y: 0.54, count: 8, glow: 0.92, r: 0.076, label: 'SOURCE CLUSTER 02' },
+    { x: 0.865, y: 0.70, count: 7, glow: 0.34, r: 0.066, label: 'SOURCE CLUSTER 03' }
   ];
 
   var hubs = [], nodes = [], links = [];
@@ -753,7 +806,7 @@ body{
         var rr = c.r * (0.42 + rand(++s) * 0.68);
         var n = {
           bx: c.x + Math.cos(a) * rr,
-          by: c.y + Math.sin(a) * rr * 1.15,
+          by: c.y + Math.sin(a) * rr * 2.15,   /* r shrank with the wider canvas; keep vertical spread */
           rad: 1.6 + rand(++s) * 2.0,
           glow: c.glow * (0.45 + rand(++s) * 0.5),
           phase: rand(++s) * 6.28,
@@ -780,10 +833,11 @@ body{
       });
     }
 
-    /* our node — isolated, dim, no completed link */
+    /* our node — isolated, dim, no completed link. Stays in the right zone,
+       far below the cluster mass so the isolation still reads. */
     self_ = {
-      bx: 0.135, by: 0.855, rad: 5.2, glow: 0.16,
-      phase: 1.2, drift: 0.006, isSelf: true
+      bx: 0.545, by: 0.795, rad: 5.2, glow: 0.16,
+      phase: 1.2, drift: 0.004, isSelf: true
     };
     nodes.push(self_);
   }
