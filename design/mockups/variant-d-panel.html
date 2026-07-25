@@ -19,12 +19,10 @@
 
   /* ink */
   --ink:           #F2F1EE;
-  --ink-90:        rgba(242,241,238,0.90);
 
   /* phosphor accent (ONE, held) */
   --amber:         #E8A33D;
-  --amber-half:    rgb(114,84,40);
-  --amber-dim:     rgba(232,163,61,0.28);
+  --amber-half:    rgb(114,84,40);   /* half-lit lamp, solid — no gradient */
 
   /* alarm */
   --alarm:         #FF3B3B;
@@ -34,9 +32,8 @@
   --hair:          rgba(242,241,238,0.10);
   --hair-soft:     rgba(242,241,238,0.06);
 
-  /* GREY IS FOR TICKS, UNITS AND AXIS LABELS ONLY */
+  /* GREY IS FOR TICK MARKS, UNITS AND AXIS CAPTIONS ONLY */
   --tick:          rgba(242,241,238,0.36);
-  --tick-faint:    rgba(242,241,238,0.20);
 
   /* type */
   --mono:          'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
@@ -73,8 +70,17 @@ body{
 .m-11{ font-size:11px; }
 .m-13{ font-size:13px; letter-spacing:0.12em; }
 
-/* grey = ticks / units / axis ONLY */
+/* meaning-carrying micro label — full contrast ink */
 .u{
+  font-family:var(--mono);
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+/* GREY: reserved for tick marks, units and axis captions ONLY */
+.tk{
   font-family:var(--mono);
   font-size:9px;
   font-weight:400;
@@ -177,7 +183,7 @@ body{
    FOLD 1 — MAIN INSTRUMENT PANEL
    ============================================================ */
 .fold{
-  height:1027px;
+  height:100vh;
   min-height:940px;
   display:grid;
   grid-template-rows:40px minmax(0,1fr) 330px;
@@ -456,10 +462,10 @@ body{
 .q-table th{
   font-family:var(--mono);
   font-size:9px;
-  font-weight:500;
+  font-weight:700;
   letter-spacing:0.16em;
   text-transform:uppercase;
-  color:var(--tick);
+  color:var(--ink);
   text-align:left;
   padding:0 14px 10px;
   border-bottom:1px solid var(--hair);
@@ -562,7 +568,7 @@ body{
     <div class="strip-item"><span class="m">TARGET</span><span class="url-tag">meridianskinlab.com/guides/vitamin-c-serum</span></div>
     <div class="strip-spacer"></div>
     <div class="strip-item"><span class="pip red"></span><span class="m">GPTBOT</span><span class="m alarm">NO FETCH</span></div>
-    <div class="strip-item"><span class="u">UTC</span><span class="m m-13" id="clock">10:31:04</span></div>
+    <div class="strip-item"><span class="tk">UTC</span><span class="m m-13" id="clock">10:31:04</span></div>
   </div>
 
   <!-- ROW A : 01 gauge | 02 factors | 03 raw -->
@@ -594,9 +600,9 @@ body{
         <div class="bars" id="bars"></div>
       </div>
       <div class="bars-axis">
-        <span class="u">SCORE 0&ndash;100</span>
+        <span class="tk">SCORE 0&ndash;100</span>
         <span class="u alarm">&mdash;&mdash; REDLINE 35</span>
-        <span class="u">WEIGHT %</span>
+        <span class="tk">WEIGHT %</span>
       </div>
     </div>
 
@@ -623,7 +629,7 @@ body{
       <div class="legend">
         <span class="legend-item"><span class="pip"></span><span class="m m-9">SPIKE = CITED</span></span>
         <span class="legend-item"><span class="m m-9">EVENTS</span><span class="m m-9 lit">2 / 5</span></span>
-        <span class="u">SWEEP 30 S/DIV &middot; GAIN 1.0</span>
+        <span class="tk">SWEEP 30 S/DIV &middot; GAIN 1.0</span>
       </div>
     </div>
     <div class="well scope-well">

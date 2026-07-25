@@ -38,7 +38,7 @@
   --display-cover-2: clamp(200px, 15.0vw, 279px);
   --display-score: clamp(400px, 25vw, 462px);
   --display-delta: clamp(260px, 17vw, 316px);
-  --quote:         clamp(44px, 3.6vw, 60px);
+  --quote:         clamp(56px, 4.6vw, 78px);
   --row-name:      26px;
   --body:          20px;
   --micro:         11px;
@@ -305,29 +305,21 @@ body {
 .factor.is-zero .factor__name  { color: var(--ink); }
 
 /* red rule struck through the failing rows */
+/* Default state is fully drawn, so any static render — print, screenshot,
+   JS disabled — shows the correct final mark. JS arms the reveal. */
 .factor__strike {
   position: absolute;
   left: 0;
-  right: 156px;          /* stops clear of the score column */
-  top: 50%;
+  right: 276px;          /* stops clear of the weight and score figures */
+  top: calc(50% - 1px);
   height: 2px;
-  overflow: visible;
+  background: var(--red);
+  transform-origin: left center;
   pointer-events: none;
 }
 
-/* Default state is fully drawn, so any static render — print, screenshot,
-   JS disabled — shows the correct final mark. JS arms the reveal. */
-.factor__strike line {
-  stroke: var(--red);
-  stroke-width: 2;
-  stroke-dasharray: 1 1;
-  stroke-dashoffset: 0;
-}
-
-.js-anim .factor:not(.is-revealed) .factor__strike line { stroke-dashoffset: 1; }
-.js-anim .factor__strike line {
-  transition: stroke-dashoffset 900ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+.js-anim .factor__strike { transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1); }
+.js-anim .factor:not(.is-revealed) .factor__strike { transform: scaleX(0); }
 
 /* ============================================================
    3 — THE EVIDENCE
@@ -353,7 +345,6 @@ body {
 .pull { margin-top: clamp(48px, 8vh, 104px); }
 
 .pull blockquote {
-  max-width: 1040px;
   font-family: var(--serif);
   font-style: italic;
   font-weight: 400;
@@ -417,7 +408,7 @@ body {
 
 .delta {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: clamp(24px, 2.4vw, 44px);
   margin-top: clamp(20px, 3vh, 44px);
 }
@@ -432,16 +423,16 @@ body {
 }
 .delta__num.is-red { color: var(--red); }
 
-.delta__arrow { flex: 0 0 auto; margin-bottom: 0.24em; }
+.delta__arrow { flex: 0 0 auto; }
 .delta__arrow path { stroke: var(--ink); stroke-width: 3; fill: none; }
 
 .delta__cap {
   margin-left: auto;
+  align-self: flex-end;
   text-align: right;
   color: var(--ink-meta);
   max-width: 300px;
   line-height: 1.9;
-  padding-bottom: 6px;
 }
 
 /* queries */
@@ -497,7 +488,8 @@ body {
 
 .result__close {
   margin-top: auto;
-  padding-top: clamp(36px, 6vh, 72px);
+  padding-top: 22px;
+  border-top: 1px solid var(--hair-strong);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -509,16 +501,6 @@ body {
   font-size: var(--body);
   color: var(--ink);
   max-width: 700px;
-}
-
-.colophon {
-  border-top: 1px solid var(--hair-strong);
-  padding-top: 16px;
-  padding-bottom: 40px;
-  display: flex;
-  justify-content: space-between;
-  gap: 32px;
-  color: var(--ink-meta);
 }
 
 /* section 2 footer */
@@ -552,9 +534,8 @@ body {
   <hr class="rule--dark">
 
   <h1 class="cover__display">
-    <span class="l1" style="font-size:clamp(170px,18vw,334px);line-height:.84;display:block">Ranked.</span>
-    <span class="l2" style="font-size:clamp(130px,13vw,242px);line-height:.9;display:block"><em class="italic">Never</em></span>
-    <span class="l2 red" style="font-size:clamp(130px,13vw,242px);line-height:.9;display:block;margin-left:.05em">quoted.</span>
+    <span class="l1">Ranked.</span>
+    <span class="l2"><em class="italic">Never</em> <span class="red">quoted.</span></span>
   </h1>
 
   <p class="cover__lede">Google ranks this page. ChatGPT has never read it, and never quotes it.</p>
@@ -619,14 +600,14 @@ body {
         <div class="factor__name">Sourced quotes</div>
         <div class="factor__weight">20%</div>
         <div class="factor__score">0</div>
-        <svg class="factor__strike" aria-hidden="true" preserveAspectRatio="none"><line x1="0" y1="1" x2="100%" y2="1" pathLength="1"/></svg>
+        <span class="factor__strike" aria-hidden="true"></span>
       </div>
 
       <div class="factor is-zero">
         <div class="factor__name">Quantified specificity</div>
         <div class="factor__weight">18%</div>
         <div class="factor__score">0</div>
-        <svg class="factor__strike" aria-hidden="true" preserveAspectRatio="none"><line x1="0" y1="1" x2="100%" y2="1" pathLength="1"/></svg>
+        <span class="factor__strike" aria-hidden="true"></span>
       </div>
 
       <div class="factor">
@@ -639,7 +620,7 @@ body {
         <div class="factor__name">Off-site authority</div>
         <div class="factor__weight">12%</div>
         <div class="factor__score">0</div>
-        <svg class="factor__strike" aria-hidden="true" preserveAspectRatio="none"><line x1="0" y1="1" x2="100%" y2="1" pathLength="1"/></svg>
+        <span class="factor__strike" aria-hidden="true"></span>
       </div>
 
       <div class="factor">
@@ -738,25 +719,18 @@ body {
 
   <div class="result__close">
     <p>Nine fixes later, every engine quotes the page by name.</p>
-    <span class="mono mono--meta">End of report</span>
+    <span class="mono mono--meta">meridianskinlab.com/guides/vitamin-c-serum &nbsp;/&nbsp; 25 July 2026</span>
   </div>
 </section>
-
-<div class="wrap">
-  <div class="colophon">
-    <span class="mono mono--meta">Cited / Citability Report No.&nbsp;01</span>
-    <span class="mono mono--meta">meridianskinlab.com/guides/vitamin-c-serum</span>
-    <span class="mono mono--meta">25 July 2026</span>
-  </div>
-</div>
 
 <script>
 (function () {
   var rows = document.querySelectorAll('.factor.is-zero');
-  if (!('IntersectionObserver' in window)) {
-    rows.forEach(function (r) { r.classList.add('is-revealed'); });
-    return;
-  }
+  if (!('IntersectionObserver' in window) || !rows.length) return;
+
+  /* Arm the undrawn state only now that we can guarantee we will draw it. */
+  document.documentElement.classList.add('js-anim');
+
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
       if (!e.isIntersecting) return;
