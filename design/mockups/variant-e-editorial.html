@@ -34,7 +34,7 @@
   --mono:   "JetBrains Mono", ui-monospace, monospace;
 
   /* scale — cover lines are sized so each one fills the 1288px measure */
-  --display-cover-1: clamp(300px, 25.6vw, 476px);
+  --display-cover-1: clamp(300px, 24.2vw, 450px);
   --display-cover-2: clamp(200px, 15.0vw, 279px);
   --display-score: clamp(400px, 25vw, 462px);
   --display-delta: clamp(260px, 17vw, 316px);
@@ -135,7 +135,10 @@ body {
   margin-top: clamp(16px, 2.6vh, 34px);
 }
 
-.cover__display > span { display: block; white-space: nowrap; }
+/* Lines are sized to sit on one line in Instrument Serif. They are allowed to
+   wrap rather than nowrap, so a webfont failure degrades to an extra line
+   instead of overflowing the viewport. */
+.cover__display > span { display: block; }
 .cover__display em { font-style: italic; }
 
 .cover__display .l1 {
@@ -147,6 +150,7 @@ body {
   font-size: var(--display-cover-2);
   line-height: 0.92;
   letter-spacing: -0.024em;
+  padding-bottom: 0.11em;   /* clearance for the descender of "q" */
 }
 /* the accent word must stay at display scale, never inherit a body size */
 .cover__display .red { font-size: inherit; }
@@ -430,7 +434,7 @@ body {
   margin-left: auto;
   align-self: flex-end;
   text-align: right;
-  color: var(--ink-meta);
+  color: var(--ink);
   max-width: 300px;
   line-height: 1.9;
 }
@@ -680,7 +684,7 @@ body {
       <path d="M0 28 H218 M196 10 L218 28 L196 46" stroke-linecap="square"/>
     </svg>
     <span class="delta__num">5</span>
-    <span class="delta__cap mono">Cited before fixes<br>&rarr; cited after fixes</span>
+    <span class="delta__cap mono">Cited before fixes<br>&rarr;&nbsp; cited after fixes</span>
   </div>
 
   <div class="queries">
