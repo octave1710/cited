@@ -23,9 +23,9 @@
   --ink:           #ECEBE7;
   --ink-dim:       #8f8d88;   /* dates, units, citations, column headers ONLY */
 
-  /* signal */
-  --blue:          #2196F3;
+  /* signal — ONE accent for the whole page. red is the alarm and the accent. */
   --red:           #FF3B3B;
+  --red-deep:      #D81E1E;   /* button fill, so white type on it stays legible */
 
   /* type */
   --display:       'Barlow Condensed', 'Arial Narrow', sans-serif;
@@ -41,7 +41,7 @@
   /* scale */
   --fs-hero:       178px;
   --fs-verdict:    320px;
-  --fs-proof:      224px;
+  --fs-proof:      168px;
   --fs-factor:     46px;
   --fs-score:      88px;
   --fs-stat:       84px;
@@ -81,7 +81,7 @@ body{
 }
 .meta{ color:var(--ink-dim); }        /* dates / units / sources / col headers */
 .red{ color:var(--red); }
-.blue{ color:var(--blue); }
+.blue{ color:var(--red); }   /* legacy class name, single accent now */
 
 .display{
   font-family:var(--display);
@@ -123,8 +123,8 @@ body{
   text-decoration:none;
 }
 .btn--primary{
-  background:var(--blue);
-  border-color:var(--blue);
+  background:var(--red-deep);
+  border-color:var(--red-deep);
   color:#04121e;
   font-weight:500;
 }
@@ -184,6 +184,7 @@ body{
   padding:52px var(--pad) 38px var(--gutter);
   display:flex;
   flex-direction:column;
+  justify-content:center;   /* hero holds only kicker, headline, lede, actions now */
   border-right:1px solid var(--rule);
 }
 
@@ -415,6 +416,109 @@ body{
 .frow--zero .meter__fill{ background:var(--red); }
 
 /* ============================================================
+   3b — THE THREE FAILURES  (one idea per block, plain language)
+   ============================================================ */
+
+.fails{ border-bottom:1px solid var(--rule); padding-bottom:52px; }
+.fail{
+  display:grid;
+  grid-template-columns:52px minmax(0,330px) minmax(0,1fr);
+  gap:44px;
+  align-items:start;
+  border-top:1px solid var(--rule);
+  padding:34px 0 32px;
+}
+.fail__i{
+  font-family:var(--mono); font-size:var(--fs-mono-sm); letter-spacing:1.1px;
+  color:var(--red); padding-top:12px;
+}
+.fail__name{
+  font-family:var(--display); font-weight:700; font-style:italic; text-transform:uppercase;
+  font-size:42px; line-height:0.92; color:var(--red);
+}
+.fail__w{
+  display:block; font-family:var(--mono); font-size:var(--fs-mono-sm); letter-spacing:1.1px;
+  color:var(--ink-dim); padding-top:14px;
+}
+.fail__what{
+  font-family:var(--body); font-size:17px; font-weight:500; line-height:1.5; color:var(--ink);
+  max-width:56ch;
+}
+.fail__ev{
+  margin-top:20px; border-left:2px solid var(--red); padding-left:16px;
+  font-family:var(--mono); font-size:12.5px; line-height:1.75; color:var(--ink);
+  max-width:74ch;
+}
+.fail__ev b{
+  display:block; font-weight:400; color:var(--ink-dim); letter-spacing:1.1px;
+  text-transform:uppercase; font-size:var(--fs-mono-sm); padding-bottom:7px;
+}
+
+/* ============================================================
+   4b — LEDGER  (compact and readable, not a wall of giant numbers)
+   ============================================================ */
+
+.led{ border-bottom:1px solid var(--rule); padding-bottom:10px; }
+.led__h{
+  display:grid;
+  grid-template-columns:minmax(0,290px) minmax(0,1fr) 92px 140px 68px;
+  gap:26px; padding:0 0 12px; border-bottom:1px solid var(--rule);
+}
+.led__h span{ font-family:var(--mono); font-size:var(--fs-mono-sm); letter-spacing:1.1px;
+  text-transform:uppercase; color:var(--ink-dim); }
+.led__h span:nth-child(3),
+.led__h span:nth-child(5){ text-align:right; }
+.lrow{
+  display:grid;
+  grid-template-columns:minmax(0,290px) minmax(0,1fr) 92px 140px 68px;
+  gap:26px; align-items:center;
+  border-top:1px solid var(--rule); padding:15px 0 14px;
+}
+.lrow:first-of-type{ border-top:0; }
+.lrow__n{
+  font-family:var(--display); font-weight:700; font-style:italic; text-transform:uppercase;
+  font-size:24px; line-height:1.05; color:var(--ink);
+}
+.lrow__d{ font-family:var(--body); font-size:15px; font-weight:500; line-height:1.4; color:var(--ink); }
+.lrow__w{ font-family:var(--mono); font-size:var(--fs-mono-sm); letter-spacing:1.1px;
+  color:var(--ink-dim); text-align:right; }
+.lrow__m{ height:7px; background:var(--rule-soft); }
+.lrow__m i{ display:block; height:7px; background:var(--ink); }
+.lrow__s{
+  font-family:var(--display); font-weight:700; font-style:italic;
+  font-size:32px; line-height:1; text-align:right; color:var(--ink);
+}
+.lrow--zero .lrow__n,
+.lrow--zero .lrow__s{ color:var(--red); }
+.lrow--zero .lrow__m i{ background:var(--red); }
+
+/* ============================================================
+   5b — WHAT "CITED" MEANS  (show one real engine answer)
+   ============================================================ */
+
+.means{ border-bottom:1px solid var(--rule); padding-bottom:60px; }
+.means__q{
+  font-family:var(--display); font-weight:700; font-style:italic; text-transform:uppercase;
+  font-size:50px; line-height:0.96; max-width:24ch; color:var(--ink);
+}
+.means__sub{
+  font-family:var(--body); font-size:17px; font-weight:500; line-height:1.5;
+  color:var(--ink); max-width:60ch; padding-top:18px;
+}
+.answer{ margin-top:32px; border:1px solid var(--rule); background:#030303; }
+.answer__h{ display:flex; gap:26px; flex-wrap:wrap; border-bottom:1px solid var(--rule); padding:12px 20px; }
+.answer__b{
+  padding:24px 22px; font-family:var(--mono); font-size:13.5px; line-height:2.05;
+  color:var(--ink); max-width:100ch;
+}
+.cite{ color:var(--red); border:1px solid var(--red); padding:0 5px; margin:0 2px; font-weight:500; }
+.cite--them{ color:var(--ink-dim); border-color:var(--rule); }
+.means__note{
+  margin-top:18px; font-family:var(--mono); font-size:var(--fs-mono-sm);
+  letter-spacing:1.1px; text-transform:uppercase; color:var(--ink-dim);
+}
+
+/* ============================================================
    4 — PROOF
    ============================================================ */
 
@@ -469,13 +573,15 @@ body{
 }
 .qtable th:nth-child(2),
 .qtable th:nth-child(3){ width:210px; }
+/* real queries read as sentences, not as uppercase mono shouting */
 .qtable td{
-  font-family:var(--mono);
-  font-size:12px;
-  letter-spacing:0.7px;
-  text-transform:uppercase;
+  font-family:var(--body);
+  font-size:18px;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
   color:var(--ink);
-  padding:15px 0;
+  padding:16px 0;
   border-bottom:1px solid var(--rule);
   vertical-align:middle;
 }
@@ -563,39 +669,6 @@ body{
       <a class="btn" href="#">EXPORT LEDGER</a>
     </div>
 
-    <div class="zeros">
-      <span class="mono-sm meta zeros__h">ZERO-SCORING FACTORS / HALF THE TOTAL WEIGHT</span>
-      <span class="zeros__r">
-        <span class="mono-sm">SOURCED QUOTES</span>
-        <span class="mono-sm red">0</span>
-        <span class="mono-sm meta">20%</span>
-      </span>
-      <span class="zeros__r">
-        <span class="mono-sm">QUANTIFIED SPECIFICITY</span>
-        <span class="mono-sm red">0</span>
-        <span class="mono-sm meta">18%</span>
-      </span>
-      <span class="zeros__r">
-        <span class="mono-sm">OFF-SITE AUTHORITY</span>
-        <span class="mono-sm red">0</span>
-        <span class="mono-sm meta">12%</span>
-      </span>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <span class="display stat__n">33<span class="mono-sm meta">/100</span></span>
-        <span class="mono-sm stat__c">CITED SCORE</span>
-      </div>
-      <div class="stat">
-        <span class="display stat__n">2<span class="mono-sm meta">/5</span></span>
-        <span class="mono-sm stat__c">QUERIES CITED</span>
-      </div>
-      <div class="stat">
-        <span class="display stat__n red">0</span>
-        <span class="mono-sm stat__c">GPTBOT HITS</span>
-      </div>
-    </div>
   </div>
 
   <div class="hero__vis">
@@ -628,81 +701,164 @@ body{
 </section>
 
 <!-- ============================ 3 — FACTORS ============================ -->
-<section class="band wrap factors">
+<section class="band wrap fails">
+  <div class="section-head">
+    <span class="mono">WHY IT IS SKIPPED</span>
+    <span class="mono-sm meta">3 FACTORS AT ZERO / 50% OF THE TOTAL WEIGHT</span>
+  </div>
+
+  <div class="fail">
+    <div class="fail__i">01</div>
+    <div>
+      <div class="fail__name">SOURCED<br>QUOTES</div>
+      <span class="fail__w">WEIGHT 20% / SCORE 0</span>
+    </div>
+    <div>
+      <p class="fail__what">An answer engine has to attribute a claim to someone. With no named expert and no institution on the page, there is nothing it can quote.</p>
+      <div class="fail__ev"><b>Found on the page</b>No attributed quote in 206 words of body copy. No credential, no researcher, no institution.</div>
+    </div>
+  </div>
+
+  <div class="fail">
+    <div class="fail__i">02</div>
+    <div>
+      <div class="fail__name">QUANTIFIED<br>SPECIFICITY</div>
+      <span class="fail__w">WEIGHT 18% / SCORE 0</span>
+    </div>
+    <div>
+      <p class="fail__what">Engines lift figures. A page that states no number gives them nothing liftable, so the claim gets paraphrased from a competitor instead.</p>
+      <div class="fail__ev"><b>Found on the page</b>0 quantified facts in 206 words. Example: "Vitamin C is a powerful antioxidant that can help brighten your skin."</div>
+    </div>
+  </div>
+
+  <div class="fail">
+    <div class="fail__i">03</div>
+    <div>
+      <div class="fail__name">OFF-SITE<br>AUTHORITY</div>
+      <span class="fail__w">WEIGHT 12% / SCORE 0</span>
+    </div>
+    <div>
+      <p class="fail__what">Nobody signs this page, and no third party mentions the brand. Engines treat unsigned pages as unverifiable.</p>
+      <div class="fail__ev"><b>Found on the page</b>No author, no credential, no linked profile, no outbound source.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 4 — LEDGER ============================ -->
+<section class="band--alt wrap led">
   <div class="section-head">
     <span class="mono">WEIGHTED LEDGER</span>
-    <span class="mono-sm meta">9 FACTORS / 1 GATE / SUM 100%</span>
+    <span class="mono-sm meta">9 FACTORS / 1 GATE / WEIGHTS FROM A CONFIG FILE</span>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">CRAWLABILITY</div>
-    <div class="mono-sm frow__w">BINARY GATE</div>
-    <div class="display frow__score">100</div>
-    <span class="meter"><i class="meter__fill" style="width:100%"></i></span>
+  <div class="led__h">
+    <span>FACTOR</span><span>WHAT IT MEASURES</span><span>WEIGHT</span><span></span><span>SCORE</span>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">ANSWER-FIRST STRUCTURE</div>
-    <div class="mono-sm frow__w">WEIGHT 24%</div>
-    <div class="display frow__score">76</div>
-    <span class="meter"><i class="meter__fill" style="width:76%"></i></span>
+  <div class="lrow">
+    <div class="lrow__n">Crawlability</div>
+    <div class="lrow__d">Whether answer-engine bots can read the page at all. Nothing counts until this passes.</div>
+    <div class="lrow__w">GATE</div>
+    <div class="lrow__m"><i style="width:100%"></i></div>
+    <div class="lrow__s">100</div>
   </div>
 
-  <div class="frow frow--zero">
-    <div class="display frow__name">SOURCED QUOTES</div>
-    <div class="mono-sm frow__w">WEIGHT 20%</div>
-    <div class="display frow__score">0</div>
-    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  <div class="lrow">
+    <div class="lrow__n">Answer-first structure</div>
+    <div class="lrow__d">Question headings whose first sentence is the answer. Engines lift passages, not pages.</div>
+    <div class="lrow__w">24%</div>
+    <div class="lrow__m"><i style="width:76%"></i></div>
+    <div class="lrow__s">76</div>
   </div>
 
-  <div class="frow frow--zero">
-    <div class="display frow__name">QUANTIFIED SPECIFICITY</div>
-    <div class="mono-sm frow__w">WEIGHT 18%</div>
-    <div class="display frow__score">0</div>
-    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  <div class="lrow lrow--zero">
+    <div class="lrow__n">Sourced quotes</div>
+    <div class="lrow__d">Claims attributed to a named expert or institution.</div>
+    <div class="lrow__w">20%</div>
+    <div class="lrow__m"><i style="width:2%"></i></div>
+    <div class="lrow__s">0</div>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">FRESHNESS</div>
-    <div class="mono-sm frow__w">WEIGHT 14%</div>
-    <div class="display frow__score">40</div>
-    <span class="meter"><i class="meter__fill" style="width:40%"></i></span>
+  <div class="lrow lrow--zero">
+    <div class="lrow__n">Quantified specificity</div>
+    <div class="lrow__d">Exact figures an engine can quote back with a source.</div>
+    <div class="lrow__w">18%</div>
+    <div class="lrow__m"><i style="width:2%"></i></div>
+    <div class="lrow__s">0</div>
   </div>
 
-  <div class="frow frow--zero">
-    <div class="display frow__name">OFF-SITE AUTHORITY</div>
-    <div class="mono-sm frow__w">WEIGHT 12%</div>
-    <div class="display frow__score">0</div>
-    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  <div class="lrow">
+    <div class="lrow__n">Freshness</div>
+    <div class="lrow__d">How recently the page was verified. This one is 314 days old.</div>
+    <div class="lrow__w">14%</div>
+    <div class="lrow__m"><i style="width:40%"></i></div>
+    <div class="lrow__s">40</div>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">FAN-OUT COVERAGE</div>
-    <div class="mono-sm frow__w">WEIGHT 8%</div>
-    <div class="display frow__score">85</div>
-    <span class="meter"><i class="meter__fill" style="width:85%"></i></span>
+  <div class="lrow lrow--zero">
+    <div class="lrow__n">Off-site authority</div>
+    <div class="lrow__d">Whether the brand is cited anywhere else on the web.</div>
+    <div class="lrow__w">12%</div>
+    <div class="lrow__m"><i style="width:2%"></i></div>
+    <div class="lrow__s">0</div>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">GOOGLE RANK</div>
-    <div class="mono-sm frow__w">WEIGHT 3%</div>
-    <div class="display frow__score">50</div>
-    <span class="meter"><i class="meter__fill" style="width:50%"></i></span>
+  <div class="lrow">
+    <div class="lrow__n">Fan-out coverage</div>
+    <div class="lrow__d">How many sub-questions of the topic the page actually answers.</div>
+    <div class="lrow__w">8%</div>
+    <div class="lrow__m"><i style="width:85%"></i></div>
+    <div class="lrow__s">85</div>
   </div>
 
-  <div class="frow">
-    <div class="display frow__name">STRUCTURED DATA</div>
-    <div class="mono-sm frow__w">WEIGHT 1%</div>
-    <div class="display frow__score">70</div>
-    <span class="meter"><i class="meter__fill" style="width:70%"></i></span>
+  <div class="lrow">
+    <div class="lrow__n">Google rank</div>
+    <div class="lrow__d">Classic ranking. Down-weighted to 3% on purpose: it no longer predicts citation.</div>
+    <div class="lrow__w">3%</div>
+    <div class="lrow__m"><i style="width:50%"></i></div>
+    <div class="lrow__s">50</div>
   </div>
+
+  <div class="lrow">
+    <div class="lrow__n">Structured data</div>
+    <div class="lrow__d">Valid JSON-LD. Generated for hygiene, weighted at 1%: measured causal effect is zero.</div>
+    <div class="lrow__w">1%</div>
+    <div class="lrow__m"><i style="width:70%"></i></div>
+    <div class="lrow__s">70</div>
+  </div>
+</section>
+
+<!-- ============================ 5 — WHAT CITED MEANS ============================ -->
+<section class="band wrap means">
+  <div class="section-head">
+    <span class="mono">WHAT "CITED" MEANS</span>
+    <span class="mono-sm meta">ONE RECORDED ENGINE ANSWER</span>
+  </div>
+
+  <h2 class="means__q">"How long until vitamin C shows results?"</h2>
+  <p class="means__sub">We put the page in front of a live answer engine against two competitors, and read which source it credits.</p>
+
+  <div class="answer">
+    <div class="answer__h">
+      <span class="mono-sm">ENGINE RESPONSE / BEFORE FIXES</span>
+      <span class="mono-sm meta">GPT-4O-MINI / TEMP 0 / 3 SOURCES IN CONTEXT</span>
+    </div>
+    <div class="answer__b">
+      Visible brightening usually appears at 8 weeks, with collagen changes measurable from 12 weeks
+      <span class="cite cite--them">[1]</span>. A meta-analysis of 31 trials reported a mean 29% improvement
+      in hyperpigmentation scores at the 12-week mark <span class="cite cite--them">[1]</span>. Dermatologists
+      frame it as a three-month commitment <span class="cite cite--them">[3]</span>.
+    </div>
+  </div>
+
+  <div class="means__note">↳ every citation went to a competitor. our page was in context and never credited.</div>
 </section>
 
 <!-- ============================ 4 — PROOF ============================ -->
 <section class="band--alt wrap proof">
   <div class="section-head">
-    <span class="mono">QUERY LAB / CITATION DELTA</span>
-    <span class="mono-sm meta">BEFORE VS AFTER FIXES</span>
+    <span class="mono">THE RE-TEST</span>
+    <span class="mono-sm meta">SAME PAGE / SAME ENGINE / AFTER THE FIXES</span>
   </div>
 
   <div class="proof__figures">
@@ -726,28 +882,28 @@ body{
     </thead>
     <tbody>
       <tr>
-        <td>BEST VITAMIN C SERUM FOR SENSITIVE SKIN</td>
+        <td>Does vitamin C serum actually work?</td>
+        <td><span class="badge badge--cited">CITED</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>How long until it shows results?</td>
         <td><span class="badge badge--absent">ABSENT</span></td>
         <td><span class="badge badge--cited">CITED</span></td>
       </tr>
       <tr>
-        <td>DOES 10% VITAMIN C ACTUALLY WORK</td>
-        <td><span class="badge badge--cited">CITED</span></td>
-        <td><span class="badge badge--cited">CITED</span></td>
-      </tr>
-      <tr>
-        <td>VITAMIN C VS NIACINAMIDE LAYERING</td>
-        <td><span class="badge badge--absent">ABSENT</span></td>
-        <td><span class="badge badge--cited">CITED</span></td>
-      </tr>
-      <tr>
-        <td>HOW LONG UNTIL VITAMIN C SHOWS RESULTS</td>
+        <td>How do I choose one?</td>
         <td><span class="badge">PARAPHRASED</span></td>
         <td><span class="badge badge--cited">CITED</span></td>
       </tr>
       <tr>
-        <td>IS L-ASCORBIC ACID UNSTABLE</td>
+        <td>Which benefits are backed by studies?</td>
         <td><span class="badge badge--cited">CITED</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>Is it worth it?</td>
+        <td><span class="badge badge--absent">ABSENT</span></td>
         <td><span class="badge badge--cited">CITED</span></td>
       </tr>
     </tbody>
