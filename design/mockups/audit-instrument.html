@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CITED — Audit view (direction: Answer Engine Instrument)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08090A; --void-2:#0E0F11; --void-3:#121316;
+  --ink:#ECEBE7; --ink-2:#B9B8B3; --muted:#8A8C92;
+  --line:rgba(236,235,231,.10); --line-2:rgba(236,235,231,.18);
+  --accent:#5B79F0; --accent-dim:rgba(91,121,240,.14);
+  --alarm:#FF3B3B; --alarm-dim:rgba(255,59,59,.12);
+  --pass:#7FD1AE;
+  --display:'Space Grotesk',sans-serif; --sans:'Instrument Sans',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{background:var(--void);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+.wrap{max-width:1400px;margin:0 auto;padding:0 48px}
+.mono{font-family:var(--mono)}
+.lbl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--muted)}
+.lbl-rule{display:flex;align-items:center;gap:12px}
+.lbl-rule::before{content:"";width:28px;height:1px;background:var(--muted)}
+/* the scale varies per section on purpose: the Query Lab is the loudest moment in the app */
+h2{font-family:var(--display);font-weight:500;font-size:52px;line-height:1.0;letter-spacing:-.03em}
+h2.big{font-size:74px;letter-spacing:-.04em;line-height:.96}
+h2.sm{font-size:42px;letter-spacing:-.025em}
+section{position:relative}
+.band{background:var(--void-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* 1 — STATUS RAIL */
+.rail{position:sticky;top:0;z-index:50;background:rgba(8,9,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.rail-in{max-width:1400px;margin:0 auto;padding:0 48px;height:36px;display:flex;align-items:center;gap:28px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.rail b{color:var(--ink);font-weight:500;letter-spacing:.1em}
+.rail .dot{width:5px;height:5px;border-radius:50%;background:var(--pass);display:inline-block;margin-right:7px;vertical-align:1px}
+.rail .dot.warn{background:var(--muted)}
+.rail-sp{margin-left:auto}
+
+/* 2 — INGEST */
+.ingest{padding:64px 0 56px;border-bottom:1px solid var(--line)}
+.grid-bg{position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(236,235,231,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(236,235,231,.13) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 55%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.35) 55%,transparent 100%)}
+.cmd{font-family:var(--mono);font-size:19px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.cmd .p{color:var(--accent)}
+.cmd .c{color:var(--ink-2)}
+.cmd .u{color:var(--ink);border-bottom:1px solid var(--line-2);padding-bottom:2px}
+.caret{display:inline-block;width:8px;height:19px;background:var(--accent);vertical-align:-3px;margin-left:2px}
+.parse{margin-top:22px;display:flex;gap:0;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.parse span{padding-right:18px;margin-right:18px;border-right:1px solid var(--line)}
+.parse span:last-child{border:0}
+.parse b{color:var(--ink-2);font-weight:400}
+
+/* 3 — VERDICT */
+.verdict{padding:96px 0 88px;display:grid;grid-template-columns:minmax(0,520px) 1fr;gap:72px;align-items:end}
+.bignum{font-family:var(--display);font-weight:500;font-size:230px;line-height:.78;letter-spacing:-.055em;color:var(--ink);display:flex;align-items:baseline}
+.bignum .den{font-size:44px;letter-spacing:-.02em;color:var(--muted);margin-left:10px}
+.grade{margin-top:26px;display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--alarm);background:var(--alarm-dim);
+  border:1px solid rgba(255,59,59,.3);border-radius:4px;padding:8px 14px}
+.v-right{padding-bottom:14px}
+.v-right p{font-family:var(--display);font-weight:400;font-size:27px;line-height:1.28;letter-spacing:-.02em;max-width:22ch}
+.v-right p em{font-style:normal;color:var(--accent)}
+.gatechk{margin-top:30px;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.05em}
+.gatechk .ok{color:var(--pass)}
+
+/* 4 — FACTOR LEDGER */
+.ledger{padding:104px 0 104px}
+.ledger h2{max-width:16ch}
+.led-head{display:flex;justify-content:space-between;align-items:flex-end;gap:48px;margin-bottom:52px}
+/* side note: lowercase mono, short, with a rule above. never a wall of right-aligned caps */
+.note{font-family:var(--mono);font-size:11.5px;line-height:1.75;color:var(--ink-2);
+  max-width:27ch;padding-top:14px;border-top:1px solid var(--line-2);flex-shrink:0}
+.rows{border-top:1px solid var(--line-2)}
+.row{border-bottom:1px solid var(--line);padding:20px 0;display:grid;
+  grid-template-columns:38px minmax(0,1fr) 62px 190px 52px;gap:24px;align-items:center}
+.row .idx{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.row .nm{font-family:var(--display);font-size:19px;font-weight:400;letter-spacing:-.01em}
+.row .nm small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.row .wt{font-family:var(--mono);font-size:11px;color:var(--ink-2);text-align:right}
+/* segmented meter: reads proportion at a glance, instrument rather than progress bar */
+.bar{height:9px;position:relative;
+  background:repeating-linear-gradient(90deg,rgba(236,235,231,.17) 0 2px,transparent 2px 11px)}
+.bar i{position:absolute;left:0;top:0;bottom:0;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 11px)}
+.bar i.zero{width:11px!important;background:repeating-linear-gradient(90deg,var(--alarm) 0 2px,transparent 2px 11px)}
+.bar i.low{background:repeating-linear-gradient(90deg,var(--alarm) 0 2px,transparent 2px 11px)}
+.row .sc{font-family:var(--mono);font-size:16px;text-align:right;letter-spacing:-.02em}
+.row .sc.z{color:var(--alarm)}
+.row.gate{border-bottom:1px solid var(--line-2)}
+.row.gate .nm small{color:var(--pass)}
+.row.open{background:linear-gradient(90deg,rgba(91,121,240,.05),transparent 60%)}
+.evid{border-bottom:1px solid var(--line);padding:4px 0 30px;display:grid;grid-template-columns:38px 1fr;gap:24px}
+.evid-in{max-width:76ch}
+.evid .src{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:18px}
+.evid ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+.evid li{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink-2);padding-left:18px;position:relative}
+.evid li::before{content:"·";position:absolute;left:2px;color:var(--muted)}
+.evid mark{background:var(--accent-dim);color:var(--ink);padding:1px 3px;border-radius:2px}
+.evid .none{color:var(--alarm)}
+
+/* 5 — FIXES */
+.fixes{padding:104px 0}
+.fx{border-top:1px solid var(--line-2)}
+.fxrow{border-bottom:1px solid var(--line);padding:30px 0;display:grid;grid-template-columns:250px 1fr;gap:56px}
+.fxmeta .t{font-family:var(--display);font-size:20px;font-weight:400;letter-spacing:-.01em;line-height:1.25}
+.fxmeta .tags{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:4px;padding:4px 8px}
+.tag.p{color:var(--accent);border-color:rgba(91,121,240,.35)}
+.diff{font-family:var(--mono);font-size:12.5px;line-height:1.75}
+.diff .l{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:7px 12px 7px 0}
+.diff .l.b{background:rgba(255,59,59,.05)}
+.diff .l.a{background:rgba(127,209,174,.05);margin-top:3px}
+.diff .s{color:var(--muted)}
+.diff .l.b .tx{color:var(--ink-2);text-decoration:line-through;text-decoration-color:rgba(255,59,59,.5)}
+.diff .l.a .tx{color:var(--ink)}
+.slot{color:var(--accent);border:1px dashed rgba(91,121,240,.45);border-radius:3px;padding:1px 5px;white-space:nowrap}
+.refuse{margin-top:16px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted)}
+
+/* 6 — QUERY LAB */
+.lab{padding:112px 0 104px;background:var(--void-3);border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.lab .glow{position:absolute;width:900px;height:900px;right:-260px;top:-380px;border-radius:50%;
+  background:radial-gradient(circle,rgba(91,121,240,.13),transparent 62%);pointer-events:none}
+.lab-head{display:flex;justify-content:space-between;align-items:flex-end;gap:48px;margin-bottom:56px;position:relative}
+.scoreflip{display:flex;align-items:baseline;gap:20px;font-family:var(--display);font-weight:500;letter-spacing:-.045em}
+.scoreflip .was{font-size:80px;color:var(--muted);position:relative}
+.scoreflip .was::after{content:"";position:absolute;left:-4%;right:-4%;top:52%;height:2px;background:var(--alarm);transform:rotate(-9deg)}
+.scoreflip .arw{font-family:var(--mono);font-size:22px;color:var(--muted);letter-spacing:0}
+.scoreflip .now{font-size:80px;color:var(--ink)}
+.scoreflip .now s{text-decoration:none;color:var(--accent)}
+.qtable{border-top:1px solid var(--line-2);position:relative}
+.qrow{border-bottom:1px solid var(--line);padding:19px 0;display:grid;grid-template-columns:30px 1fr 150px 150px;gap:24px;align-items:center}
+.qrow .q{font-family:var(--mono);font-size:13px;color:var(--ink-2);letter-spacing:-.01em}
+.qh{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding-bottom:14px}
+.st{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px}
+.st.abs{color:var(--muted)}
+.st.abs::before{content:"";width:7px;height:1px;background:var(--muted)}
+.st.par{color:#E0B341}
+.st.par::before{content:"◐";font-size:10px}
+.st.cit{color:var(--accent)}
+.st.cit::before{content:"●";font-size:8px}
+.answer{margin-top:44px;border:1px solid var(--line);border-radius:4px;background:rgba(8,9,10,.6);position:relative}
+.answer .ah{border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:20px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.answer .ab{padding:24px 20px;font-family:var(--mono);font-size:13px;line-height:1.95;color:var(--ink-2);max-width:96ch}
+.cite{color:var(--accent);background:var(--accent-dim);border-radius:2px;padding:0 4px;font-weight:500}
+.cite.them{color:var(--muted);background:rgba(236,235,231,.06)}
+
+/* 7 — PRODUCTION TRUTH */
+.truth{padding:104px 0}
+.tt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+.tt th{text-align:left;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  font-weight:400;padding:0 0 14px;border-bottom:1px solid var(--line-2)}
+.tt td{padding:15px 0;border-bottom:1px solid var(--line);color:var(--ink-2)}
+.tt tr:nth-child(even) td{background:rgba(236,235,231,.014)}
+.tt .bot{color:var(--ink)}
+.tt .never{color:var(--alarm)}
+.tt .num{text-align:right}
+.tt-note{margin-top:20px;font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em}
+
+/* 8 — REFUSALS */
+.refusals{padding:96px 0 120px;border-top:1px solid var(--line)}
+.rf{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:44px}
+.rf div{background:var(--void);padding:26px 24px}
+.rf .n{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--alarm);margin-bottom:12px}
+.rf .x{font-family:var(--display);font-size:17px;font-weight:400;letter-spacing:-.01em;line-height:1.35}
+@media (prefers-reduced-motion:no-preference){
+  .caret{animation:bl 1.1s steps(1) infinite}
+  @keyframes bl{50%{opacity:0}}
+}
+</style>
+</head>
+<body>
+
+<!-- 1 · STATUS RAIL -->
+<div class="rail"><div class="rail-in">
+  <span><b>CITED</b> v0.1</span>
+  <span><span class="dot"></span>ENGINE_OPENAI</span>
+  <span><span class="dot warn"></span>PROFOUND=MOCK</span>
+  <span>WEIGHTS_LOCKED · 8_FACTORS</span>
+  <span class="rail-sp">BUILD 2026.07.25</span>
+  <span>10:31:04 UTC</span>
+</div></div>
+
+<!-- 2 · INGEST -->
+<section class="ingest">
+  <div class="grid-bg"></div>
+  <div class="wrap">
+    <div class="cmd">
+      <span class="p">$</span><span class="c">cited audit</span>
+      <span class="u">meridianskinlab.com/guides/vitamin-c-serum</span><span class="caret"></span>
+    </div>
+    <div class="parse">
+      <span>fetched <b>200 OK</b></span>
+      <span>parsed <b>5 sections</b></span>
+      <span><b>235</b> words server-rendered</span>
+      <span>json-ld <b>Article</b></span>
+      <span>author <b>none</b></span>
+      <span>published <b>2025-09-14</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · VERDICT -->
+<section class="verdict wrap">
+  <div>
+    <div class="lbl lbl-rule" style="margin-bottom:28px">Citability score</div>
+    <div class="bignum">33<span class="den">/100</span></div>
+    <div class="grade">Invisible to answer engines</div>
+  </div>
+  <div class="v-right">
+    <p>This page ranks. It is never cited, because it makes <em>zero checkable claims</em> and nobody signs it.</p>
+    <div class="gatechk"><span class="ok">✓</span> Crawlability gate passed · bots can read the page</div>
+  </div>
+</section>
+
+<!-- 4 · FACTOR LEDGER -->
+<section class="ledger band">
+  <div class="wrap">
+    <div class="led-head">
+      <div>
+        <div class="lbl lbl-rule" style="margin-bottom:22px">Weighted factors</div>
+        <h2>Eight factors, each with its receipt.</h2>
+      </div>
+      <div class="note">the weights live in a config file, not in an opinion. every score quotes the page back to you.</div>
+    </div>
+
+    <div class="rows">
+      <div class="row gate">
+        <div class="idx">00</div>
+        <div class="nm">Technical accessibility<small>Binary gate · Shepard/Zyppy 54-study meta-analysis</small></div>
+        <div class="wt">GATE</div>
+        <div class="bar"><i style="width:100%"></i></div>
+        <div class="sc">100</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">01</div>
+        <div class="nm">Answer-first structure<small>seoClarity 2026 · r=0.87</small></div>
+        <div class="wt">24%</div>
+        <div class="bar"><i style="width:76%"></i></div>
+        <div class="sc">76</div>
+      </div>
+
+      <div class="row open">
+        <div class="idx">02</div>
+        <div class="nm">Sourced quotes<small>GEO paper SIGKDD 2024 · +41% citation share</small></div>
+        <div class="wt">20%</div>
+        <div class="bar"><i class="zero"></i></div>
+        <div class="sc z">00</div>
+      </div>
+      <div class="evid">
+        <div></div>
+        <div class="evid-in">
+          <div class="src">Evidence extracted from the page</div>
+          <ul>
+            <li class="none">No attributed quote found anywhere on the page.</li>
+            <li>Claims present but unsigned: <mark>"Vitamin C is a powerful antioxidant that can help brighten your skin"</mark></li>
+            <li>No institution, no credential, no named researcher in 206 words of body copy.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="idx">03</div>
+        <div class="nm">Quantified specificity<small>GEO paper SIGKDD 2024 · +31% PAWC</small></div>
+        <div class="wt">18%</div>
+        <div class="bar"><i class="zero"></i></div>
+        <div class="sc z">00</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">04</div>
+        <div class="nm">Freshness<small>seoClarity 2026 · 314 days old</small></div>
+        <div class="wt">14%</div>
+        <div class="bar"><i class="low" style="width:40%"></i></div>
+        <div class="sc">40</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">05</div>
+        <div class="nm">Off-site authority<small>Ahrefs 2026 factor #1 · partial, on-page proxy</small></div>
+        <div class="wt">12%</div>
+        <div class="bar"><i class="zero"></i></div>
+        <div class="sc z">00</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">06</div>
+        <div class="nm">Fan-out coverage<small>Ahrefs 2026 · partial, on-page proxy</small></div>
+        <div class="wt">8%</div>
+        <div class="bar"><i style="width:85%"></i></div>
+        <div class="sc">85</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">07</div>
+        <div class="nm">Classic Google rank<small>Down-weighted on purpose · overlap 76%→17% in a year</small></div>
+        <div class="wt">3%</div>
+        <div class="bar"><i style="width:50%"></i></div>
+        <div class="sc">50</div>
+      </div>
+
+      <div class="row">
+        <div class="idx">08</div>
+        <div class="nm">Structured data<small>Ahrefs May 2026 · null causal effect, 1,885 pages</small></div>
+        <div class="wt">1%</div>
+        <div class="bar"><i style="width:70%"></i></div>
+        <div class="sc">70</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · FIXES -->
+<section class="fixes">
+  <div class="wrap">
+    <div class="led-head">
+      <div>
+        <div class="lbl lbl-rule" style="margin-bottom:22px">Prioritised rewrites</div>
+        <h2>Impact × ease, not a checklist.</h2>
+      </div>
+      <div class="note">cited writes the fix. it refuses to invent the data that belongs inside the fix.</div>
+    </div>
+
+    <div class="fx">
+      <div class="fxrow">
+        <div class="fxmeta">
+          <div class="t">Replace hedge with a sourced figure</div>
+          <div class="tags"><span class="tag p">priority 9</span><span class="tag">impact 3/5</span><span class="tag">effort 3/5</span></div>
+        </div>
+        <div>
+          <div class="diff">
+            <div class="l b"><span class="s">−</span><span class="tx">Vitamin C is a powerful antioxidant that can help brighten your skin and protect it from environmental damage.</span></div>
+            <div class="l a"><span class="s">+</span><span class="tx">Vitamin C reduced hyperpigmentation scores by <span class="slot">[STAT: %, timeframe]</span> across <span class="slot">[STUDY + YEAR]</span>.</span></div>
+          </div>
+          <div class="refuse">↳ the bracketed slots stay empty until a real source fills them. no fabricated statistics.</div>
+        </div>
+      </div>
+
+      <div class="fxrow">
+        <div class="fxmeta">
+          <div class="t">Rephrase heading as the question users ask</div>
+          <div class="tags"><span class="tag p">priority 10</span><span class="tag">impact 2/5</span><span class="tag">effort 1/5</span></div>
+        </div>
+        <div>
+          <div class="diff">
+            <div class="l b"><span class="s">−</span><span class="tx">H2 · Benefits of vitamin C serum</span></div>
+            <div class="l a"><span class="s">+</span><span class="tx">H2 · What are the benefits of vitamin C serum?</span></div>
+          </div>
+          <div class="refuse">↳ container headings (faq, sources, conclusion) are exempt. the engine matches passages, not pages.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · QUERY LAB -->
+<section class="lab">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="lab-head">
+      <div>
+        <div class="lbl lbl-rule" style="margin-bottom:22px">Query Lab · live answer engine</div>
+        <h2 class="big" style="max-width:17ch">We do not predict citation. We re-test it.</h2>
+      </div>
+      <div class="scoreflip">
+        <span class="was">2</span><span class="arw">→</span><span class="now">5<s>/5</s></span>
+      </div>
+    </div>
+
+    <div class="qtable">
+      <div class="qrow" style="border:0;padding-bottom:0">
+        <div class="qh">#</div><div class="qh">Strategic query</div>
+        <div class="qh">Before fixes</div><div class="qh">After fixes</div>
+      </div>
+      <div class="qrow">
+        <div class="q" style="color:var(--muted)">01</div>
+        <div class="q">what is vitamin c serum and does it actually work</div>
+        <div><span class="st cit">cited</span></div><div><span class="st cit">cited</span></div>
+      </div>
+      <div class="qrow">
+        <div class="q" style="color:var(--muted)">02</div>
+        <div class="q">how long does vitamin c serum take to show results</div>
+        <div><span class="st abs">absent</span></div><div><span class="st cit">cited</span></div>
+      </div>
+      <div class="qrow">
+        <div class="q" style="color:var(--muted)">03</div>
+        <div class="q">how do I choose a vitamin c serum</div>
+        <div><span class="st par">paraphrased</span></div><div><span class="st cit">cited</span></div>
+      </div>
+      <div class="qrow">
+        <div class="q" style="color:var(--muted)">04</div>
+        <div class="q">vitamin c serum benefits backed by studies</div>
+        <div><span class="st cit">cited</span></div><div><span class="st cit">cited</span></div>
+      </div>
+      <div class="qrow">
+        <div class="q" style="color:var(--muted)">05</div>
+        <div class="q">is vitamin c serum worth it</div>
+        <div><span class="st abs">absent</span></div><div><span class="st cit">cited</span></div>
+      </div>
+    </div>
+
+    <div class="answer">
+      <div class="ah">
+        <span>Recorded engine response · query 02 · after fixes</span>
+        <span style="margin-left:auto">gpt-4o-mini · temp 0 · 3 sources in context</span>
+      </div>
+      <div class="ab">
+        Visible brightening from a vitamin C serum typically appears at 8 weeks, with collagen-related changes
+        measurable from 12 weeks <span class="cite them">[1]</span>. A meta-analysis of 31 trials found a mean 29%
+        improvement in hyperpigmentation scores at the 12-week mark, using 10-20% L-ascorbic acid applied daily
+        <span class="cite">[2]</span>. Dermatologists frame it as a three-month commitment rather than a quick fix
+        <span class="cite">[2]</span>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · PRODUCTION TRUTH -->
+<section class="truth">
+  <div class="wrap">
+    <div class="led-head">
+      <div>
+        <div class="lbl lbl-rule" style="margin-bottom:22px">Production truth · Profound</div>
+        <h2 class="sm" style="max-width:18ch">What the bots actually did.</h2>
+      </div>
+      <div class="note">our score is a model. this table is the observed behaviour of real crawlers.</div>
+    </div>
+
+    <table class="tt">
+      <tr>
+        <th>Bot</th><th>Operator</th><th class="num">Hits / 30d</th>
+        <th class="num">Last seen</th><th>This path</th>
+      </tr>
+      <tr><td class="bot">GPTBot</td><td>OpenAI</td><td class="num">1,284</td><td class="num">4h ago</td><td class="never">never visited</td></tr>
+      <tr><td class="bot">OAI-SearchBot</td><td>OpenAI</td><td class="num">903</td><td class="num">11h ago</td><td class="never">never visited</td></tr>
+      <tr><td class="bot">PerplexityBot</td><td>Perplexity</td><td class="num">417</td><td class="num">2d ago</td><td>3 hits</td></tr>
+      <tr><td class="bot">ClaudeBot</td><td>Anthropic</td><td class="num">288</td><td class="num">1d ago</td><td>1 hit</td></tr>
+      <tr><td class="bot">Google-Extended</td><td>Google</td><td class="num">2,051</td><td class="num">2h ago</td><td>18 hits</td></tr>
+    </table>
+    <div class="tt-note">↳ factor 00 scored 100 from on-page signals, but GPTBot has never fetched this URL. the model was right and still incomplete.</div>
+  </div>
+</section>
+
+<!-- 8 · REFUSALS -->
+<section class="refusals">
+  <div class="wrap">
+    <div class="lbl lbl-rule">Where we refuse to automate</div>
+    <div class="rf">
+      <div><div class="n">01</div><div class="x">Nothing publishes without human approval.</div></div>
+      <div><div class="n">02</div><div class="x">No health, finance or legal claim without expert review per market.</div></div>
+      <div><div class="n">03</div><div class="x">Missing grounding is a hard stop, never a best guess.</div></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
