@@ -68,7 +68,7 @@ Rejected on purpose: light SaaS dashboard (invisible), glassmorphism (2021), gra
 
 ### Non-negotiable guardrails
 
-Never: Inter/Roboto/Open Sans · pure `#FFFFFF` background or text · blue-to-purple gradients · floating blobs or orbs · glassmorphism · emoji as UI icons · `font-bold` as the default heading weight · a card grid where every card is the same size · body copy in muted gray (lab-notes rule 10: muted is for genuine metadata only, and section titles are large, never 17px) · decorative elements at fixed pixel size pinned next to variable-width neighbours (lab-notes rule 11).
+Never: Inter/Roboto/Open Sans/Playfair Display · pure `#FFFFFF` background or text · blue-to-purple gradients · floating blobs or orbs · glassmorphism · emoji as UI icons · `font-bold` as the default heading weight · a card grid where every card is the same size · body copy in muted gray (lab-notes rule 10: muted is for genuine metadata only, and section titles are large, never 17px) · decorative elements at fixed pixel size pinned next to variable-width neighbours (lab-notes rule 11).
 
 Always: verify at **1858×1027**, Octave's real resolution, not just a small agent window (lab-notes rule 11) · every visual element carries information · `prefers-reduced-motion` respected on every animation · 4.5:1 contrast on body text.
 
@@ -175,7 +175,17 @@ Higgsfield MCP is connected in this session but the account is on the free plan 
 
 ### Type and colour decision
 
-Fonts stay **Space Grotesk (display) + Instrument Sans (UI/body) + JetBrains Mono (all instrument labels)** — V3's exact trio, all already proven on Octave's own site. This is not laziness: COMPUTE runs on Instrument Sans + JetBrains Mono, literally a subset of his own system, which is evidence his taste was already right. One fan-out variant will swap the display face to **Barlow Condensed 700 italic caps** (JARVIS's move) so the difference is visible rather than argued.
+Baseline stays **Space Grotesk (display) + Instrument Sans (UI/body) + JetBrains Mono (all instrument labels)** — V3's exact trio, already proven on Octave's own site. COMPUTE runs on Instrument Sans + JetBrains Mono, literally a subset of that system, which is evidence the taste was already right.
+
+Two findings from the type research that matter:
+
+**Monospace is structurally correct for the data layer.** Any monospace font has uniform-width digits by construction, so JetBrains Mono gives aligned numeric columns with no `font-variant-numeric` gymnastics. Proportional faces only align if they expose the `tnum` OpenType feature, which has to be verified per font rather than assumed. Score numerals, factor weights, bot-crawl tables and query counts therefore all live in mono, not in the display face.
+
+**The award tier runs on paid type.** Typewolf's ranking, built on 3,000+ award-winning sites, is 100% commercial foundries in its top 30 (Apercu, GT America, Founders Grotesk, Söhne, Untitled Sans, Tiempos, Graphik). Inter sits at 39th. No free Google font appears in the top 50. That does not make free type unusable, it means free type is where everyone starts, so distinctiveness has to come from the *system* rather than the file. If Octave wants to buy the extra edge cheaply, the honest options are Pangram Pangram from **$40** (Neue Montreal, Monument), OH no Type Co **$45-499** (Vulf Mono at $45), or Klim at roughly **$60 per style** (Söhne, Untitled Sans, Tiempos). Berkeley Mono at $75 is tempting for a data tool but its licence restricts use to "UI elements" and a dense data table sits in a grey zone, so it needs a direct question to the foundry first.
+
+Fan-out variants will therefore test three display directions: Space Grotesk (baseline), **Instrument Serif** (free, OFL, high-contrast editorial, same designers as Instrument Sans so the pairing is formally coherent), and **Barlow Condensed 700 italic caps** (JARVIS's move). Also worth noting: **Playfair Display is now a slop signal**, flagged by design commentary as the default "first pretty Google serif" choice, so it is out despite appearing in the example system prompt.
+
+Satoshi and General Sans are avoided: Fontshare publishes contradictory licence terms for them, and the restrictive reading (ITF Free Font License) would forbid self-hosting.
 
 Palette, dark inversion of V3:
 
