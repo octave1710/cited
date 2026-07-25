@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CITED — variant A · cinematic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08090A; --void-2:#0C0D0F;
+  --ink:#ECEBE7;                /* ALL content text. no exceptions. */
+  --meta:#8A8C92;               /* units, dates, column headers ONLY */
+  --line:rgba(236,235,231,.13); --line-2:rgba(236,235,231,.22);
+  --accent:#7C97FF; --alarm:#FF4A4A;
+  --sans:'Instrument Sans',sans-serif; --mono:'JetBrains Mono',monospace;
+  --hero:url('assets/hero-archive.png');
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{background:var(--void);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+.wrap{max-width:1500px;margin:0 auto;padding:0 56px;width:100%}
+.k{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.22em;color:var(--ink);
+  display:flex;align-items:center;gap:14px}
+.k::before{content:"";width:34px;height:1px;background:var(--accent)}
+.u{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.18em;color:var(--meta)}
+.d{font-family:var(--sans);font-weight:400;letter-spacing:-.035em;line-height:.94}
+
+/* ── rail */
+.rail{position:fixed;top:0;left:0;right:0;z-index:60;height:40px;display:flex;align-items:center;
+  background:rgba(8,9,10,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.rail .wrap{display:flex;align-items:center;gap:30px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.rail .sp{margin-left:auto;color:var(--meta)}
+.rail .lit{color:var(--accent)}
+
+/* ── 1 · HERO */
+.hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden}
+/* full-bleed, shifted so the lit sheet lands right of centre and the copy sits in the dark */
+/* the lit sheet sits at the image centre; a low background-position pushes it right of the copy */
+.hero .art{position:absolute;inset:0;background-image:var(--hero);background-size:cover;background-position:26% 54%}
+.hero .art::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,var(--void) 0%,rgba(8,9,10,.90) 24%,rgba(8,9,10,.22) 44%,rgba(8,9,10,0) 62%),
+             linear-gradient(0deg,var(--void) 0%,rgba(8,9,10,0) 30%)}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{font-size:clamp(64px,7.4vw,116px);max-width:15ch;margin-top:30px}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .sub{margin-top:34px;font-size:19px;max-width:38ch;color:var(--ink)}
+.stats{position:absolute;left:0;right:0;bottom:56px;z-index:2}
+.stats .row{display:flex;gap:0;border-top:1px solid var(--line);padding-top:26px}
+.stats .c{padding-right:64px;margin-right:64px;border-right:1px solid var(--line)}
+.stats .c:last-child{border:0}
+.stats .n{font-family:var(--sans);font-weight:400;font-size:56px;letter-spacing:-.045em;line-height:1}
+.stats .n s{text-decoration:none;font-size:24px;color:var(--meta);letter-spacing:-.02em}
+.stats .n.bad{color:var(--alarm)}
+.stats .u{margin-top:9px}
+
+/* ── 2 · VERDICT */
+.verdict{min-height:88vh;display:flex;align-items:center;border-top:1px solid var(--line);background:var(--void-2);overflow:hidden}
+.verdict .wrap{display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center}
+.verdict .num{font-family:var(--sans);font-weight:400;font-size:clamp(200px,25vw,380px);
+  letter-spacing:-.06em;line-height:.8;margin-left:-.05em}
+.verdict .num s{text-decoration:none;font-size:.2em;color:var(--meta);letter-spacing:-.02em}
+.verdict .stamp{display:inline-block;margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--alarm);border:1px solid var(--alarm);padding:10px 16px}
+.verdict p{font-size:clamp(26px,2.5vw,38px);letter-spacing:-.025em;line-height:1.24;max-width:20ch}
+.verdict p em{font-style:normal;color:var(--accent)}
+
+/* ── 3 · FACTORS as a wall of type */
+.factors{padding:120px 0 130px;border-top:1px solid var(--line)}
+.factors h2{font-size:clamp(44px,4.6vw,68px);max-width:15ch;margin:24px 0 66px}
+.f{border-top:1px solid var(--line-2)}
+.f .r{display:grid;grid-template-columns:1fr 92px 132px;gap:32px;align-items:center;
+  border-bottom:1px solid var(--line);padding:22px 0;transition:background .2s}
+.f .r:hover{background:rgba(124,151,255,.05)}
+.f .nm{font-size:clamp(22px,2.1vw,32px);letter-spacing:-.025em;color:var(--ink)}
+.f .w{font-family:var(--mono);font-size:12px;color:var(--meta);text-align:right}
+.f .s{font-family:var(--sans);font-weight:400;font-size:clamp(38px,3.6vw,58px);letter-spacing:-.045em;
+  text-align:right;line-height:1}
+.f .s.z{color:var(--alarm)}
+.f .r.gate .nm::after{content:"gate";font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);margin-left:16px;vertical-align:5px}
+
+/* ── 4 · PROOF */
+.proof{padding:124px 0 132px;border-top:1px solid var(--line);background:var(--void-2);position:relative;overflow:hidden}
+.proof .halo{position:absolute;width:1000px;height:1000px;right:-320px;top:-420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,151,255,.11),transparent 62%)}
+.proof .wrap{position:relative}
+.flip{display:flex;align-items:baseline;gap:34px;margin:26px 0 64px}
+.flip .a{font-family:var(--sans);font-weight:400;font-size:clamp(120px,15vw,220px);letter-spacing:-.06em;
+  line-height:.82;color:var(--meta);position:relative}
+.flip .a::after{content:"";position:absolute;left:-8%;right:-8%;top:50%;height:3px;background:var(--alarm);transform:rotate(-11deg)}
+.flip .ar{font-family:var(--mono);font-size:34px;color:var(--ink);letter-spacing:0}
+.flip .b{font-family:var(--sans);font-weight:400;font-size:clamp(120px,15vw,220px);letter-spacing:-.06em;
+  line-height:.82;color:var(--accent)}
+.flip .cap{align-self:flex-end;padding-bottom:26px;max-width:19ch;font-size:17px;color:var(--ink)}
+.q{border-top:1px solid var(--line-2)}
+.q .r{display:grid;grid-template-columns:1fr 190px;gap:32px;align-items:center;
+  border-bottom:1px solid var(--line);padding:19px 0}
+.q .t{font-size:19px;letter-spacing:-.015em;color:var(--ink)}
+.q .st{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;text-align:right}
+.q .st.no{color:var(--alarm)}
+.q .st.mid{color:#F0C04A}
+.q .st.yes{color:var(--accent)}
+
+@media (prefers-reduced-motion:no-preference){
+  .rise{opacity:0;transform:translateY(22px);animation:rise .9s cubic-bezier(.16,1,.3,1) forwards}
+  .d1{animation-delay:.1s}.d2{animation-delay:.24s}.d3{animation-delay:.38s}.d4{animation-delay:.5s}
+  @keyframes rise{to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<div class="rail"><div class="wrap">
+  <span><b style="font-weight:500">CITED</b></span>
+  <span class="lit">● engine openai</span>
+  <span>weights locked</span>
+  <span class="sp">build 2026.07.25</span>
+  <span>10:31:04 utc</span>
+</div></div>
+
+<!-- 1 · HERO -->
+<section class="hero">
+  <div class="art"></div>
+  <div class="wrap">
+    <div class="k rise d1">Citability audit · meridianskinlab.com</div>
+    <h1 class="d rise d2">Ranked on Google. <em>Invisible</em> to the engines.</h1>
+    <p class="sub rise d3">Four answer engines read this page this month. None of them quoted it.</p>
+  </div>
+  <div class="stats"><div class="wrap"><div class="row rise d4">
+    <div class="c"><div class="n">33<s>/100</s></div><div class="u">citability score</div></div>
+    <div class="c"><div class="n">2<s>&nbsp;of 5</s></div><div class="u">queries citing the page</div></div>
+    <div class="c"><div class="n bad">0</div><div class="u">GPTBot hits on this URL</div></div>
+  </div></div></div>
+</section>
+
+<!-- 2 · VERDICT -->
+<section class="verdict">
+  <div class="wrap">
+    <div>
+      <div class="num">33<s>/100</s></div>
+      <div class="stamp">Invisible</div>
+    </div>
+    <p>It makes <em>no checkable claim</em>, and nobody signs it.</p>
+  </div>
+</section>
+
+<!-- 3 · FACTORS -->
+<section class="factors">
+  <div class="wrap">
+    <div class="k">Weighted factors</div>
+    <h2 class="d">Three of them score zero.</h2>
+    <div class="f">
+      <div class="r gate"><div class="nm">Crawlability</div><div class="w">binary</div><div class="s">100</div></div>
+      <div class="r"><div class="nm">Answer-first structure</div><div class="w">24%</div><div class="s">76</div></div>
+      <div class="r"><div class="nm">Sourced quotes</div><div class="w">20%</div><div class="s z">0</div></div>
+      <div class="r"><div class="nm">Quantified specificity</div><div class="w">18%</div><div class="s z">0</div></div>
+      <div class="r"><div class="nm">Freshness</div><div class="w">14%</div><div class="s">40</div></div>
+      <div class="r"><div class="nm">Off-site authority</div><div class="w">12%</div><div class="s z">0</div></div>
+      <div class="r"><div class="nm">Fan-out coverage</div><div class="w">8%</div><div class="s">85</div></div>
+      <div class="r"><div class="nm">Google rank</div><div class="w">3%</div><div class="s">50</div></div>
+      <div class="r"><div class="nm">Structured data</div><div class="w">1%</div><div class="s">70</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 · PROOF -->
+<section class="proof">
+  <div class="halo"></div>
+  <div class="wrap">
+    <div class="k">Query Lab · live answer engine</div>
+    <div class="flip">
+      <span class="a">2</span><span class="ar">→</span><span class="b">5</span>
+      <span class="cap">of five queries, after applying the fixes.</span>
+    </div>
+    <div class="q">
+      <div class="r"><div class="t">does vitamin c serum actually work</div><div class="st yes">cited → cited</div></div>
+      <div class="r"><div class="t">how long until it shows results</div><div class="st no">absent → <span style="color:var(--accent)">cited</span></div></div>
+      <div class="r"><div class="t">how do I choose one</div><div class="st mid">paraphrased → <span style="color:var(--accent)">cited</span></div></div>
+      <div class="r"><div class="t">benefits backed by studies</div><div class="st yes">cited → cited</div></div>
+      <div class="r"><div class="t">is it worth it</div><div class="st no">absent → <span style="color:var(--accent)">cited</span></div></div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

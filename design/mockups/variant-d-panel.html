@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CITED-01 — Instrument Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  /* surfaces */
+  --bg:            #0A0A0B;
+  --panel:         #121316;
+  --well:          #08080A;
+
+  /* ink */
+  --ink:           #F2F1EE;
+  --ink-90:        rgba(242,241,238,0.90);
+
+  /* phosphor accent (ONE, held) */
+  --amber:         #E8A33D;
+  --amber-half:    rgb(114,84,40);
+  --amber-dim:     rgba(232,163,61,0.28);
+
+  /* alarm */
+  --alarm:         #FF3B3B;
+  --alarm-dim:     rgba(255,59,59,0.30);
+
+  /* structure */
+  --hair:          rgba(242,241,238,0.10);
+  --hair-soft:     rgba(242,241,238,0.06);
+
+  /* GREY IS FOR TICKS, UNITS AND AXIS LABELS ONLY */
+  --tick:          rgba(242,241,238,0.36);
+  --tick-faint:    rgba(242,241,238,0.20);
+
+  /* type */
+  --mono:          'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --display:       'Space Grotesk', system-ui, sans-serif;
+
+  --radius:        2px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html{ background:var(--bg); }
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--display);
+  font-feature-settings:"tnum" 1, "ss01" 1;
+  -webkit-font-smoothing:antialiased;
+  min-width:1280px;
+}
+
+/* ============================================================
+   MONO LABEL SYSTEM  (rack-unit tags, units, values)
+   ============================================================ */
+.m{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.m-9{ font-size:9px; }
+.m-11{ font-size:11px; }
+.m-13{ font-size:13px; letter-spacing:0.12em; }
+
+/* grey = ticks / units / axis ONLY */
+.u{
+  font-family:var(--mono);
+  font-size:9px;
+  font-weight:400;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--tick);
+}
+.alarm{ color:var(--alarm); }
+.lit{ color:var(--amber); }
+
+/* ============================================================
+   PANEL / CELL CONSTRUCTION
+   ============================================================ */
+.rack{
+  border-top:1px solid var(--hair);
+  border-bottom:1px solid var(--hair);
+  background:var(--panel);
+}
+
+.cell{
+  position:relative;
+  background:var(--panel);
+  border-right:1px solid var(--hair);
+  padding:16px 20px 18px;
+  min-width:0;
+  overflow:hidden;
+}
+.cell:last-child{ border-right:0; }
+
+.cell-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:16px;
+  height:15px;
+  margin-bottom:10px;
+}
+.cell-id{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink);
+  white-space:nowrap;
+}
+.cell-id span{ color:var(--amber); margin-right:8px; }
+
+.well{
+  position:relative;
+  background:var(--well);
+  border:1px solid var(--hair-soft);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+/* scanline + grid texture, max 0.04 */
+.well::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0.04;
+  background:
+    repeating-linear-gradient(to bottom, #F2F1EE 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(to right,  #F2F1EE 0 1px, transparent 1px 4px);
+}
+
+/* ============================================================
+   STATUS STRIP
+   ============================================================ */
+.strip{
+  height:40px;
+  display:flex;
+  align-items:center;
+  gap:0;
+  background:var(--panel);
+  border-bottom:1px solid var(--hair);
+}
+.strip-item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:0 20px;
+  height:100%;
+  border-right:1px solid var(--hair);
+  white-space:nowrap;
+}
+.strip-item:first-child{ background:var(--well); }
+.strip-spacer{ flex:1; border-right:1px solid var(--hair); height:100%; }
+
+.pip{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 7px rgba(232,163,61,0.85);
+  flex:none;
+}
+.pip.red{ background:var(--alarm); box-shadow:0 0 7px rgba(255,59,59,0.85); }
+
+/* ============================================================
+   FOLD 1 — MAIN INSTRUMENT PANEL
+   ============================================================ */
+.fold{
+  height:1027px;
+  min-height:940px;
+  display:grid;
+  grid-template-rows:40px minmax(0,1fr) 330px;
+}
+.fold-row{
+  display:grid;
+  grid-template-columns:34% minmax(0,1fr) 380px;
+  border-bottom:1px solid var(--hair);
+  min-height:0;
+}
+
+/* ---------- 01 CITABILITY ---------- */
+.gauge-cell{ display:flex; flex-direction:column; }
+.gauge-stage{
+  position:relative;
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#gauge{ width:100%; height:100%; display:block; }
+
+.gauge-readout{
+  position:absolute;
+  left:50%;
+  top:64%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  pointer-events:none;
+}
+.gauge-num{
+  font-family:var(--display);
+  font-size:232px;
+  font-weight:500;
+  line-height:0.78;
+  letter-spacing:-0.055em;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.gauge-den{
+  margin-top:12px;
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:0.16em;
+  color:var(--tick);
+}
+.grade{
+  position:absolute;
+  left:50%;
+  bottom:2px;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 14px;
+  border:1px solid var(--alarm-dim);
+  border-radius:var(--radius);
+  background:rgba(255,59,59,0.06);
+}
+.grade b{
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.22em;
+  color:var(--alarm);
+  text-shadow:0 0 12px rgba(255,59,59,0.55);
+}
+
+.url-tag{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:400;
+  letter-spacing:0.06em;
+  color:var(--ink);
+  text-transform:none;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ---------- 02 FACTOR PROFILE ---------- */
+.factor-cell{ display:flex; flex-direction:column; }
+.bars-well{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  padding:16px 18px 0;
+}
+.bars{
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+  gap:14px;
+  align-items:end;
+}
+.bar{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  height:100%;
+  min-width:0;
+}
+.bar-val{
+  font-family:var(--mono);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  text-align:center;
+  margin-bottom:8px;
+  font-variant-numeric:tabular-nums;
+}
+.bar-val.zero{ color:var(--alarm); text-shadow:0 0 10px rgba(255,59,59,0.5); }
+.bar-track{
+  position:relative;
+  flex:1;
+  width:100%;
+  max-width:54px;
+  min-height:0;
+  border:1px solid var(--hair-soft);
+  border-radius:var(--radius);
+  background:
+    repeating-linear-gradient(to bottom, rgba(242,241,238,0.05) 0 1px, transparent 1px 12px);
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+}
+.bar-fill{
+  width:100%;
+  height:100%;
+  background:var(--amber);
+  transform-origin:bottom center;
+  transform:scaleY(0);
+}
+.bar-nub{
+  width:100%;
+  height:4px;
+  background:var(--alarm);
+  box-shadow:0 0 16px rgba(255,59,59,0.85);
+}
+.redline{
+  position:absolute;
+  left:0; right:0;
+  bottom:35%;
+  z-index:2;
+  border-top:1px dashed rgba(255,59,59,0.70);
+  pointer-events:none;
+}
+.bar-abbr{
+  margin-top:9px;
+  font-family:var(--mono);
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+  color:var(--ink);
+  text-align:center;
+  white-space:nowrap;
+}
+.bar-w{
+  margin-top:4px;
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:0.10em;
+  color:var(--tick);
+  text-align:center;
+}
+.bars-axis{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 18px 0;
+}
+.gate{
+  display:flex; align-items:center; gap:8px;
+  padding:4px 10px;
+  border:1px solid var(--hair);
+  border-radius:var(--radius);
+}
+.gate b{
+  font-family:var(--mono); font-size:9px; font-weight:700;
+  letter-spacing:0.16em; color:var(--ink);
+}
+
+/* ---------- 03 RAW READOUT ---------- */
+.raw-cell{ display:flex; flex-direction:column; }
+.raw-well{ flex:1; min-height:0; display:flex; flex-direction:column; }
+.raw-row{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 20px;
+  border-bottom:1px solid var(--hair-soft);
+}
+.raw-row:last-child{ border-bottom:0; }
+.raw-key{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.raw-num{
+  font-family:var(--mono);
+  font-size:38px;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:-0.02em;
+  color:var(--amber);
+  text-shadow:0 0 16px rgba(232,163,61,0.40);
+  font-variant-numeric:tabular-nums;
+}
+.raw-num.zero{ color:var(--alarm); text-shadow:0 0 16px rgba(255,59,59,0.55); }
+.raw-num.none{ font-size:26px; color:var(--alarm); letter-spacing:0.12em; text-transform:uppercase; }
+.raw-unit{ color:var(--tick); font-size:14px; font-weight:400; letter-spacing:0.08em; }
+
+/* ---------- 04 CITATION SIGNAL ---------- */
+.scope-cell{
+  border-right:0;
+  display:flex;
+  flex-direction:column;
+  padding-bottom:14px;
+}
+.scope-well{ flex:1; min-height:0; }
+#scope{ display:block; width:100%; height:100%; }
+
+.legend{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+.legend-item{ display:flex; align-items:center; gap:7px; }
+
+/* ============================================================
+   FOLD 2 — 05 QUERY BENCH
+   ============================================================ */
+.bench{
+  display:grid;
+  grid-template-columns:34% minmax(0,1fr);
+  border-bottom:1px solid var(--hair);
+}
+.bench-compare{
+  display:flex;
+  align-items:stretch;
+  gap:0;
+  height:100%;
+}
+.big-read{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:26px 0;
+}
+.big-read + .big-read{ border-left:1px solid var(--hair); }
+.big-num{
+  font-family:var(--display);
+  font-size:118px;
+  font-weight:500;
+  line-height:0.82;
+  letter-spacing:-0.05em;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.big-num.on{
+  color:var(--amber);
+  text-shadow:0 0 44px rgba(232,163,61,0.35);
+}
+
+.q-table{ width:100%; border-collapse:collapse; }
+.q-table th{
+  font-family:var(--mono);
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--tick);
+  text-align:left;
+  padding:0 14px 10px;
+  border-bottom:1px solid var(--hair);
+}
+.q-table th.c{ text-align:center; width:110px; }
+.q-table td{
+  padding:0 14px;
+  height:52px;
+  border-bottom:1px solid var(--hair-soft);
+  vertical-align:middle;
+}
+.q-table tr:last-child td{ border-bottom:0; }
+.q-idx{
+  font-family:var(--mono); font-size:10px; font-weight:700;
+  letter-spacing:0.14em; color:var(--amber); width:44px;
+}
+.q-str{
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:400;
+  letter-spacing:0.01em;
+  color:var(--ink);
+}
+.q-lamp{ text-align:center; }
+
+.lamp{
+  display:inline-block;
+  width:11px; height:11px;
+  border-radius:50%;
+  background:rgba(242,241,238,0.16);
+  vertical-align:middle;
+}
+.lamp.half{ background:var(--amber-half); }
+.lamp.on{ background:var(--amber); box-shadow:0 0 12px rgba(232,163,61,0.9); }
+
+/* ============================================================
+   FOLD 3 — 06 CRAWL TRACE
+   ============================================================ */
+.trace-cell{ border-right:0; }
+.trace-well{ height:186px; }
+#trace{ display:block; width:100%; height:100%; }
+.trace-keys{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  margin-bottom:12px;
+}
+.trace-key{ display:flex; align-items:center; gap:9px; }
+.trace-key b{
+  font-family:var(--mono); font-size:10px; font-weight:700;
+  letter-spacing:0.16em; text-transform:uppercase; color:var(--ink);
+}
+.trace-key b.red{ color:var(--alarm); }
+
+.verdict{
+  font-family:var(--display);
+  font-size:22px;
+  font-weight:500;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  padding:18px 20px 22px;
+  border-top:1px solid var(--hair);
+}
+.verdict em{ font-style:normal; color:var(--alarm); }
+
+.footrail{
+  display:flex;
+  align-items:center;
+  height:38px;
+  background:var(--well);
+  border-top:1px solid var(--hair);
+}
+
+/* ============================================================
+   MOTION — animated when allowed, static otherwise
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference){
+  #needle{
+    transition:transform 1750ms cubic-bezier(.13,.82,.24,1.02);
+  }
+  .bar-fill{
+    transition:transform 900ms cubic-bezier(.2,.75,.2,1);
+  }
+  .lamp{ transition:background 400ms linear, box-shadow 400ms linear; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==========================================================
+     01 — 04 : MAIN INSTRUMENT PANEL (full viewport)
+     ========================================================== -->
+<section class="fold">
+
+  <!-- STATUS STRIP -->
+  <div class="strip">
+    <div class="strip-item"><span class="pip"></span><span class="m m-11">CITED-01</span></div>
+    <div class="strip-item"><span class="m">ENGINE</span><span class="m lit">OPENAI</span></div>
+    <div class="strip-item"><span class="m">WEIGHTS</span><span class="m lit">LOCKED</span></div>
+    <div class="strip-item"><span class="m">TARGET</span><span class="url-tag">meridianskinlab.com/guides/vitamin-c-serum</span></div>
+    <div class="strip-spacer"></div>
+    <div class="strip-item"><span class="pip red"></span><span class="m">GPTBOT</span><span class="m alarm">NO FETCH</span></div>
+    <div class="strip-item"><span class="u">UTC</span><span class="m m-13" id="clock">10:31:04</span></div>
+  </div>
+
+  <!-- ROW A : 01 gauge | 02 factors | 03 raw -->
+  <div class="fold-row">
+
+    <!-- 01 CITABILITY -->
+    <div class="cell gauge-cell">
+      <div class="cell-head">
+        <div class="cell-id"><span>01</span>CITABILITY</div>
+        <div class="u">ARC 0&ndash;100 &middot; REDLINE &lt;35</div>
+      </div>
+      <div class="well gauge-stage">
+        <svg id="gauge" viewBox="0 0 600 486" preserveAspectRatio="xMidYMid meet" aria-label="Citability 33 of 100"></svg>
+        <div class="gauge-readout">
+          <div class="gauge-num">33</div>
+          <div class="gauge-den">SCORE / 100</div>
+        </div>
+        <div class="grade"><span class="pip red"></span><b>INVISIBLE</b></div>
+      </div>
+    </div>
+
+    <!-- 02 FACTOR PROFILE -->
+    <div class="cell factor-cell">
+      <div class="cell-head">
+        <div class="cell-id"><span>02</span>FACTOR PROFILE</div>
+        <div class="gate"><span class="pip"></span><b>GATE CRAWLABILITY 100</b></div>
+      </div>
+      <div class="well bars-well">
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="bars-axis">
+        <span class="u">SCORE 0&ndash;100</span>
+        <span class="u alarm">&mdash;&mdash; REDLINE 35</span>
+        <span class="u">WEIGHT %</span>
+      </div>
+    </div>
+
+    <!-- 03 RAW READOUT -->
+    <div class="cell raw-cell">
+      <div class="cell-head">
+        <div class="cell-id"><span>03</span>RAW READOUT</div>
+        <div class="u">EXTRACTED</div>
+      </div>
+      <div class="well raw-well">
+        <div class="raw-row"><span class="raw-key">WORDS</span><span class="raw-num">235</span></div>
+        <div class="raw-row"><span class="raw-key">QUOTES</span><span class="raw-num zero">0</span></div>
+        <div class="raw-row"><span class="raw-key">STATS</span><span class="raw-num zero">0</span></div>
+        <div class="raw-row"><span class="raw-key">AGE</span><span class="raw-num">314<span class="raw-unit">d</span></span></div>
+        <div class="raw-row"><span class="raw-key">AUTHOR</span><span class="raw-num none">none</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW B : 04 oscilloscope -->
+  <div class="cell scope-cell">
+    <div class="cell-head">
+      <div class="cell-id"><span>04</span>CITATION SIGNAL</div>
+      <div class="legend">
+        <span class="legend-item"><span class="pip"></span><span class="m m-9">SPIKE = CITED</span></span>
+        <span class="legend-item"><span class="m m-9">EVENTS</span><span class="m m-9 lit">2 / 5</span></span>
+        <span class="u">SWEEP 30 S/DIV &middot; GAIN 1.0</span>
+      </div>
+    </div>
+    <div class="well scope-well">
+      <canvas id="scope"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     05 : QUERY BENCH
+     ========================================================== -->
+<section class="bench">
+
+  <div class="cell">
+    <div class="cell-head">
+      <div class="cell-id"><span>05</span>QUERY BENCH</div>
+      <div class="u">N = 5</div>
+    </div>
+    <div class="well" style="height:calc(100% - 25px);">
+      <div class="bench-compare">
+        <div class="big-read">
+          <div class="big-num">2/5</div>
+          <div class="m m-9">BEFORE</div>
+        </div>
+        <div class="big-read">
+          <div class="big-num on">5/5</div>
+          <div class="m m-9 lit">AFTER</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <div class="cell-head">
+      <div class="cell-id">CITATION MATRIX</div>
+      <div class="legend">
+        <span class="legend-item"><span class="lamp"></span><span class="u">ABSENT</span></span>
+        <span class="legend-item"><span class="lamp half"></span><span class="u">PARAPHRASED</span></span>
+        <span class="legend-item"><span class="lamp on"></span><span class="u">CITED</span></span>
+      </div>
+    </div>
+    <div class="well" style="padding:14px 6px;">
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th style="width:44px;">ID</th>
+            <th>QUERY</th>
+            <th class="c">BEFORE</th>
+            <th class="c">AFTER</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="q-idx">Q1</td>
+            <td class="q-str">best vitamin c serum for sensitive skin</td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+          </tr>
+          <tr>
+            <td class="q-idx">Q2</td>
+            <td class="q-str">what vitamin c percentage for beginners</td>
+            <td class="q-lamp"><span class="lamp half"></span></td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+          </tr>
+          <tr>
+            <td class="q-idx">Q3</td>
+            <td class="q-str">does vitamin c serum cause irritation</td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+          </tr>
+          <tr>
+            <td class="q-idx">Q4</td>
+            <td class="q-str">how to layer vitamin c with retinol</td>
+            <td class="q-lamp"><span class="lamp"></span></td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+          </tr>
+          <tr>
+            <td class="q-idx">Q5</td>
+            <td class="q-str">vitamin c serum vs niacinamide</td>
+            <td class="q-lamp"><span class="lamp"></span></td>
+            <td class="q-lamp"><span class="lamp on"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================
+     06 : CRAWL TRACE
+     ========================================================== -->
+<section class="rack" style="border-top:0;">
+  <div class="cell trace-cell">
+    <div class="cell-head">
+      <div class="cell-id"><span>06</span>CRAWL TRACE</div>
+      <div class="u">WINDOW 30 D &middot; 1 MARK = 1 FETCH</div>
+    </div>
+    <div class="trace-keys">
+      <span class="trace-key"><span class="pip"></span><b>ALL BOTS / DOMAIN / 1,284 EVENTS</b></span>
+      <span class="trace-key"><span class="pip red"></span><b class="red">GPTBOT / THIS URL / 0 EVENTS</b></span>
+    </div>
+    <div class="well trace-well">
+      <canvas id="trace"></canvas>
+    </div>
+  </div>
+  <div class="verdict">GPTBot has never fetched this URL.</div>
+  <div class="footrail">
+    <div class="strip-item" style="border-left:0;"><span class="m m-9">CITED-01</span></div>
+    <div class="strip-item"><span class="m m-9">SCORE 33</span></div>
+    <div class="strip-item"><span class="m m-9 alarm">GRADE INVISIBLE</span></div>
+    <div class="strip-item"><span class="m m-9">BENCH 2/5 &rarr; <span class="lit">5/5</span></span></div>
+    <div class="strip-spacer"></div>
+    <div class="strip-item"><span class="u">WEIGHTS V1 &middot; SHA 4F1C</span></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+
+  var MOTION = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+  /* ---------------------------------------------------------
+     01 — ARC GAUGE (SVG)
+     angle(v) = -130 + 260 * v/100 ; 0 = bottom-left, 100 = bottom-right
+     --------------------------------------------------------- */
+  var SCORE = 33, CX = 300, CY = 330, R = 214;
+
+  function ang(v){ return -130 + 260 * (v / 100); }
+  function pt(v, r){
+    var a = ang(v) * Math.PI / 180;
+    return [CX + r * Math.sin(a), CY - r * Math.cos(a)];
+  }
+  function arcPath(v0, v1, r){
+    var p0 = pt(v0, r), p1 = pt(v1, r);
+    var large = Math.abs(ang(v1) - ang(v0)) > 180 ? 1 : 0;
+    return "M " + p0[0].toFixed(2) + " " + p0[1].toFixed(2) +
+           " A " + r + " " + r + " 0 " + large + " 1 " + p1[0].toFixed(2) + " " + p1[1].toFixed(2);
+  }
+  function el(tag, attrs){
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  var g = document.getElementById("gauge");
+
+  // outer bezel ring
+  g.appendChild(el("circle", { cx:CX, cy:CY, r:R + 30, fill:"none",
+    stroke:"rgba(242,241,238,0.06)", "stroke-width":1 }));
+
+  // track
+  g.appendChild(el("path", { d:arcPath(0, 100, R), fill:"none",
+    stroke:"rgba(242,241,238,0.12)", "stroke-width":16, "stroke-linecap":"butt" }));
+
+  // redline zone 0 - 35
+  g.appendChild(el("path", { d:arcPath(0, 35, R), fill:"none",
+    stroke:"rgba(255,59,59,0.22)", "stroke-width":16 }));
+  g.appendChild(el("path", { d:arcPath(0, 35, R + 14), fill:"none",
+    stroke:"rgba(255,59,59,0.55)", "stroke-width":3 }));
+
+  // measured value arc 0 -> 33 (inside redline => alarm)
+  g.appendChild(el("path", { d:arcPath(0, SCORE, R), fill:"none",
+    stroke:"#FF3B3B", "stroke-width":16 }));
+
+  // minor ticks every 2, major every 10
+  for (var v = 0; v <= 100; v += 2){
+    var major = v % 10 === 0;
+    var a = pt(v, R - 12), b = pt(v, R - (major ? 30 : 21));
+    g.appendChild(el("line", {
+      x1:a[0].toFixed(2), y1:a[1].toFixed(2), x2:b[0].toFixed(2), y2:b[1].toFixed(2),
+      stroke: major ? "rgba(242,241,238,0.55)" : "rgba(242,241,238,0.20)",
+      "stroke-width": major ? 2 : 1
+    }));
+  }
+
+  // tick numerals (grey — axis labels)
+  [0,20,40,60,80,100].forEach(function(v){
+    var p = pt(v, R - 47);
+    var t = el("text", {
+      x:p[0].toFixed(2), y:(p[1] + 4).toFixed(2),
+      "text-anchor":"middle", fill:"rgba(242,241,238,0.36)",
+      "font-family":"'JetBrains Mono', monospace", "font-size":"15",
+      "letter-spacing":"1.4"
+    });
+    t.textContent = v;
+    g.appendChild(t);
+  });
+
+  /* Rim-anchored index blade: sits on the bezel and tapers inward, stopping
+     well short of the 232px numeral so the readout is never crossed. */
+  var rOut = CY - R - 10, rIn = CY - Math.round(R * 0.60);
+  var needle = el("g", { id:"needle", transform:"rotate(" + ang(SCORE).toFixed(2) + " " + CX + " " + CY + ")" });
+
+  needle.appendChild(el("path", {
+    d:"M " + (CX - 6.5) + " " + rOut +
+      " L " + (CX + 6.5) + " " + rOut +
+      " L " + CX + " " + rIn + " Z",
+    fill:"#F2F1EE"
+  }));
+  needle.appendChild(el("path", {
+    d:"M " + (CX - 6.5) + " " + rOut +
+      " L " + (CX + 6.5) + " " + rOut +
+      " L " + (CX + 4.6) + " " + (rOut + 42) +
+      " L " + (CX - 4.6) + " " + (rOut + 42) + " Z",
+    fill:"#FF3B3B"
+  }));
+  // bezel bug marker riding with the blade
+  needle.appendChild(el("rect", {
+    x:CX - 1.2, y:rOut - 16, width:2.4, height:14, fill:"#FF3B3B"
+  }));
+  g.appendChild(needle);
+
+  if (MOTION){
+    needle.setAttribute("transform", "rotate(" + ang(0).toFixed(2) + " " + CX + " " + CY + ")");
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        needle.setAttribute("transform", "rotate(" + ang(SCORE).toFixed(2) + " " + CX + " " + CY + ")");
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------
+     02 — EIGHT VERTICAL BAR GAUGES
+     --------------------------------------------------------- */
+  var FACTORS = [
+    ["A-FIRST",  76, "24%"],
+    ["QUOTES",    0, "20%"],
+    ["STATS",     0, "18%"],
+    ["FRESH",    40, "14%"],
+    ["AUTH",      0, "12%"],
+    ["FANOUT",   85,  "8%"],
+    ["RANK",     50,  "3%"],
+    ["SCHEMA",   70,  "1%"]
+  ];
+
+  var barsHost = document.getElementById("bars"), fills = [];
+  FACTORS.forEach(function(f){
+    var zero = f[1] === 0;
+    var wrap = document.createElement("div");
+    wrap.className = "bar";
+    wrap.innerHTML =
+      '<div class="bar-val' + (zero ? ' zero' : '') + '">' + f[1] + '</div>' +
+      '<div class="bar-track"><div class="redline"></div>' +
+        (zero ? '<div class="bar-nub"></div>' : '<div class="bar-fill"></div>') +
+      '</div>' +
+      '<div class="bar-abbr">' + f[0] + '</div>' +
+      '<div class="bar-w">' + f[2] + '</div>';
+    barsHost.appendChild(wrap);
+    var fill = wrap.querySelector(".bar-fill");
+    if (fill){
+      var s = (f[1] / 100).toFixed(3);
+      fill.style.transform = "scaleY(" + s + ")";
+      fills.push([fill, s]);
+    }
+  });
+
+  if (MOTION){
+    fills.forEach(function(p){ p[0].style.transform = "scaleY(0)"; });
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        fills.forEach(function(p, i){
+          p[0].style.transitionDelay = (70 * i) + "ms";
+          p[0].style.transform = "scaleY(" + p[1] + ")";
+        });
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------
+     canvas helper (device pixel ratio)
+     --------------------------------------------------------- */
+  function fit(cv){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    cv.width  = Math.max(1, Math.round(w * dpr));
+    cv.height = Math.max(1, Math.round(h * dpr));
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx:ctx, w:w, h:h };
+  }
+
+  /* ---------------------------------------------------------
+     04 — OSCILLOSCOPE / CITATION SIGNAL
+     mostly flat, two spikes = 2 of 5 queries citing
+     --------------------------------------------------------- */
+  var scope = document.getElementById("scope");
+  var PERIOD = 1180, SPIKE_A = 380, SPIKE_B = 812;
+
+  function signal(t){
+    var base = 0.045 * Math.sin(t * 0.031) + 0.028 * Math.sin(t * 0.097 + 1.3)
+             + 0.016 * Math.sin(t * 0.23 + 0.4);
+    var m = ((t % PERIOD) + PERIOD) % PERIOD, s = 0;
+    [SPIKE_A, SPIKE_B].forEach(function(c){
+      var d = m - c;
+      if (d > PERIOD / 2) d -= PERIOD;
+      if (d < -PERIOD / 2) d += PERIOD;
+      s += 0.86 * Math.exp(-(d * d) / (2 * 13 * 13));
+      s -= 0.20 * Math.exp(-((d - 26) * (d - 26)) / (2 * 16 * 16));
+    });
+    return base + s;
+  }
+
+  function drawScope(offset){
+    var m = fit(scope), ctx = m.ctx, w = m.w, h = m.h;
+    var mid = h * 0.62;
+    ctx.clearRect(0, 0, w, h);
+
+    // graticule
+    ctx.strokeStyle = "rgba(242,241,238,0.055)";
+    ctx.lineWidth = 1;
+    for (var x = 0; x <= w; x += w / 20){
+      ctx.beginPath(); ctx.moveTo(Math.round(x) + .5, 0); ctx.lineTo(Math.round(x) + .5, h); ctx.stroke();
+    }
+    for (var y = 0; y <= h; y += h / 6){
+      ctx.beginPath(); ctx.moveTo(0, Math.round(y) + .5); ctx.lineTo(w, Math.round(y) + .5); ctx.stroke();
+    }
+    // zero baseline
+    ctx.strokeStyle = "rgba(242,241,238,0.16)";
+    ctx.beginPath(); ctx.moveTo(0, mid + .5); ctx.lineTo(w, mid + .5); ctx.stroke();
+
+    // trace — one signal period spans the window, so exactly 2 spikes are lit
+    var amp = h * 0.50, upp = PERIOD / w;
+    function path(){
+      ctx.beginPath();
+      for (var px = 0; px <= w; px++){
+        var yv = mid - signal(px * upp + offset) * amp;
+        if (px === 0) ctx.moveTo(px, yv); else ctx.lineTo(px, yv);
+      }
+    }
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(232,163,61,0.22)"; ctx.lineWidth = 6; path(); ctx.stroke();
+    ctx.strokeStyle = "#E8A33D";              ctx.lineWidth = 1.6; path(); ctx.stroke();
+
+    // spike tags
+    ctx.font = "500 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "rgba(242,241,238,0.90)";
+    [[SPIKE_A, "Q1"], [SPIKE_B, "Q3"]].forEach(function(sp){
+      var m2 = ((sp[0] - offset) % PERIOD + PERIOD) % PERIOD;
+      var px = m2 / upp;
+      if (px < 8 || px > w - 26) return;
+      var yv = mid - signal(px * upp + offset) * amp;
+      ctx.fillText(sp[1], px + 9, yv + 3);
+    });
+
+    // axis labels (grey)
+    ctx.font = "400 9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "rgba(242,241,238,0.34)";
+    ctx.fillText("0", 8, mid - 8);
+    ctx.fillText("+1.0", 8, 16);
+    ctx.fillText("T-30", 8, h - 8);
+    ctx.textAlign = "right";
+    ctx.fillText("T-0", w - 8, h - 8);
+    ctx.textAlign = "left";
+  }
+
+  var off = 0, running = MOTION;
+  function loop(){
+    off += 1.15;
+    drawScope(off);
+    if (running) requestAnimationFrame(loop);
+  }
+
+  /* ---------------------------------------------------------
+     06 — CRAWL TRACE (30 days, two lanes)
+     --------------------------------------------------------- */
+  function rnd(seed){ var x = Math.sin(seed * 12.9898) * 43758.5453; return x - Math.floor(x); }
+
+  function drawTrace(){
+    var cv = document.getElementById("trace");
+    var m = fit(cv), ctx = m.ctx, w = m.w, h = m.h;
+    var padL = 20, padR = 20, plotW = w - padL - padR;
+    var laneA = h * 0.34, laneB = h * 0.70;
+    ctx.clearRect(0, 0, w, h);
+
+    // day gridlines
+    ctx.strokeStyle = "rgba(242,241,238,0.055)";
+    ctx.lineWidth = 1;
+    for (var d = 0; d <= 30; d++){
+      var x = Math.round(padL + plotW * d / 30) + .5;
+      ctx.beginPath(); ctx.moveTo(x, 14); ctx.lineTo(x, h - 22); ctx.stroke();
+    }
+
+    // lane A rail
+    ctx.strokeStyle = "rgba(242,241,238,0.12)";
+    ctx.beginPath(); ctx.moveTo(padL, laneA + .5); ctx.lineTo(w - padR, laneA + .5); ctx.stroke();
+
+    // lane A marks — dense domain traffic
+    for (var i = 0; i < 30; i++){
+      var n = 4 + Math.floor(rnd(i + 3) * 7);
+      for (var k = 0; k < n; k++){
+        var xx = padL + plotW * (i + rnd(i * 31 + k * 7 + 1)) / 30;
+        var yy = laneA + (rnd(i * 17 + k * 3 + 5) - 0.5) * 22;
+        var r = 1.3 + rnd(i * 5 + k) * 1.5;
+        ctx.fillStyle = "rgba(232,163,61," + (0.42 + rnd(i + k * 2) * 0.52).toFixed(2) + ")";
+        ctx.beginPath(); ctx.arc(xx, yy, r, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // lane B rail — empty, red dashed
+    ctx.save();
+    ctx.setLineDash([5, 6]);
+    ctx.strokeStyle = "rgba(255,59,59,0.65)";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(padL, laneB + .5); ctx.lineTo(w - padR, laneB + .5); ctx.stroke();
+    ctx.restore();
+
+    // lane tags
+    ctx.font = "700 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "rgba(242,241,238,0.90)";
+    ctx.fillText("ALL BOTS / DOMAIN", padL + 2, 12);
+    ctx.fillStyle = "#FF3B3B";
+    ctx.fillText("GPTBOT / THIS URL", padL + 2, laneB - 12);
+
+    // counts, right aligned
+    ctx.textAlign = "right";
+    ctx.fillStyle = "rgba(242,241,238,0.90)";
+    ctx.fillText("1,284", w - padR - 2, 12);
+    ctx.fillStyle = "#FF3B3B";
+    ctx.fillText("0", w - padR - 2, laneB - 12);
+    ctx.textAlign = "left";
+
+    // day axis (grey)
+    ctx.font = "400 9px 'JetBrains Mono', monospace";
+    ctx.fillStyle = "rgba(242,241,238,0.34)";
+    for (var dd = 0; dd <= 30; dd += 5){
+      var lx = padL + plotW * dd / 30;
+      ctx.fillText("D-" + (30 - dd), lx + 3, h - 8);
+    }
+  }
+
+  /* ---------------------------------------------------------
+     live UTC clock
+     --------------------------------------------------------- */
+  var clock = document.getElementById("clock");
+  function tick(){
+    var d = new Date();
+    function p(n){ return (n < 10 ? "0" : "") + n; }
+    clock.textContent = p(d.getUTCHours()) + ":" + p(d.getUTCMinutes()) + ":" + p(d.getUTCSeconds());
+  }
+
+  /* ---------------------------------------------------------
+     boot
+     --------------------------------------------------------- */
+  function render(){ drawScope(off); drawTrace(); }
+  window.addEventListener("resize", render);
+  render();
+  tick();
+  setInterval(tick, 1000);
+  if (MOTION) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CITED — AUDIT LEDGER — meridianskinlab.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CITED — VARIANT B — TECHNICAL BRUTALIST LEDGER
+   ============================================================ */
+
+:root{
+  /* surfaces */
+  --bg:            #050505;
+  --bg-band:       #080808;
+  --rule:          #1e1e1e;
+  --rule-soft:     #141414;
+
+  /* ink */
+  --ink:           #ECEBE7;
+  --ink-dim:       #8f8d88;   /* dates, units, citations, column headers ONLY */
+
+  /* signal */
+  --blue:          #2196F3;
+  --red:           #FF3B3B;
+
+  /* type */
+  --display:       'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --body:          'Barlow', system-ui, sans-serif;
+  --mono:          'IBM Plex Mono', ui-monospace, monospace;
+
+  /* metrics */
+  --maxw:          1400px;
+  --pad:           48px;
+  --gutter:        max(var(--pad), calc((100vw - var(--maxw)) / 2 + var(--pad)));
+  --bar-h:         36px;
+
+  /* scale */
+  --fs-hero:       178px;
+  --fs-verdict:    320px;
+  --fs-proof:      224px;
+  --fs-factor:     46px;
+  --fs-score:      88px;
+  --fs-stat:       84px;
+  --fs-mono:       11px;
+  --fs-mono-sm:    10px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; border-radius:0; }
+
+html{ background:var(--bg); }
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* ---------- primitives ---------- */
+
+.mono{
+  font-family:var(--mono);
+  font-size:var(--fs-mono);
+  font-weight:500;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.mono-sm{
+  font-family:var(--mono);
+  font-size:var(--fs-mono-sm);
+  font-weight:400;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.meta{ color:var(--ink-dim); }        /* dates / units / sources / col headers */
+.red{ color:var(--red); }
+.blue{ color:var(--blue); }
+
+.display{
+  font-family:var(--display);
+  font-weight:700;
+  font-style:italic;
+  text-transform:uppercase;
+  letter-spacing:-0.025em;
+  line-height:0.88;
+}
+
+.rule{
+  border-top:1px solid var(--rule);
+  width:100%;
+}
+
+.band{ background:var(--bg); }
+.band--alt{ background:var(--bg-band); }
+
+.wrap{
+  padding-left:var(--gutter);
+  padding-right:var(--gutter);
+}
+
+.btn{
+  height:40px;
+  padding:0 20px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--mono);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  border:1px solid var(--ink);
+  background:transparent;
+  color:var(--ink);
+  cursor:pointer;
+  text-decoration:none;
+}
+.btn--primary{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#04121e;
+  font-weight:500;
+}
+
+/* ============================================================
+   STATUS BAR
+   ============================================================ */
+
+.statusbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  height:var(--bar-h);
+  display:flex;
+  align-items:center;
+  gap:28px;
+  background:var(--bg);
+  border-bottom:1px solid var(--rule);
+  padding-left:var(--gutter);
+  padding-right:var(--gutter);
+  white-space:nowrap;
+  overflow:hidden;
+}
+.statusbar .dot{
+  width:6px; height:6px;
+  background:var(--red);
+  flex:none;
+}
+.statusbar .spacer{ margin-left:auto; }
+
+/* ============================================================
+   1 — HERO
+   ============================================================ */
+
+.hero{
+  min-height:calc(100vh - var(--bar-h));
+  display:grid;
+  grid-template-columns:minmax(0,44%) minmax(0,56%);
+  border-bottom:1px solid var(--rule);
+}
+
+.hero__left{
+  padding:56px var(--pad) 40px var(--gutter);
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid var(--rule);
+}
+
+.kicker{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-bottom:34px;
+}
+.kicker__url{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.6px;
+  color:var(--ink);
+  word-break:break-all;
+}
+
+.headline{
+  font-size:var(--fs-hero);
+  margin-left:-0.045em;
+}
+
+.lede{
+  font-family:var(--body);
+  font-size:19px;
+  font-weight:500;
+  line-height:1.35;
+  color:var(--ink);
+  max-width:30ch;
+  padding-top:26px;
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+  padding-top:30px;
+}
+
+.stats{
+  margin-top:auto;
+  padding-top:44px;
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  border-top:1px solid var(--rule);
+}
+.stat{
+  padding:22px 16px 0 0;
+}
+.stat__n{
+  font-size:var(--fs-stat);
+  display:block;
+  margin-left:-0.03em;
+}
+.stat__c{
+  display:block;
+  padding-top:8px;
+}
+
+/* ---- canvas panel ---- */
+
+.hero__vis{
+  position:relative;
+  min-height:520px;
+  background:
+    linear-gradient(180deg, #060606 0%, #040404 100%);
+}
+#net{ display:block; width:100%; height:100%; }
+
+.vis__tag{
+  position:absolute;
+  top:22px;
+  left:26px;
+  display:flex;
+  gap:18px;
+}
+.vis__legend{
+  position:absolute;
+  bottom:22px;
+  left:26px;
+  right:26px;
+  display:flex;
+  gap:34px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+}
+.legend__item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.legend__swatch{
+  width:9px; height:9px;
+  flex:none;
+  border:1px solid var(--ink);
+  background:var(--ink);
+}
+.legend__swatch--dim{
+  background:transparent;
+  border-color:var(--red);
+}
+.vis__bots{
+  margin-left:auto;
+  text-align:right;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+/* ============================================================
+   2 — VERDICT
+   ============================================================ */
+
+.verdict{
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--rule);
+  padding:64px 0 56px;
+}
+.verdict__grid{
+  display:grid;
+  grid-template-columns:minmax(0,32%) minmax(0,68%);
+  align-items:center;
+  padding-right:var(--gutter);
+}
+.verdict__num{
+  font-size:var(--fs-verdict);
+  line-height:0.76;
+  margin-left:-0.075em;
+  color:var(--ink);
+}
+.verdict__num sup{
+  font-size:0.16em;
+  vertical-align:top;
+  font-family:var(--mono);
+  font-style:normal;
+  font-weight:500;
+  letter-spacing:1.1px;
+  color:var(--ink);
+  top:0.9em;
+  position:relative;
+  left:0.4em;
+}
+.verdict__right{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  border-left:1px solid var(--rule);
+  padding-left:48px;
+}
+.verdict__grade{
+  font-size:112px;
+  color:var(--red);
+}
+.verdict__line{
+  font-family:var(--body);
+  font-size:22px;
+  font-weight:500;
+  line-height:1.3;
+  color:var(--ink);
+  max-width:34ch;
+}
+
+/* ============================================================
+   3 — FACTORS
+   ============================================================ */
+
+.section-head{
+  display:flex;
+  align-items:baseline;
+  gap:26px;
+  padding:26px 0 22px;
+}
+
+.factors{ border-bottom:1px solid var(--rule); padding-bottom:8px; }
+
+.frow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 190px 200px;
+  align-items:center;
+  gap:24px;
+  border-top:1px solid var(--rule);
+  padding:14px 0 12px;
+  position:relative;
+}
+.frow__name{
+  font-size:var(--fs-factor);
+  color:var(--ink);
+}
+.frow__w{
+  justify-self:start;
+}
+.frow__score{
+  font-size:var(--fs-score);
+  text-align:right;
+  justify-self:end;
+  line-height:0.82;
+}
+.frow--zero .frow__name,
+.frow--zero .frow__score{ color:var(--red); }
+
+.meter{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:2px;
+  background:var(--rule-soft);
+}
+.meter__fill{
+  display:block;
+  height:2px;
+  background:var(--ink);
+}
+.frow--zero .meter__fill{ background:var(--red); }
+
+/* ============================================================
+   4 — PROOF
+   ============================================================ */
+
+.proof{ padding-bottom:72px; }
+
+.proof__figures{
+  display:flex;
+  align-items:center;
+  gap:44px;
+  padding:16px 0 8px;
+}
+.proof__n{
+  font-size:var(--fs-proof);
+  line-height:0.8;
+}
+.proof__arrow{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:104px;
+  line-height:0.7;
+  color:var(--ink);
+}
+.proof__den{
+  font-size:0.42em;
+  letter-spacing:-0.02em;
+}
+.proof__caps{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-left:1px solid var(--rule);
+  padding:6px 0 6px 24px;
+  margin-left:8px;
+}
+
+.qtable{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:34px;
+  table-layout:fixed;
+}
+.qtable th{
+  text-align:left;
+  font-family:var(--mono);
+  font-size:var(--fs-mono-sm);
+  font-weight:400;
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  color:var(--ink-dim);
+  padding:0 0 12px;
+  border-bottom:1px solid var(--rule);
+}
+.qtable th:nth-child(2),
+.qtable th:nth-child(3){ width:210px; }
+.qtable td{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:0.7px;
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:15px 0;
+  border-bottom:1px solid var(--rule);
+  vertical-align:middle;
+}
+.qtable td:first-child{ padding-right:32px; }
+.badge{
+  display:inline-block;
+  border:1px solid var(--rule);
+  padding:5px 10px;
+  font-family:var(--mono);
+  font-size:var(--fs-mono-sm);
+  letter-spacing:1.1px;
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.badge--absent{ border-color:var(--red); color:var(--red); }
+.badge--cited{ border-color:var(--ink); background:var(--ink); color:#050505; }
+
+.footline{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  padding:34px 0 0;
+  border-top:1px solid var(--rule);
+  margin-top:44px;
+  flex-wrap:wrap;
+}
+
+/* ============================================================
+   MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: no-preference){
+  .pulse{ animation:blink 2.4s steps(2, jump-none) infinite; }
+  @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.25} }
+}
+
+/* ============================================================
+   NARROW FALLBACK
+   ============================================================ */
+
+@media (max-width:1180px){
+  :root{ --fs-hero:104px; --fs-verdict:190px; --fs-proof:140px;
+         --fs-factor:34px; --fs-score:58px; --fs-stat:56px; }
+  .hero{ grid-template-columns:1fr; }
+  .hero__left{ border-right:0; border-bottom:1px solid var(--rule); }
+  .hero__vis{ min-height:460px; }
+  .verdict__grid{ grid-template-columns:1fr; gap:32px; }
+  .verdict__right{ border-left:0; padding-left:0; }
+  .frow{ grid-template-columns:minmax(0,1fr) 120px; }
+  .frow__w{ grid-column:1; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ STATUS BAR ============================ -->
+<div class="statusbar mono-sm">
+  <span class="dot pulse"></span>
+  <span>SYS:CITED-01</span>
+  <span>ENGINE_OPENAI</span>
+  <span>WEIGHTS_LOCKED</span>
+  <span>BUILD 2026.07.25</span>
+  <span class="spacer">AUDIT_ID 0xB7F3</span>
+  <span class="meta" id="clock">10:31:04 UTC</span>
+</div>
+
+<!-- ============================ 1 — HERO ============================ -->
+<section class="hero">
+
+  <div class="hero__left">
+    <div class="kicker">
+      <span class="mono-sm">TARGET / SINGLE URL / RUN 001</span>
+      <span class="kicker__url">meridianskinlab.com/guides/vitamin-c-serum</span>
+    </div>
+
+    <h1 class="display headline">NEVER<br><span class="blue">CITED</span></h1>
+
+    <p class="lede">GPTBot has never fetched this page. Nine weighted factors explain why.</p>
+
+    <div class="actions">
+      <a class="btn btn--primary" href="#">RUN FIX PLAN</a>
+      <a class="btn" href="#">EXPORT LEDGER</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="display stat__n">33<span class="mono-sm meta">/100</span></span>
+        <span class="mono-sm stat__c">CITED SCORE</span>
+      </div>
+      <div class="stat">
+        <span class="display stat__n">2<span class="mono-sm meta">/5</span></span>
+        <span class="mono-sm stat__c">QUERIES CITED</span>
+      </div>
+      <div class="stat">
+        <span class="display stat__n red">0</span>
+        <span class="mono-sm stat__c">GPTBOT HITS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__vis">
+    <canvas id="net"></canvas>
+
+    <div class="vis__tag">
+      <span class="mono-sm">CITATION GRAPH</span>
+      <span class="mono-sm meta">QUERY SET N=5</span>
+    </div>
+
+    <div class="vis__legend">
+      <span class="legend__item mono-sm"><i class="legend__swatch"></i>COMPETING SOURCES</span>
+      <span class="legend__item mono-sm"><i class="legend__swatch legend__swatch--dim"></i>THIS PAGE</span>
+      <span class="vis__bots">
+        <span class="mono-sm">GPTBOT <span class="red">NEVER VISITED</span></span>
+        <span class="mono-sm">1,284 DOMAIN HITS <span class="meta">/ 30D</span></span>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 2 — VERDICT ============================ -->
+<section class="band--alt verdict">
+  <div class="verdict__grid">
+    <div class="display verdict__num">33<sup>/100</sup></div>
+    <div class="verdict__right">
+      <div class="display verdict__grade">INVISIBLE</div>
+      <p class="verdict__line">Three factors score zero, so every answer engine skips this page entirely.</p>
+      <span class="mono-sm meta">GRADE BANDS &nbsp;0–39 INVISIBLE &nbsp;40–69 PARTIAL &nbsp;70–100 CITED</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 3 — FACTORS ============================ -->
+<section class="band wrap factors">
+  <div class="section-head">
+    <span class="mono">WEIGHTED LEDGER</span>
+    <span class="mono-sm meta">9 FACTORS / 1 GATE / SUM 100%</span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">CRAWLABILITY</div>
+    <div class="mono-sm frow__w">BINARY GATE</div>
+    <div class="display frow__score">100</div>
+    <span class="meter"><i class="meter__fill" style="width:100%"></i></span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">ANSWER-FIRST STRUCTURE</div>
+    <div class="mono-sm frow__w">WEIGHT 24%</div>
+    <div class="display frow__score">76</div>
+    <span class="meter"><i class="meter__fill" style="width:76%"></i></span>
+  </div>
+
+  <div class="frow frow--zero">
+    <div class="display frow__name">SOURCED QUOTES</div>
+    <div class="mono-sm frow__w">WEIGHT 20%</div>
+    <div class="display frow__score">0</div>
+    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  </div>
+
+  <div class="frow frow--zero">
+    <div class="display frow__name">QUANTIFIED SPECIFICITY</div>
+    <div class="mono-sm frow__w">WEIGHT 18%</div>
+    <div class="display frow__score">0</div>
+    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">FRESHNESS</div>
+    <div class="mono-sm frow__w">WEIGHT 14%</div>
+    <div class="display frow__score">40</div>
+    <span class="meter"><i class="meter__fill" style="width:40%"></i></span>
+  </div>
+
+  <div class="frow frow--zero">
+    <div class="display frow__name">OFF-SITE AUTHORITY</div>
+    <div class="mono-sm frow__w">WEIGHT 12%</div>
+    <div class="display frow__score">0</div>
+    <span class="meter"><i class="meter__fill" style="width:1.5%"></i></span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">FAN-OUT COVERAGE</div>
+    <div class="mono-sm frow__w">WEIGHT 8%</div>
+    <div class="display frow__score">85</div>
+    <span class="meter"><i class="meter__fill" style="width:85%"></i></span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">GOOGLE RANK</div>
+    <div class="mono-sm frow__w">WEIGHT 3%</div>
+    <div class="display frow__score">50</div>
+    <span class="meter"><i class="meter__fill" style="width:50%"></i></span>
+  </div>
+
+  <div class="frow">
+    <div class="display frow__name">STRUCTURED DATA</div>
+    <div class="mono-sm frow__w">WEIGHT 1%</div>
+    <div class="display frow__score">70</div>
+    <span class="meter"><i class="meter__fill" style="width:70%"></i></span>
+  </div>
+</section>
+
+<!-- ============================ 4 — PROOF ============================ -->
+<section class="band--alt wrap proof">
+  <div class="section-head">
+    <span class="mono">QUERY LAB / CITATION DELTA</span>
+    <span class="mono-sm meta">BEFORE VS AFTER FIXES</span>
+  </div>
+
+  <div class="proof__figures">
+    <span class="display proof__n">2</span>
+    <span class="proof__arrow">&rarr;</span>
+    <span class="display proof__n">5<span class="proof__den">/5</span></span>
+    <span class="proof__caps">
+      <span class="mono-sm">BEFORE 2 OF 5 CITED</span>
+      <span class="mono-sm">AFTER 5 OF 5 CITED</span>
+      <span class="mono-sm meta">SAME PAGE / 9 FIXES APPLIED</span>
+    </span>
+  </div>
+
+  <table class="qtable">
+    <thead>
+      <tr>
+        <th>STRATEGIC QUERY</th>
+        <th>BEFORE</th>
+        <th>AFTER</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>BEST VITAMIN C SERUM FOR SENSITIVE SKIN</td>
+        <td><span class="badge badge--absent">ABSENT</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>DOES 10% VITAMIN C ACTUALLY WORK</td>
+        <td><span class="badge badge--cited">CITED</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>VITAMIN C VS NIACINAMIDE LAYERING</td>
+        <td><span class="badge badge--absent">ABSENT</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>HOW LONG UNTIL VITAMIN C SHOWS RESULTS</td>
+        <td><span class="badge">PARAPHRASED</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+      <tr>
+        <td>IS L-ASCORBIC ACID UNSTABLE</td>
+        <td><span class="badge badge--cited">CITED</span></td>
+        <td><span class="badge badge--cited">CITED</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footline">
+    <span class="mono-sm">CITED / ANSWER ENGINE VISIBILITY AUDIT</span>
+    <span class="mono-sm meta">ENGINE OPENAI &nbsp;/&nbsp; RUN 2026-07-25 10:31 UTC</span>
+    <a class="btn" href="#" style="margin-left:auto">VIEW FIX PLAN</a>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   CITATION NETWORK — three competing clusters, one dim isolate
+   ============================================================ */
+(function () {
+  var canvas = document.getElementById('net');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var INK = '236,235,231';
+  var RED = '255,59,59';
+
+  var clusters = [
+    { x: 0.63, y: 0.26, count: 9, glow: 1.00, r: 0.15, label: 'SOURCE CLUSTER 01' },
+    { x: 0.34, y: 0.57, count: 8, glow: 0.92, r: 0.14, label: 'SOURCE CLUSTER 02' },
+    { x: 0.76, y: 0.74, count: 7, glow: 0.34, r: 0.12, label: 'SOURCE CLUSTER 03' }
+  ];
+
+  var hubs = [], nodes = [], links = [];
+  var W = 0, H = 0, DPR = 1;
+
+  function rand(seed) { /* deterministic pseudo-random */
+    var x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  function build() {
+    hubs = []; nodes = []; links = [];
+    var s = 0;
+
+    clusters.forEach(function (c, ci) {
+      var hub = {
+        bx: c.x, by: c.y, rad: 7.5, glow: c.glow,
+        phase: rand(++s) * 6.28, drift: 0.010 + rand(++s) * 0.006,
+        label: c.label, isHub: true, cluster: ci
+      };
+      hubs.push(hub);
+      nodes.push(hub);
+
+      for (var i = 0; i < c.count; i++) {
+        var a = (i / c.count) * 6.28 + rand(++s) * 1.1;
+        var rr = c.r * (0.42 + rand(++s) * 0.68);
+        var n = {
+          bx: c.x + Math.cos(a) * rr,
+          by: c.y + Math.sin(a) * rr * 1.15,
+          rad: 1.6 + rand(++s) * 2.0,
+          glow: c.glow * (0.45 + rand(++s) * 0.5),
+          phase: rand(++s) * 6.28,
+          drift: 0.008 + rand(++s) * 0.010,
+          cluster: ci
+        };
+        nodes.push(n);
+        links.push({ a: n, b: hub, base: 0.30 * c.glow, phase: rand(++s) * 6.28, speed: 0.6 + rand(++s) });
+      }
+    });
+
+    /* inter-cluster spine */
+    links.push({ a: hubs[0], b: hubs[1], base: 0.52, phase: 0.4, speed: 0.5 });
+    links.push({ a: hubs[1], b: hubs[2], base: 0.20, phase: 1.9, speed: 0.42 });
+    links.push({ a: hubs[0], b: hubs[2], base: 0.22, phase: 3.1, speed: 0.38 });
+
+    /* a few cross links between the two glowing clusters */
+    var c0 = nodes.filter(function (n) { return n.cluster === 0 && !n.isHub; });
+    var c1 = nodes.filter(function (n) { return n.cluster === 1 && !n.isHub; });
+    for (var k = 0; k < 4; k++) {
+      links.push({
+        a: c0[k % c0.length], b: c1[(k * 2) % c1.length],
+        base: 0.16, phase: rand(++s) * 6.28, speed: 0.5 + rand(++s) * 0.6
+      });
+    }
+
+    /* our node — isolated, dim, no completed link */
+    self_ = {
+      bx: 0.135, by: 0.855, rad: 5.2, glow: 0.16,
+      phase: 1.2, drift: 0.006, isSelf: true
+    };
+    nodes.push(self_);
+  }
+
+  var self_ = null;
+
+  function resize() {
+    var rect = canvas.getBoundingClientRect();
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(rect.width, 1);
+    H = Math.max(rect.height, 1);
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  function pos(n, t) {
+    return {
+      x: (n.bx + Math.sin(t * 0.00021 + n.phase) * n.drift) * W,
+      y: (n.by + Math.cos(t * 0.00017 + n.phase * 1.7) * n.drift * 0.9) * H
+    };
+  }
+
+  function grid() {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(30,30,30,0.85)';
+    ctx.lineWidth = 1;
+    var step = 74;
+    for (var x = step; x < W; x += step) {
+      ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); ctx.stroke();
+    }
+    for (var y = step; y < H; y += step) {
+      ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    grid();
+
+    /* links */
+    ctx.lineWidth = 1;
+    links.forEach(function (l) {
+      var p = pos(l.a, t), q = pos(l.b, t);
+      var osc = 0.42 + 0.58 * (0.5 + 0.5 * Math.sin(t * 0.0006 * l.speed + l.phase));
+      ctx.strokeStyle = 'rgba(' + INK + ',' + (l.base * osc).toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    });
+
+    /* severed stub from our node toward the nearest hub */
+    (function () {
+      var p = pos(self_, t), q = pos(hubs[1], t);
+      var reach = 0.26 + 0.05 * Math.sin(t * 0.0005);
+      ctx.save();
+      ctx.setLineDash([3, 6]);
+      ctx.strokeStyle = 'rgba(' + RED + ',0.42)';
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + (q.x - p.x) * reach, p.y + (q.y - p.y) * reach);
+      ctx.stroke();
+      ctx.restore();
+    })();
+
+    /* nodes */
+    nodes.forEach(function (n) {
+      var p = pos(n, t);
+      if (n.isSelf) return;
+      var breathe = 0.72 + 0.28 * (0.5 + 0.5 * Math.sin(t * 0.0008 + n.phase));
+      ctx.save();
+      ctx.shadowBlur = n.isHub ? 26 : 12;
+      ctx.shadowColor = 'rgba(' + INK + ',' + (0.55 * n.glow).toFixed(3) + ')';
+      ctx.fillStyle = 'rgba(' + INK + ',' + Math.min(1, n.glow * breathe).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, n.rad, 0, 6.2832);
+      ctx.fill();
+      ctx.restore();
+
+      if (n.isHub) {
+        ctx.strokeStyle = 'rgba(' + INK + ',' + (0.22 * n.glow).toFixed(3) + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, n.rad + 12 + 3 * Math.sin(t * 0.0009 + n.phase), 0, 6.2832);
+        ctx.stroke();
+      }
+    });
+
+    /* our node — dim fill, red ring */
+    (function () {
+      var p = pos(self_, t);
+      ctx.fillStyle = 'rgba(' + INK + ',0.20)';
+      ctx.beginPath(); ctx.arc(p.x, p.y, self_.rad, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = 'rgba(' + RED + ',0.9)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(p.x, p.y, self_.rad + 4, 0, 6.2832); ctx.stroke();
+      ctx.strokeStyle = 'rgba(' + RED + ',' + (0.30 * (0.5 + 0.5 * Math.sin(t * 0.0011))).toFixed(3) + ')';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, self_.rad + 15, 0, 6.2832); ctx.stroke();
+    })();
+
+    /* labels */
+    ctx.save();
+    ctx.font = '500 10px "IBM Plex Mono", monospace';
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '1.1px';
+    hubs.forEach(function (h) {
+      var p = pos(h, t);
+      ctx.fillStyle = 'rgba(' + INK + ',' + (h.glow > 0.5 ? 0.92 : 0.55) + ')';
+      ctx.fillText(h.label, p.x + 20, p.y - 14);
+    });
+    var sp = pos(self_, t);
+    ctx.fillStyle = 'rgba(' + RED + ',0.95)';
+    ctx.fillText('THIS PAGE / ISOLATED', sp.x + 22, sp.y + 4);
+    ctx.restore();
+  }
+
+  var motionOK = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+    : true;
+
+  function frame(ts) { draw(ts); requestAnimationFrame(frame); }
+
+  function start() {
+    resize(); build();
+    if (motionOK) requestAnimationFrame(frame);
+    else draw(0);
+  }
+
+  window.addEventListener('resize', function () {
+    resize(); build();
+    if (!motionOK) draw(0);
+  });
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start);
+  else start();
+})();
+
+/* ---------------- live UTC clock ---------------- */
+(function () {
+  var el = document.getElementById('clock');
+  if (!el) return;
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function tick() {
+    var d = new Date();
+    el.textContent = pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds()) + ' UTC';
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
