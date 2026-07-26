@@ -96,3 +96,9 @@ tests with a dedicated test file. Confirmed refused end to end.
 (checkpoint b) is not built. Query Lab, re-test, Profound and Part B remain.
 
 STOPPED at checkpoint (a) for Octave's judgment, per the contract.
+
+### Loop 3 - closed loop (checkpoint b)
+
+Apply + re-test works in one click. Verified with real OpenAI calls, then replayed offline:
+2/5 to 5/5 cited, score 33 to 78, 7 fixes applied, 1 refused (needs a fact nobody supplied).
+Remaining: Profound panel (D8) and Part B pipeline with the blocking gate (D9).
