@@ -20,7 +20,7 @@ export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; en
         display: "flex",
         alignItems: "center",
         gap: 26,
-        background: "rgba(5,5,5,.92)",
+        background: "var(--void)", // opaque: a translucent bar lets scrolled text bleed through
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -57,7 +57,7 @@ export function InputBar({
 
   return (
     /* paddingTop/Bottom only: the shorthand would wipe the gutter that .gut owns */
-    <div className="rule-b gut" style={{ paddingTop: 18, paddingBottom: 16, background: "var(--band)" }}>
+    <div className="rule-b gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)" }}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -101,9 +101,18 @@ export function InputBar({
         </button>
       </form>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 12, flexWrap: "wrap" }}>
-        <span className="m-sm meta" style={{ marginRight: 4 }}>
-          OR RUN A BUNDLED DEMO PAGE
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 16, flexWrap: "wrap" }}>
+        <span
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: 11,
+            letterSpacing: 1.3,
+            textTransform: "uppercase",
+            color: "var(--ink)",
+            marginRight: 6,
+          }}
+        >
+          Or run a bundled demo page
         </span>
         {DEMO_PAGES.map((d) => (
           <button

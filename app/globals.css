@@ -22,7 +22,8 @@
   --rule: #1e1e1e;
   --rule-soft: #141414;
   --ink: #ecebe7;
-  --meta: #8f8d88; /* dates, units, sources, column headers ONLY */
+  /* was #8f8d88 and unreadable. nothing that carries meaning uses this. */
+  --meta: #c3c1bb;
   --red: #ff3b3b;
   --red-deep: #d81e1e;
   --go: #7fd1ae;
@@ -32,8 +33,9 @@
   --body: var(--font-body), system-ui, sans-serif;
   --mono: var(--font-mono), ui-monospace, monospace;
 
-  --bar-h: 44px;
-  --gutter: 40px;
+  --bar-h: 46px;
+  --gutter: 72px;
+  --rail: 340px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0; }
@@ -143,3 +145,41 @@ body {
 
 /* thin scrollbars, dark */
 * { scrollbar-width: thin; scrollbar-color: #2a2a2a transparent; }
+
+/* ---------- the agent trace: proof that the work happened ---------- */
+
+.trace { border-top: 1px solid var(--rule); }
+
+.tr {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 250px) minmax(0, 1fr) 96px 72px;
+  gap: 28px;
+  align-items: baseline;
+  padding: 18px 0 17px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.tr__i { font-family: var(--mono); font-size: 11px; color: var(--meta); }
+.tr__name { font-family: var(--body); font-size: 17px; font-weight: 600; color: var(--ink); }
+.tr__what { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; color: var(--ink); }
+.tr__ms { font-family: var(--mono); font-size: 12px; color: var(--meta); text-align: right; }
+.tr__sc {
+  font-family: var(--display); font-weight: 700; font-style: italic;
+  font-size: 30px; line-height: 1; text-align: right; color: var(--ink);
+}
+.tr--zero .tr__sc { color: var(--red); }
+.tr--zero .tr__name { color: var(--red); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .tr { animation: trIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes trIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+}
+
+/* ---------- section rhythm ---------- */
+.sec { padding-top: 56px; }
+.sec + .sec { padding-top: 64px; }
+.kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink); }
+.h1 { font-family: var(--display); font-weight: 700; font-style: italic; text-transform: uppercase;
+      letter-spacing: -0.022em; line-height: 0.94; font-size: clamp(40px, 3.6vw, 60px); }
+.h2 { font-family: var(--display); font-weight: 700; font-style: italic; text-transform: uppercase;
+      letter-spacing: -0.02em; line-height: 1; font-size: 28px; }
+.lede { font-family: var(--body); font-size: 18px; font-weight: 500; line-height: 1.55; color: var(--ink); }

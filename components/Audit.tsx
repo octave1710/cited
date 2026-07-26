@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { FACTORS } from "../engine/weights.config";
-import type { Run } from "../lib/types";
+import type { FactorEvent, TraceEvent } from "../lib/stream";
 
-/** One plain-language line per factor. A number with no meaning is reporting. */
 const MEASURES: Record<string, string> = {
-  crawlability: "Whether answer-engine bots can read the page at all. Nothing else counts until this passes.",
+  crawlability: "Can answer-engine bots read the page at all. Nothing else counts until this passes.",
   answerStructure: "Question headings whose first sentence is the answer. Engines lift passages, not pages.",
   sourcedQuotes: "Claims attributed to a named expert or institution.",
   factualSpecificity: "Exact figures an engine can quote back with a source.",
@@ -24,236 +22,235 @@ const HEADLINE: Record<string, string> = {
   cited: "This page is quotable.",
 };
 
-const SHORT: Record<string, string> = {
-  crawlability: "Crawl",
-  answerStructure: "Answer-first",
-  sourcedQuotes: "Quotes",
-  factualSpecificity: "Figures",
-  freshness: "Freshness",
-  offSiteAuthority: "Authority",
-  fanoutCoverage: "Fan-out",
-  googleRank: "Rank",
-  schemaValidity: "Schema",
-};
-
 export function AuditPanel({
-  run,
+  url,
+  mode,
+  trace,
+  factors,
+  summary,
   busy,
   onFixes,
+  hasFixes,
 }: {
-  run: Run;
+  url: string;
+  mode: "live" | "demo";
+  trace: TraceEvent[];
+  factors: FactorEvent[];
+  summary: { overall: number; grade: string; zeros: number; lostWeight: number; totalMs: number; checks: number } | null;
   busy: string | null;
   onFixes: () => void;
+  hasFixes: boolean;
 }) {
-  const audit = run.audit;
-  const [selected, setSelected] = useState<string>("sourcedQuotes");
-  if (!audit) return null;
-
-  const byKey = new Map(audit.factors.map((f) => [f.key, f]));
-  const gate = byKey.get("crawlability");
-  const detail = byKey.get(selected) ?? gate;
-  const cfg = FACTORS.find((c) => c.key === selected);
+  const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <div style={{ padding: "40px 0 72px" }} className="gut">
-      {/* ---- verdict: the number, and the action it unlocks ---- */}
-      <h1 className="d" style={{ fontSize: "clamp(40px,4vw,64px)", maxWidth: "16ch" }}>
-        {HEADLINE[audit.grade] ?? "Audit complete."}
-      </h1>
-
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 40, marginTop: 26, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-          <span
-            className="d"
-            style={{ fontSize: 128, lineHeight: 0.78, color: audit.overall < 40 ? "var(--red)" : "var(--ink)" }}
-          >
-            {audit.overall}
-          </span>
-          <span className="m meta" style={{ fontSize: 15 }}>
-            /100
-          </span>
+    <div style={{ paddingBottom: 120 }}>
+      {/* ---------------- header ---------------- */}
+      <div className="sec" style={{ paddingTop: 52 }}>
+        <div className="kicker" style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+          <span>{mode === "live" ? "LIVE FETCH" : "BUNDLED DEMO PAGE"}</span>
+          <span style={{ color: "var(--meta)" }}>{url}</span>
         </div>
 
-        <div style={{ paddingBottom: 8 }}>
-          <div style={{ fontSize: 17, fontWeight: 500, maxWidth: "34ch", lineHeight: 1.4 }}>
-            Weighted across nine factors. {audit.factors.filter((f) => f.score === 0).length} of them return zero, and
-            they carry{" "}
-            {Math.round(
-              audit.factors
-                .filter((f) => f.score === 0)
-                .reduce((s, f) => s + (FACTORS.find((c) => c.key === f.key)?.weight ?? 0), 0) * 100,
+        <h1 className="h1" style={{ maxWidth: "20ch", marginTop: 26 }}>
+          {summary ? HEADLINE[summary.grade] : "Reading the page the way an engine does."}
+        </h1>
+
+        {summary && (
+          <p className="lede" style={{ maxWidth: "58ch", marginTop: 22 }}>
+            {summary.checks} checks ran against the real text in {summary.totalMs} ms.{" "}
+            {summary.zeros > 0 && (
+              <>
+                {summary.zeros} factors returned zero and they carry {summary.lostWeight}% of the weight.
+              </>
             )}
-            % of the total weight.
-          </div>
-          <button className="btn btn--primary" style={{ marginTop: 14 }} onClick={onFixes} disabled={busy !== null}>
-            {busy === "fixes" ? "Writing…" : run.fixes ? "Fix plan ready ↓" : "Generate the fix plan"}
-          </button>
-        </div>
-
-        {gate && (
-          <div style={{ paddingBottom: 8, marginLeft: "auto" }}>
-            <div className="m-sm meta">CRAWLABILITY GATE</div>
-            <div
-              style={{
-                marginTop: 8,
-                fontFamily: "var(--mono)",
-                fontSize: 13,
-                color: gate.score === 100 ? "var(--go)" : "var(--red)",
-                border: `1px solid ${gate.score === 100 ? "var(--go)" : "var(--red)"}`,
-                padding: "8px 12px",
-                display: "inline-block",
-              }}
-            >
-              {gate.score === 100 ? "PASSED · bots can read it" : "FAILED · bots cannot read it"}
-            </div>
-          </div>
+          </p>
         )}
       </div>
 
-      {/* ---- the weight bar: width = weight, fill = score. not a list of rows ---- */}
-      <div style={{ marginTop: 54 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 18, marginBottom: 14 }}>
-          <h2 className="d" style={{ fontSize: 26 }}>
-            Where the score comes from
-          </h2>
-          <span style={{ fontSize: 15, fontWeight: 500 }}>
-            Each block is as wide as the weight it carries. Click one to read its evidence.
-          </span>
-        </div>
-
-        {/* scores sit above the bar in full ink: never text laid over its own fill */}
-        <div style={{ display: "flex", gap: 3, marginBottom: 6 }}>
-          {FACTORS.map((c) => {
-            const score = byKey.get(c.key)?.score ?? 0;
-            return (
+      {/* ---------------- score + action ---------------- */}
+      {summary && (
+        <div
+          className="sec"
+          style={{ display: "flex", alignItems: "flex-end", gap: 64, flexWrap: "wrap", paddingTop: 44 }}
+        >
+          <div>
+            <div className="kicker" style={{ marginBottom: 14, color: "var(--meta)" }}>
+              CITABILITY SCORE
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
               <span
-                key={c.key}
-                style={{ flex: `${c.weight} 1 0`, minWidth: 0, overflow: "hidden" }}
-                className="d"
-              >
-                <span style={{ fontSize: 22, color: score === 0 ? "var(--red)" : "var(--ink)" }}>{score}</span>
-              </span>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "flex", gap: 3, height: 150, alignItems: "flex-end" }}>
-          {FACTORS.map((c) => {
-            const score = byKey.get(c.key)?.score ?? 0;
-            const isSel = selected === c.key;
-            const zero = score === 0;
-            return (
-              <button
-                key={c.key}
-                onClick={() => setSelected(c.key)}
-                title={`${c.name} · weight ${(c.weight * 100).toFixed(0)}% · score ${score}`}
+                className="h1"
                 style={{
-                  flex: `${c.weight} 1 0`,
-                  height: "100%",
-                  position: "relative",
-                  border: 0,
-                  outline: isSel ? "2px solid var(--ink)" : "none",
-                  outlineOffset: 2,
-                  cursor: "pointer",
-                  padding: 0,
-                  minWidth: 0,
-                  background: "var(--rule-soft)",
+                  fontSize: 132,
+                  lineHeight: 0.8,
+                  color: summary.overall < 40 ? "var(--red)" : "var(--ink)",
                 }}
               >
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    height: `${Math.max(score, 2)}%`,
-                    background: zero ? "var(--red)" : "var(--ink)",
-                    transition: "height .5s cubic-bezier(.16,1,.3,1)",
-                  }}
-                />
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "flex", gap: 3, marginTop: 9 }}>
-          {FACTORS.map((c) => (
-            <span key={c.key} style={{ flex: `${c.weight} 1 0`, minWidth: 0, overflow: "hidden" }} className="m-sm">
-              <span style={{ color: "var(--ink)" }}>{(c.weight * 100).toFixed(0)}%</span>
-              {/* narrow blocks would clip their name; the tooltip and the panel below carry it */}
-              {c.weight >= 0.08 && (
-                <span
-                  style={{
-                    display: "block",
-                    color: selected === c.key ? "var(--ink)" : "var(--meta)",
-                    whiteSpace: "nowrap",
-                    fontSize: 10,
-                    paddingTop: 3,
-                  }}
-                >
-                  {SHORT[c.key]}
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ---- the selected factor, with its receipt ---- */}
-      {detail && (
-        <div className="rule-t" style={{ marginTop: 40, paddingTop: 30 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,360px) minmax(0,1fr)", gap: 52 }}>
-            <div>
-              <h3 className="d" style={{ fontSize: 38, color: detail.score === 0 ? "var(--red)" : "var(--ink)" }}>
-                {detail.name.replace(/\s*\(.*\)$/, "")}
-              </h3>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginTop: 14 }}>
-                <span className="d" style={{ fontSize: 46, color: detail.score === 0 ? "var(--red)" : "var(--ink)" }}>
-                  {detail.score}
-                </span>
-                <span className="m-sm meta">
-                  {cfg ? `WEIGHT ${(cfg.weight * 100).toFixed(0)}%` : "BINARY GATE"}
-                </span>
-              </div>
-              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.5, marginTop: 16 }}>
-                {MEASURES[detail.key] ?? detail.reasoning}
-              </p>
-              {detail.partial && (
-                <p style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.5, marginTop: 12, color: "var(--amber)" }}>
-                  Scored on on-page proxies only. The full signal needs production data.
-                </p>
-              )}
+                {summary.overall}
+              </span>
+              <span style={{ fontFamily: "var(--mono)", fontSize: 15, color: "var(--meta)" }}>/100</span>
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: 12,
+                  letterSpacing: 1.4,
+                  textTransform: "uppercase",
+                  color: summary.overall < 40 ? "var(--red)" : "var(--ink)",
+                  border: `1px solid ${summary.overall < 40 ? "var(--red)" : "var(--ink)"}`,
+                  padding: "7px 11px",
+                  marginLeft: 12,
+                }}
+              >
+                {summary.grade}
+              </span>
             </div>
+          </div>
 
-            <div>
-              <div className="m-sm meta" style={{ marginBottom: 14 }}>
-                EVIDENCE TAKEN FROM THE PAGE
-              </div>
-              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                {detail.evidence.map((e, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      fontFamily: "var(--mono)",
-                      fontSize: 13,
-                      lineHeight: 1.75,
-                      color: "var(--ink)",
-                      borderLeft: `2px solid ${detail.score === 0 ? "var(--red)" : "var(--rule)"}`,
-                      paddingLeft: 14,
-                      maxWidth: "84ch",
-                    }}
-                  >
-                    {e}
-                  </li>
-                ))}
-              </ul>
-              <div className="m-sm meta" style={{ marginTop: 20, maxWidth: "80ch", lineHeight: 1.7 }}>
-                SOURCE · {cfg?.source ?? "Shepard/Zyppy meta-analysis, 54 studies, May 2026"}
-              </div>
+          <div style={{ paddingBottom: 10 }}>
+            <button className="btn btn--primary" onClick={onFixes} disabled={busy !== null}>
+              {busy === "fixes" ? "Writing the rewrites…" : hasFixes ? "Fix plan ready" : "Write the fix plan"}
+            </button>
+            <div style={{ fontFamily: "var(--mono)", fontSize: 11.5, color: "var(--meta)", marginTop: 12 }}>
+              NEXT STEP · TURNS THESE FINDINGS INTO REWRITES
             </div>
           </div>
         </div>
       )}
+
+      {/* ---------------- the trace: proof of work ---------------- */}
+      <div className="sec">
+        <h2 className="h2">Every check that ran</h2>
+        <p className="lede" style={{ maxWidth: "64ch", marginTop: 14, marginBottom: 26 }}>
+          What each check looked at, how long it took, and what it scored. Click a row to read the exact text it
+          pulled off the page.
+        </p>
+
+        <div className="trace">
+          <div
+            className="tr"
+            style={{ borderBottom: "1px solid var(--rule)", paddingTop: 0, paddingBottom: 12 }}
+          >
+            <span className="tr__i" />
+            <span className="tr__i">CHECK</span>
+            <span className="tr__i">WHAT IT INSPECTED</span>
+            <span className="tr__i" style={{ textAlign: "right" }}>
+              TIME
+            </span>
+            <span className="tr__i" style={{ textAlign: "right" }}>
+              SCORE
+            </span>
+          </div>
+
+          {trace.map((t, i) =>
+            t.type === "check" ? (
+              <div className="tr" key={`c${i}`}>
+                <span className="tr__i">{String(i + 1).padStart(2, "0")}</span>
+                <span className="tr__name">{t.name}</span>
+                <span className="tr__what">{t.what}</span>
+                <span className="tr__ms">{t.ms} ms</span>
+                <span className="tr__sc" style={{ color: "var(--go)", fontSize: 18 }}>
+                  ok
+                </span>
+              </div>
+            ) : null,
+          )}
+
+          {factors.map((f, i) => {
+            const isOpen = open === f.key;
+            return (
+              <div key={f.key}>
+                <button
+                  className={`tr${f.score === 0 ? " tr--zero" : ""}`}
+                  onClick={() => setOpen(isOpen ? null : f.key)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    background: isOpen ? "rgba(236,235,231,.045)" : "transparent",
+                    border: 0,
+                    borderBottom: "1px solid var(--rule-soft)",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span className="tr__i">{String(trace.filter((t) => t.type === "check").length + i + 1).padStart(2, "0")}</span>
+                  <span>
+                    <span className="tr__name" style={{ display: "block" }}>
+                      {f.name}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--mono)",
+                        fontSize: 11,
+                        letterSpacing: 1.1,
+                        textTransform: "uppercase",
+                        color: "var(--meta)",
+                        display: "block",
+                        paddingTop: 5,
+                      }}
+                    >
+                      {f.gate ? "BINARY GATE" : `WEIGHT ${Math.round((f.weight ?? 0) * 100)}%`}
+                      {f.partial ? " · PARTIAL" : ""}
+                    </span>
+                  </span>
+                  <span className="tr__what">{f.inspected}</span>
+                  <span className="tr__ms">{f.ms} ms</span>
+                  <span className="tr__sc">{f.score}</span>
+                </button>
+
+                {isOpen && (
+                  <div
+                    style={{
+                      borderBottom: "1px solid var(--rule-soft)",
+                      padding: "22px 0 30px",
+                      display: "grid",
+                      gridTemplateColumns: "26px minmax(0,250px) minmax(0,1fr)",
+                      gap: 28,
+                    }}
+                  >
+                    <span />
+                    <p style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.5, color: "var(--ink)" }}>
+                      {MEASURES[f.key] ?? f.reasoning}
+                    </p>
+                    <div>
+                      <div className="kicker" style={{ color: "var(--meta)", marginBottom: 12 }}>
+                        TEXT PULLED OFF THE PAGE
+                      </div>
+                      <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 11 }}>
+                        {f.evidence.map((e, j) => (
+                          <li
+                            key={j}
+                            style={{
+                              fontFamily: "var(--mono)",
+                              fontSize: 13,
+                              lineHeight: 1.75,
+                              color: "var(--ink)",
+                              borderLeft: `2px solid ${f.score === 0 ? "var(--red)" : "var(--rule)"}`,
+                              paddingLeft: 14,
+                            }}
+                          >
+                            {e}
+                          </li>
+                        ))}
+                      </ul>
+                      <div
+                        style={{
+                          fontFamily: "var(--mono)",
+                          fontSize: 11.5,
+                          lineHeight: 1.7,
+                          color: "var(--meta)",
+                          marginTop: 18,
+                        }}
+                      >
+                        WEIGHTED FROM · {f.source}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
