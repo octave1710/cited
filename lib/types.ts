@@ -1,5 +1,6 @@
 import type { AuditResult, Fix } from "../engine/index";
 import type { LabRun } from "../querylab/types";
+import type { AccessReport } from "../engine/crawlerAccess";
 
 export type StepId = "ingest" | "score" | "fixes" | "schema" | "querylab" | "retest" | "truth";
 export type StepState = "queued" | "running" | "done" | "blocked" | "failed";
@@ -55,6 +56,7 @@ export interface Run {
   applied?: { title: string; how: string }[];
   skipped?: { title: string; why: string }[];
   scoreAfter?: number;
+  access?: AccessReport;
 }
 
 export interface BotRow {

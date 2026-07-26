@@ -12,6 +12,7 @@ import { fanoutCoverage } from "../../../../engine/factors/fanoutCoverage";
 import { googleRank } from "../../../../engine/factors/googleRank";
 import { schemaValidity } from "../../../../engine/factors/schemaValidity";
 import { DEMO_PAGES, IngestError, fetchPage, normaliseUrl } from "../../../../engine/ingest";
+import { checkCrawlerAccess } from "../../../../engine/crawlerAccess";
 import { newRunId, saveRun } from "../../../../lib/db";
 import { blankSteps, type Run } from "../../../../lib/types";
 import type { FactorResult, ParsedPage } from "../../../../engine/types";
@@ -122,6 +123,37 @@ export async function POST(req: Request) {
         }`,
       };
       send({ type: "step", id: "ingest", state: "done", note: run.steps.ingest.note });
+
+      // ---------- crawler access: verifiable by the client in their own robots.txt ----------
+      if (!body.demoId) {
+        const ta = performance.now();
+        const access = await checkCrawlerAccess(run.url);
+        run.access = access;
+        send({
+          type: "check",
+          group: "access",
+          name: "Read robots.txt",
+          what: access.error
+            ? access.error
+            : `${access.robotsUrl} · HTTP ${access.status} · ${access.verdicts.length} AI crawlers evaluated`,
+          ms: +(performance.now() - ta).toFixed(1),
+        });
+        for (const v of access.verdicts) {
+          send({
+            type: "access",
+            ua: v.ua,
+            operator: v.operator,
+            feeds: v.feeds,
+            allowed: v.allowed,
+            rule: v.rule,
+            group: v.group,
+            robotsUrl: access.robotsUrl,
+          });
+        }
+        if (access.blocked.length) {
+          send({ type: "patch", kind: "robots", filename: "robots-patch.txt", content: access.patch ?? "" });
+        }
+      }
 
       // ---------- score, one check at a time ----------
       send({ type: "step", id: "score", state: "running" });
