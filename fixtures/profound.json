@@ -1,0 +1,17 @@
+{
+  "_note": "Recorded shape for the Production Truth panel. Used only when the live Profound call fails; the UI always says which mode it is in.",
+  "visibilityScore": 12,
+  "shareOfVoice": [
+    { "market": "UK", "pct": 4.1 },
+    { "market": "SE", "pct": 1.2 },
+    { "market": "DK", "pct": 0.8 },
+    { "market": "US", "pct": 6.3 }
+  ],
+  "bots": [
+    { "bot": "GPTBot", "operator": "OpenAI", "hits30d": 1284, "lastSeen": "4h ago", "thisPath": 0 },
+    { "bot": "OAI-SearchBot", "operator": "OpenAI", "hits30d": 903, "lastSeen": "11h ago", "thisPath": 0 },
+    { "bot": "PerplexityBot", "operator": "Perplexity", "hits30d": 417, "lastSeen": "2d ago", "thisPath": 3 },
+    { "bot": "ClaudeBot", "operator": "Anthropic", "hits30d": 288, "lastSeen": "1d ago", "thisPath": 1 },
+    { "bot": "Google-Extended", "operator": "Google", "hits30d": 2051, "lastSeen": "2h ago", "thisPath": 18 }
+  ]
+}

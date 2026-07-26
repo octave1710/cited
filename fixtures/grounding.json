@@ -1,0 +1,23 @@
+{
+  "_note": "Per-market grounding. The point of the exercise: the winning term in a market is not the translation of the English one. Volumes are recorded samples, labelled as such in the UI.",
+  "vitamin c serum": {
+    "UK": {
+      "term": "vitamin c serum",
+      "monthlyVolume": 40500,
+      "note": "Head term. Buyers search the ingredient, not the benefit.",
+      "runnerUp": "best vitamin c serum uk"
+    },
+    "SE": {
+      "term": "c-vitaminserum",
+      "monthlyVolume": 6600,
+      "note": "The literal translation 'vitamin c serum' gets 480 searches. Swedes compound the noun: c-vitaminserum wins 14 to 1. Translating the English term would target the wrong page.",
+      "runnerUp": "bästa c-vitaminserum"
+    },
+    "DK": {
+      "term": "c-vitamin serum",
+      "monthlyVolume": 3200,
+      "note": "Danish splits where Swedish compounds. Same ingredient, different orthography, separate page needed.",
+      "runnerUp": "c vitamin serum ansigt"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { RunRail } from "../components/Run";
 import { AuditPanel } from "../components/Audit";
 import { FixesPanel } from "../components/Fixes";
 import { LabPanel } from "../components/Lab";
+import { TruthPanel } from "../components/Truth";
 import { readStream, type FactorEvent, type SummaryEvent, type TraceEvent } from "../lib/stream";
 import type { Run, StepId } from "../lib/types";
 
@@ -69,7 +70,7 @@ export default function Page() {
   }, []);
 
   const step = useCallback(
-    async (name: "fixes" | "schema" | "querylab" | "retest") => {
+    async (name: "fixes" | "schema" | "querylab" | "retest" | "truth") => {
       if (!run) return;
       setBusy(name);
       setError(null);
@@ -94,6 +95,7 @@ export default function Page() {
 
   const showFixes = active === "fixes" && run?.fixes;
   const showLab = run && (active === "querylab" || active === "retest");
+  const showTruth = run && active === "truth";
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -128,7 +130,8 @@ export default function Page() {
 
         <main className="gut" style={{ minWidth: 0, maxWidth: 1500 }}>
           {!run && !trace.length && <Empty />}
-          {showLab && (
+          {showTruth && <TruthPanel run={run!} busy={busy} onLoad={() => step("truth")} />}
+          {!showTruth && showLab && (
             <LabPanel
               run={run!}
               busy={busy}
@@ -136,8 +139,8 @@ export default function Page() {
               onRetest={() => step("retest")}
             />
           )}
-          {!showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
-          {!showLab && !showFixes && (trace.length > 0 || run) && (
+          {!showTruth && !showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
+          {!showTruth && !showLab && !showFixes && (trace.length > 0 || run) && (
             <AuditPanel
               url={target.url || run?.url || ""}
               mode={target.mode}
