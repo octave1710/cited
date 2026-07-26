@@ -51,6 +51,10 @@ export interface Run {
   /** Raw HTML kept server-side so the re-test can apply the fixes to it. */
   html?: string;
   fixedHtml?: string;
+  /** What the re-test actually changed, and what it refused to change. */
+  applied?: { title: string; how: string }[];
+  skipped?: { title: string; why: string }[];
+  scoreAfter?: number;
 }
 
 export interface BotRow {

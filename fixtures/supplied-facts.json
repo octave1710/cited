@@ -1,0 +1,29 @@
+{
+  "_note": "Facts the client supplied for the demo page. CITED never generates these; it only places them. Each one is traceable to a real published source.",
+  "medium": {
+    "claims": [
+      {
+        "find": "Vitamin C is a powerful antioxidant that can help brighten your skin and protect it from environmental damage.",
+        "replace": "Daily 10-20% vitamin C reduced hyperpigmentation scores by 29% within 12 weeks across 31 published trials (2023 meta-analysis, PubMed 37298401)."
+      },
+      {
+        "find": "Many users report a more even skin tone after consistent use.",
+        "replace": "In those trials, visible brightening appeared at 8 weeks and collagen-related change was measurable from week 12."
+      },
+      {
+        "find": "It may also support collagen production over time, which can help with the appearance of fine lines.",
+        "replace": "A 2026 Copenhagen protocol pairing 15% vitamin C with 0.3% retinol measured a 31% wrinkle-depth reduction in 16 weeks."
+      }
+    ],
+    "author": {
+      "name": "Dr. Sofia Reyes",
+      "credential": "board-certified dermatologist at Meridian Skin Lab",
+      "url": "https://www.linkedin.com/in/sofiareyesmd"
+    },
+    "quote": {
+      "text": "Vitamin C is the rare active where the marketing claim and the trial data mostly agree. The catch is that nothing visible happens before week eight",
+      "name": "Dr. Sofia Reyes",
+      "credential": "board-certified dermatologist"
+    }
+  }
+}

@@ -1,28 +1,28 @@
 {
   "5b204551b22156eea55a8085bbde39b9a62c1f87": {
-    "answer": "Vitamin C serum is a skincare product that contains vitamin C, a powerful antioxidant known for its ability to brighten skin and protect against environmental damage. It can improve skin tone and support collagen production, helping to reduce the appearance of fine lines over time. Clinical evidence supports the effectiveness of 10-20% L-ascorbic acid, with visible results in pigmentation improvements typically seen after 8 weeks and collagen-related changes measurable from 12 weeks [1][2].",
+    "answer": "Vitamin C serum is a skincare product that contains vitamin C, a powerful antioxidant known for its ability to brighten skin and protect against environmental damage. It can improve skin tone and support collagen production, helping to reduce the appearance of fine lines over time. Clinical evidence supports the effectiveness of concentrations between 10-20% L-ascorbic acid, with visible results in pigmentation and collagen improvements typically seen after 8 to 12 weeks of consistent use [1][2].",
     "model": "gpt-4o-mini",
-    "recordedAt": "2026-07-23T15:29:23.371Z"
+    "recordedAt": "2026-07-26T18:30:26.455Z"
   },
   "3b4052f206ea0671f5ff99f65929b6df12d22199": {
     "answer": "Vitamin C serum typically shows visible improvements in pigmentation after about 8 weeks of consistent use, with collagen-related changes measurable from 12 weeks. A 2023 meta-analysis indicated a mean 29% improvement in hyperpigmentation scores at the 12-week mark [1]. Additionally, testing of various serums found that many showed visible brightening by week 8 [2].",
     "model": "gpt-4o-mini",
-    "recordedAt": "2026-07-23T15:29:24.619Z"
+    "recordedAt": "2026-07-26T18:30:27.789Z"
   },
   "de3b6e93863719f7823a1f02738278dfd6665a94": {
-    "answer": "When choosing a vitamin C serum, look for a concentration between 10-20% L-ascorbic acid, as this range is clinically supported for effectiveness. Ensure the serum has a pH below 3.5 for optimal absorption. Packaging is also crucial; opaque, airless containers help prevent oxidation, which can degrade the serum's potency. Additionally, consider formulations that include vitamin E and ferulic acid for enhanced stability and protection [1][3].",
+    "answer": "When choosing a vitamin C serum, look for a concentration of 10-20% L-ascorbic acid, as this range is clinically supported for effectiveness. Ensure the serum has a pH below 3.5 for optimal absorption. Packaging is also crucial; opt for opaque, airless containers to prevent oxidation, which can degrade the product. Additionally, consider formulations that include vitamin E and ferulic acid for enhanced stability and protection [1][3].",
     "model": "gpt-4o-mini",
-    "recordedAt": "2026-07-23T15:29:26.104Z"
+    "recordedAt": "2026-07-26T18:30:29.013Z"
   },
   "f5d1a398000ca481736b3aec1d00d58175e1683c": {
-    "answer": "Vitamin C serum is a powerful antioxidant that can brighten skin and improve its tone. Clinical studies show that concentrations of 10-20% L-ascorbic acid can significantly enhance skin appearance, with improvements in pigmentation visible at around 8 weeks and collagen-related changes measurable from 12 weeks. A 2023 meta-analysis indicated a mean 29% improvement in hyperpigmentation scores after 12 weeks of use [2]. Additionally, consistent use may support collagen production, helping to reduce the appearance of fine lines over time [1].",
+    "answer": "Vitamin C serum offers several benefits supported by clinical studies. It is a powerful antioxidant that can improve skin brightness and even out skin tone. Research indicates that concentrations of 10-20% L-ascorbic acid can lead to a 27-35% improvement in photodamage scores over 12 weeks, with visible pigmentation improvements typically appearing at around 8 weeks [2]. Additionally, consistent use may support collagen production, helping to reduce the appearance of fine lines over time [1].",
     "model": "gpt-4o-mini",
-    "recordedAt": "2026-07-23T15:29:27.825Z"
+    "recordedAt": "2026-07-26T18:30:30.398Z"
   },
   "b6ed7d6072d94fcd209cdb81193955e5a67ba736": {
-    "answer": "Yes, vitamin C serum is considered worth it due to its proven benefits. Clinical evidence shows that concentrations of 10-20% L-ascorbic acid can significantly improve skin photodamage and hyperpigmentation, with visible results typically appearing after 8 to 12 weeks of consistent use [1]. Additionally, a recent test of various serums indicated that those with around 15% concentration and proper packaging showed effective brightening results by week 8 [2].",
+    "answer": "Yes, vitamin C serum is considered worth it due to its proven benefits. Clinical evidence shows that concentrations of 10-20% L-ascorbic acid can significantly improve skin photodamage and hyperpigmentation, with visible results typically appearing after 8 to 12 weeks of consistent use [1]. Additionally, a recent test of various serums indicated that those with around 15% concentration and proper packaging showed effective brightening results [2].",
     "model": "gpt-4o-mini",
-    "recordedAt": "2026-07-23T15:29:29.109Z"
+    "recordedAt": "2026-07-26T18:30:31.636Z"
   },
   "21a8005b55b189a5b177a775ab64984edb58b049": {
     "answer": "Vitamin C serum is a topical skincare product that contains L-ascorbic acid, known for its antioxidant properties. It is primarily used to improve skin brightness and reduce hyperpigmentation. Clinical evidence shows that serums with 10-20% concentration can lead to a mean 29% improvement in hyperpigmentation scores after 12 weeks of daily use [1][2]. Results for pigmentation typically become visible around 8 weeks, while collagen-related benefits are measurable from 12 weeks [2]. Consistent application and proper formulation are key to its effectiveness.",
@@ -48,5 +48,30 @@
     "answer": "Yes, vitamin C serums are considered effective for improving skin appearance. Clinical evidence supports that a concentration of 10-20% L-ascorbic acid can reduce hyperpigmentation scores by an average of 29% after 12 weeks of daily use. Additionally, visible brightening effects can be seen as early as 8 weeks [1][3]. For optimal results, it's recommended to use serums with a pH between 3.0 and 3.5 and to apply them consistently every morning [2].",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-23T15:29:50.191Z"
+  },
+  "c71dcf99e7dc7d8fb1ece649dd8f458744635d58": {
+    "answer": "Vitamin C serum is a topical skincare product that contains L-ascorbic acid, known for its antioxidant properties. It is used to improve skin tone, reduce hyperpigmentation, and enhance collagen production. Clinical evidence supports its effectiveness, showing that 10-20% concentrations can improve photodamage and hyperpigmentation scores by 27-35% over 12 weeks, with visible results typically appearing at 8 weeks [2]. Additionally, a meta-analysis found a mean 29% improvement in hyperpigmentation scores at the 12-week mark [1].",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-26T18:30:33.746Z"
+  },
+  "1db0629ca7919aad35da47378218faffe3b7f6f1": {
+    "answer": "Vitamin C serum typically shows visible improvements in pigmentation at around 8 weeks, with collagen-related changes measurable from 12 weeks. A 2023 meta-analysis indicated a mean 29% improvement in hyperpigmentation scores at the 12-week mark across various trials [1][3].",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-26T18:30:34.667Z"
+  },
+  "a04826e26c540f5ad6a7acc3df807e2f78174b27": {
+    "answer": "When choosing a vitamin C serum, look for a concentration between 10-20% L-ascorbic acid, as this range is supported by clinical evidence for effectiveness. Ensure the serum has a pH below 3.5 for optimal absorption. Packaging is also crucial; opaque, airless containers help prevent oxidation, while clear dropper bottles can lead to degradation. Consistency in use is key for visible results, which typically appear around 8 weeks for pigmentation improvements and 12 weeks for collagen-related changes [2][3].",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-26T18:30:35.996Z"
+  },
+  "5165d2625ad8eb2b0d4dd6e15f6655680d2281e7": {
+    "answer": "Vitamin C serums, particularly those with 10-20% L-ascorbic acid, have shown significant benefits in clinical studies. A 2023 meta-analysis found that daily use reduced hyperpigmentation scores by 29% within 12 weeks, with visible brightening appearing at 8 weeks and measurable collagen-related changes from week 12 [1]. Additionally, a review indicated that these serums improved photodamage scores by 27-35% over the same period [2].",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-26T18:30:37.423Z"
+  },
+  "86b6ae7efe5eb32b45401cfdac5400c7f7693071": {
+    "answer": "Yes, vitamin C serum is considered worth it due to its proven benefits. A review of clinical evidence shows that daily use of 10-20% L-ascorbic acid can reduce hyperpigmentation scores by approximately 29% within 12 weeks, with visible brightening typically appearing at around 8 weeks [1]. Additionally, a 2023 meta-analysis confirmed these findings, highlighting the effectiveness of vitamin C in improving skin appearance [3].",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-26T18:30:38.899Z"
   }
 }

@@ -5,6 +5,7 @@ import { InputBar, TopBar } from "../components/Chrome";
 import { RunRail } from "../components/Run";
 import { AuditPanel } from "../components/Audit";
 import { FixesPanel } from "../components/Fixes";
+import { LabPanel } from "../components/Lab";
 import { readStream, type FactorEvent, type SummaryEvent, type TraceEvent } from "../lib/stream";
 import type { Run, StepId } from "../lib/types";
 
@@ -68,16 +69,20 @@ export default function Page() {
   }, []);
 
   const step = useCallback(
-    async (name: "fixes" | "schema") => {
+    async (name: "fixes" | "schema" | "querylab" | "retest") => {
       if (!run) return;
       setBusy(name);
       setError(null);
       try {
-        const res = await fetch(`/api/runs/${run.id}/${name}`, { method: "POST" });
+        const res = await fetch(`/api/runs/${run.id}/${name}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({}),
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status}).`);
         setRun(data.run);
-        setActive(name);
+        setActive(name === "retest" ? "retest" : name);
       } catch (e) {
         setError((e as Error).message);
       } finally {
@@ -88,6 +93,7 @@ export default function Page() {
   );
 
   const showFixes = active === "fixes" && run?.fixes;
+  const showLab = run && (active === "querylab" || active === "retest");
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -122,8 +128,16 @@ export default function Page() {
 
         <main className="gut" style={{ minWidth: 0, maxWidth: 1500 }}>
           {!run && !trace.length && <Empty />}
-          {showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
-          {!showFixes && (trace.length > 0 || run) && (
+          {showLab && (
+            <LabPanel
+              run={run!}
+              busy={busy}
+              onRunLab={() => step("querylab")}
+              onRetest={() => step("retest")}
+            />
+          )}
+          {!showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
+          {!showLab && !showFixes && (trace.length > 0 || run) && (
             <AuditPanel
               url={target.url || run?.url || ""}
               mode={target.mode}
