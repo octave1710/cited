@@ -1,4 +1,4 @@
-import type { LabQuery } from "./types.js";
+import type { LabQuery } from "./types";
 
 /**
  * Deterministic query fan-out from a topic: the strategic sub-queries an answer

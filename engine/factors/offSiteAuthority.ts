@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 const AUTHORITATIVE_RE = /\.gov|\.edu|pubmed|ncbi|nih\.gov|sciencedirect|nature\.com|journal/i;
 const CREDENTIALS_RE = /\b(Dr\.|PhD|MD|board-certified|professor)\b/;

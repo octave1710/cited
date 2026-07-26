@@ -1,14 +1,14 @@
-import type { AuditOptions, AuditResult, FactorResult, ParsedPage } from "./types.js";
-import { FACTORS } from "./weights.config.js";
-import { crawlability } from "./factors/crawlability.js";
-import { answerStructure } from "./factors/answerStructure.js";
-import { factualSpecificity } from "./factors/factualSpecificity.js";
-import { sourcedQuotes } from "./factors/sourcedQuotes.js";
-import { freshness } from "./factors/freshness.js";
-import { offSiteAuthority } from "./factors/offSiteAuthority.js";
-import { fanoutCoverage } from "./factors/fanoutCoverage.js";
-import { googleRank } from "./factors/googleRank.js";
-import { schemaValidity } from "./factors/schemaValidity.js";
+import type { AuditOptions, AuditResult, FactorResult, ParsedPage } from "./types";
+import { FACTORS } from "./weights.config";
+import { crawlability } from "./factors/crawlability";
+import { answerStructure } from "./factors/answerStructure";
+import { factualSpecificity } from "./factors/factualSpecificity";
+import { sourcedQuotes } from "./factors/sourcedQuotes";
+import { freshness } from "./factors/freshness";
+import { offSiteAuthority } from "./factors/offSiteAuthority";
+import { fanoutCoverage } from "./factors/fanoutCoverage";
+import { googleRank } from "./factors/googleRank";
+import { schemaValidity } from "./factors/schemaValidity";
 
 export function audit(page: ParsedPage, opts: AuditOptions = {}): AuditResult {
   const gate = crawlability(page);

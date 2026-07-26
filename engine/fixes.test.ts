@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parse } from "./parse.js";
-import { audit } from "./score.js";
-import { generateFixes } from "./fixes.js";
-import { generateSchemas } from "./schemaGen.js";
-import { schemaValidity } from "./factors/schemaValidity.js";
+import { parse } from "./parse";
+import { audit } from "./score";
+import { generateFixes } from "./fixes";
+import { generateSchemas } from "./schemaGen";
+import { schemaValidity } from "./factors/schemaValidity";
 
 const NOW = new Date("2026-07-18");
 const load = (name: string) => parse(readFileSync(join(__dirname, "..", "fixtures", "pages", name), "utf8"));

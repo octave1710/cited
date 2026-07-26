@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 const FACT_RE = /\d+(?:[.,]\d+)?\s?(?:%|percent|mg|ml|µg|iu|spf|nm|weeks?|days?|months?|years?|hours?|minutes?|participants?|subjects?|studies|x\b)|[$€£]\s?\d+|\b\d+(?:[.,]\d+)?\b/gi;
 

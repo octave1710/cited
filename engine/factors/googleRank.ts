@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 /** Deliberately down-weighted: ranking well on Google predicts citations less every year. */
 export function googleRank(_page: ParsedPage, rank?: number): FactorResult {

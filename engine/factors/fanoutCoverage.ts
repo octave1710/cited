@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 const STOPWORDS = new Set("the a an and or of to for in on with your you what how why when is are does can should it".split(" "));
 const FAQ_RE = /faq|frequently asked|questions/i;

@@ -1,6 +1,9 @@
 node_modules/
 .env
 MASTER_PROMPT.md
+dev.log
+data/
+next-env.d.ts
 *.db
 .next/
 dist/

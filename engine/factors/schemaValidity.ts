@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 const CITABLE_TYPES = ["Article", "NewsArticle", "BlogPosting", "FAQPage", "HowTo", "Product"];
 

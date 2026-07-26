@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 /** Age of the page from dateModified (preferred) or datePublished. */
 export function freshness(page: ParsedPage, now: Date): FactorResult {

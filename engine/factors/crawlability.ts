@@ -1,4 +1,4 @@
-import type { FactorResult, ParsedPage } from "../types.js";
+import type { FactorResult, ParsedPage } from "../types";
 
 /**
  * Binary gate: if answer-engine bots cannot read the page, no other factor matters.

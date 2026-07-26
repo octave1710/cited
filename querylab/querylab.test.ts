@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parse } from "../engine/parse.js";
-import { fanout } from "./fanout.js";
-import { detect, toLabDoc } from "./detect.js";
-import { runLab } from "./run.js";
-import { mockLLM } from "../adapters/llm.js";
-import type { LabDoc } from "./types.js";
+import { parse } from "../engine/parse";
+import { fanout } from "./fanout";
+import { detect, toLabDoc } from "./detect";
+import { runLab } from "./run";
+import { mockLLM } from "../adapters/llm";
+import type { LabDoc } from "./types";
 
 const load = (name: string) => parse(readFileSync(join(__dirname, "..", "fixtures", "pages", name), "utf8"));
 

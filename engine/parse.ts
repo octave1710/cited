@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import type { Heading, ParsedPage, Section } from "./types.js";
+import type { Heading, ParsedPage, Section } from "./types";
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim();
 

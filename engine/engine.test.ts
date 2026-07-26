@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parse } from "./parse.js";
-import { audit } from "./score.js";
-import { freshness } from "./factors/freshness.js";
-import { crawlability } from "./factors/crawlability.js";
-import { factualSpecificity } from "./factors/factualSpecificity.js";
-import { FACTORS } from "./weights.config.js";
+import { parse } from "./parse";
+import { audit } from "./score";
+import { freshness } from "./factors/freshness";
+import { crawlability } from "./factors/crawlability";
+import { factualSpecificity } from "./factors/factualSpecificity";
+import { FACTORS } from "./weights.config";
 
 // Frozen reference date so freshness scoring is deterministic.
 const NOW = new Date("2026-07-18");

@@ -1,9 +1,9 @@
 import { readFileSync } from "node:fs";
-import { parse, audit, generateFixes, generateSchemas, FACTORS, GATE_FACTOR } from "./engine/index.js";
-import { getLLM } from "./adapters/llm.js";
-import { fanout, userQueries } from "./querylab/fanout.js";
-import { toLabDoc } from "./querylab/detect.js";
-import { runLab } from "./querylab/run.js";
+import { parse, audit, generateFixes, generateSchemas, FACTORS, GATE_FACTOR } from "./engine/index";
+import { getLLM } from "./adapters/llm";
+import { fanout, userQueries } from "./querylab/fanout";
+import { toLabDoc } from "./querylab/detect";
+import { runLab } from "./querylab/run";
 
 try {
   process.loadEnvFile(); // .env is optional; env vars already set win over it

@@ -1,6 +1,6 @@
 import type { Article, FAQPage, HowTo, WithContext } from "schema-dts";
-import type { ParsedPage } from "./types.js";
-import { QUESTION_RE } from "./factors/answerStructure.js";
+import type { ParsedPage } from "./types";
+import { QUESTION_RE } from "./factors/answerStructure";
 
 export interface SchemaGenResult {
   blocks: WithContext<Article | FAQPage | HowTo>[];

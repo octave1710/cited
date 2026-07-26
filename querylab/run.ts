@@ -1,6 +1,6 @@
-import type { LLMClient } from "../adapters/llm.js";
-import { detect } from "./detect.js";
-import type { LabDoc, LabQuery, LabRun, QueryVerdict } from "./types.js";
+import type { LLMClient } from "../adapters/llm";
+import { detect } from "./detect";
+import type { LabDoc, LabQuery, LabRun, QueryVerdict } from "./types";
 
 // Citation slots are scarce on real answer engines (1-3 citations picked from
 // dozens of candidate pages). With only 3 docs in context the engine must be

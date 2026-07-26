@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CITED — technical brutalist. One accent, full-ink content.
+   ============================================================ */
+@theme {
+  --color-void: #050505;
+  --color-band: #080808;
+  --color-rule: #1e1e1e;
+  --color-rule-soft: #141414;
+  --color-ink: #ecebe7;
+  --color-meta: #8f8d88;
+  --color-red: #ff3b3b;
+  --color-red-deep: #d81e1e;
+  --color-go: #7fd1ae;
+}
+
+:root {
+  --void: #050505;
+  --band: #080808;
+  --band-2: #0b0b0b;
+  --rule: #1e1e1e;
+  --rule-soft: #141414;
+  --ink: #ecebe7;
+  --meta: #8f8d88; /* dates, units, sources, column headers ONLY */
+  --red: #ff3b3b;
+  --red-deep: #d81e1e;
+  --go: #7fd1ae;
+  --amber: #e8a33d;
+
+  --display: var(--font-display), "Arial Narrow", sans-serif;
+  --body: var(--font-body), system-ui, sans-serif;
+  --mono: var(--font-mono), ui-monospace, monospace;
+
+  --bar-h: 44px;
+  --gutter: 40px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0; }
+
+html, body { background: var(--void); color: var(--ink); }
+body {
+  font-family: var(--body);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--ink); color: var(--void); }
+
+/* ---------- primitives ---------- */
+
+.d {
+  font-family: var(--display);
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.022em;
+  line-height: 0.92;
+}
+.m {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+.m-sm { font-family: var(--mono); font-size: 10px; letter-spacing: 1.1px; text-transform: uppercase; }
+.meta { color: var(--meta); }
+
+.rule-t { border-top: 1px solid var(--rule); }
+.rule-b { border-bottom: 1px solid var(--rule); }
+
+/* the container owns the gutter; sections never override it */
+.gut { padding-left: var(--gutter); padding-right: var(--gutter); }
+
+/* ---------- buttons: every number gets one ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--ink); color: var(--void); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { border-color: var(--rule); color: #55534f; cursor: not-allowed; background: transparent; transform: none; }
+
+.btn--primary { background: var(--red-deep); border-color: var(--red-deep); color: #fff; }
+.btn--primary:hover { background: var(--red); border-color: var(--red); color: #fff; }
+.btn--primary:disabled { background: #2a1414; border-color: #2a1414; color: #6b5050; }
+
+.btn--ghost { border-color: var(--rule); color: var(--meta); }
+.btn--ghost:hover { border-color: var(--ink); background: transparent; color: var(--ink); }
+
+.btn--sm { height: 30px; padding: 0 12px; font-size: 10px; }
+
+/* ---------- form controls ---------- */
+
+.field {
+  height: 40px;
+  background: #0a0a0a;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  padding: 0 14px;
+  outline: none;
+  transition: border-color 0.12s ease;
+  min-width: 0;
+}
+.field:focus { border-color: var(--ink); }
+.field::placeholder { color: #56544f; }
+
+/* ---------- run step states ---------- */
+
+.dot { width: 7px; height: 7px; flex: none; display: inline-block; }
+.dot--queued { background: #2a2a2a; }
+.dot--running { background: var(--amber); animation: pulse 1s steps(2) infinite; }
+.dot--done { background: var(--go); }
+.dot--blocked { background: var(--red); }
+.dot--failed { background: var(--red); }
+
+@keyframes pulse { 50% { opacity: 0.25; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot--running { animation: none; }
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* thin scrollbars, dark */
+* { scrollbar-width: thin; scrollbar-color: #2a2a2a transparent; }

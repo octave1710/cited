@@ -1,6 +1,6 @@
-import type { AuditResult, ParsedPage, Section } from "./types.js";
-import { FACTORS } from "./weights.config.js";
-import { QUESTION_RE } from "./factors/answerStructure.js";
+import type { AuditResult, ParsedPage, Section } from "./types";
+import { FACTORS } from "./weights.config";
+import { QUESTION_RE } from "./factors/answerStructure";
 
 export interface Fix {
   factorKey: string;

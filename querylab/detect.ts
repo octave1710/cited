@@ -1,5 +1,5 @@
-import type { ParsedPage } from "../engine/types.js";
-import type { CitationStatus, LabDoc } from "./types.js";
+import type { ParsedPage } from "../engine/types";
+import type { CitationStatus, LabDoc } from "./types";
 
 const MARKER_RE = /\d+(?:[.,]\d+)?\s?(?:%|mg|ml|spf|weeks?|days?|months?|years?|x\b)|(?:Dr\.|Professor|Prof\.)\s+[A-Z][a-z]+ [A-Z][a-z]+/g;
 
