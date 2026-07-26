@@ -322,14 +322,14 @@ body{
 }
 .verdict__grid{
   display:grid;
-  grid-template-columns:minmax(0,32%) minmax(0,68%);
+  grid-template-columns:minmax(0,34%) minmax(0,66%);
   align-items:center;
+  padding-left:var(--gutter);   /* the number sits on the grid, never glued to the edge */
   padding-right:var(--gutter);
 }
 .verdict__num{
   font-size:var(--fs-verdict);
   line-height:0.76;
-  margin-left:-0.075em;
   color:var(--ink);
 }
 .verdict__num sup{
@@ -416,7 +416,86 @@ body{
 .frow--zero .meter__fill{ background:var(--red); }
 
 /* ============================================================
-   3b — THE THREE FAILURES  (one idea per block, plain language)
+   3 — EVIDENCE SPECIMEN
+   The client's own paragraph, marked up like a corrected proof.
+   One idea: an engine keeps only what it can lift, and here it kept nothing.
+   ============================================================ */
+
+/* vertical only: .wrap owns the horizontal gutter, never override it */
+.ev{ padding-top:100px; padding-bottom:92px; border-bottom:1px solid var(--rule); }
+
+/* the purpose of the section is a headline, never a small grey label */
+.ev__h{
+  font-family:var(--display); font-weight:700; font-style:italic; text-transform:uppercase;
+  font-size:clamp(48px,4.6vw,80px); line-height:0.94; color:var(--ink);
+  max-width:17ch;
+}
+.ev__sub{
+  font-family:var(--body); font-size:20px; font-weight:500; line-height:1.5;
+  color:var(--ink); max-width:60ch; padding-top:22px;
+}
+
+.ev__paper{
+  margin-top:46px;
+  border-top:1px solid var(--rule);
+  padding:64px 0 34px;
+}
+.spec{
+  font-family:var(--body); font-weight:500;
+  font-size:clamp(26px,2.35vw,38px); line-height:2.0; letter-spacing:-0.012em;
+  max-width:1180px;
+  color:rgba(236,235,231,0.36);          /* receded on purpose: this is the discarded text */
+}
+.m{
+  position:relative;
+  background:transparent;                 /* kill the browser's yellow <mark> fill */
+  color:var(--ink);                       /* the problems stay at full ink */
+  box-shadow:inset 0 -2px 0 var(--red);
+}
+.m i{
+  position:absolute; left:0; top:-1.42em;
+  font-family:var(--mono); font-size:11px; font-style:normal; font-weight:500;
+  letter-spacing:1.4px; text-transform:uppercase; color:var(--red); white-space:nowrap;
+}
+
+.ev__verdict{
+  display:flex; align-items:baseline; gap:28px;
+  margin-top:34px; padding-top:38px; border-top:1px solid var(--rule);
+}
+.ev__big{
+  font-family:var(--display); font-weight:700; font-style:italic;
+  font-size:clamp(130px,12vw,200px); line-height:0.76; color:var(--red);
+}
+.ev__cap{
+  font-family:var(--body); font-size:23px; font-weight:500; line-height:1.35;
+  color:var(--ink); max-width:20ch;
+}
+
+.ev__cost{
+  margin-top:52px;
+  font-family:var(--body); font-size:25px; font-weight:500; line-height:1.5;
+  color:var(--ink); max-width:46ch;
+  display:flex; align-items:baseline; gap:22px; flex-wrap:wrap;
+}
+.ev__cost b{
+  font-family:var(--display); font-weight:700; font-style:italic;
+  font-size:96px; line-height:0.82; color:var(--red);
+}
+
+@media (prefers-reduced-motion: no-preference){
+  .spec{ animation:specDim .85s 1.15s both cubic-bezier(.16,1,.3,1); }
+  @keyframes specDim{ from{ color:rgba(236,235,231,0.94); } to{ color:rgba(236,235,231,0.36); } }
+  .m{ animation:markRule .45s both cubic-bezier(.16,1,.3,1); }
+  @keyframes markRule{ from{ box-shadow:inset 0 0 0 var(--red); } to{ box-shadow:inset 0 -2px 0 var(--red); } }
+  .m i{ opacity:0; animation:markIn .45s both cubic-bezier(.16,1,.3,1); }
+  .m:nth-of-type(1){ animation-delay:1.75s } .m:nth-of-type(1) i{ animation-delay:1.95s }
+  .m:nth-of-type(2){ animation-delay:2.05s } .m:nth-of-type(2) i{ animation-delay:2.25s }
+  .m:nth-of-type(3){ animation-delay:2.35s } .m:nth-of-type(3) i{ animation-delay:2.55s }
+  @keyframes markIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+}
+
+/* ============================================================
+   3b — THE THREE FAILURES  (superseded by the specimen above)
    ============================================================ */
 
 .fails{ border-bottom:1px solid var(--rule); padding-bottom:52px; }
@@ -701,7 +780,26 @@ body{
 </section>
 
 <!-- ============================ 3 — FACTORS ============================ -->
-<section class="band wrap fails">
+<section class="band wrap ev">
+  <h2 class="ev__h">Nothing on this page can be quoted.</h2>
+  <p class="ev__sub">An answer engine keeps only what it can lift: a figure, a named source, a claim somebody signed. Here is the paragraph it landed on, with everything it had to discard pushed back.</p>
+
+  <div class="ev__paper">
+    <p class="spec">Vitamin C is a <mark class="m">powerful antioxidant<i>no number to quote</i></mark> that can help brighten your skin and protect it from environmental damage. <mark class="m">Many users report<i>nobody named</i></mark> a more even skin tone after consistent use. It <mark class="m">may also support<i>hedge, not a claim</i></mark> collagen production over time, which can help with the appearance of fine lines.</p>
+
+    <div class="ev__verdict">
+      <span class="ev__big">0</span>
+      <span class="ev__cap">quotable claims in 206 words of body copy</span>
+    </div>
+  </div>
+
+  <div class="ev__cost">
+    <b>50%</b>
+    <span>of the score comes from three factors that all read zero: sourced quotes, quantified specificity, off-site authority.</span>
+  </div>
+</section>
+
+<section class="band wrap fails" hidden>
   <div class="section-head">
     <span class="mono">WHY IT IS SKIPPED</span>
     <span class="mono-sm meta">3 FACTORS AT ZERO / 50% OF THE TOTAL WEIGHT</span>
