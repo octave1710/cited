@@ -16,6 +16,7 @@ const LABEL: React.CSSProperties = {
 
 /** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
 const ROUTES = [
+  { href: "/board", label: "BOARD" },
   { href: "/map", label: "MAP" },
   { href: "/autopsy", label: "AUTOPSY" },
   { href: "/", label: "AUDIT" },

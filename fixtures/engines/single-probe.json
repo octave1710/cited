@@ -1,0 +1,752 @@
+[
+  {
+    "#debug": {
+      "requestId": "FKSxSeBHkDH0qqR",
+      "url": "http://www.google.co.uk/search?q=best+vitamin+C+serum+for+sensitive+skin&enhanceAiOverview=1&hl=en",
+      "loadedUrl": "http://www.google.co.uk/search?q=best+vitamin+C+serum+for+sensitive+skin&enhanceAiOverview=1&hl=en",
+      "method": "GET",
+      "retryCount": 0,
+      "errorMessages": [],
+      "statusCode": 200
+    },
+    "#error": false,
+    "searchQuery": {
+      "term": "best vitamin C serum for sensitive skin",
+      "url": "http://www.google.co.uk/search?q=best+vitamin+C+serum+for+sensitive+skin&hl=en",
+      "device": "DESKTOP",
+      "page": 1,
+      "type": "SEARCH",
+      "domain": "google.co.uk",
+      "countryCode": "GB",
+      "languageCode": "en",
+      "locationUule": null,
+      "resultsPerPage": 10
+    },
+    "url": "http://www.google.co.uk/search?q=best+vitamin+C+serum+for+sensitive+skin&hl=en",
+    "hasNextPage": true,
+    "serpProviderCode": "O",
+    "resultsTotal": null,
+    "relatedQueries": [
+      {
+        "title": "Best vitamin C serum recommended by dermatologist",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+recommended+by+dermatologist&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhMEAE"
+      },
+      {
+        "title": "Best vitamin C serum for sensitive skin UK",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+for+sensitive+skin+UK&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhbEAE"
+      },
+      {
+        "title": "Best vitamin c serum for sensitive skin boots",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+c+serum+for+sensitive+skin+boots&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhaEAE"
+      },
+      {
+        "title": "Best affordable vitamin C serum recommended by dermatologist",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+affordable+vitamin+C+serum+recommended+by+dermatologist&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhZEAE"
+      },
+      {
+        "title": "Dermatologist recommended Vitamin C serum for sensitive skin",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Dermatologist+recommended+Vitamin+C+serum+for+sensitive+skin&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhYEAE"
+      },
+      {
+        "title": "Best Vitamin C serum for hyperpigmentation",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+Vitamin+C+serum+for+hyperpigmentation&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhXEAE"
+      },
+      {
+        "title": "Best vitamin c serum for sensitive skin amazon",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+c+serum+for+sensitive+skin+amazon&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhWEAE"
+      },
+      {
+        "title": "Best vitamin C serum UK",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+UK&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhNEAE"
+      },
+      {
+        "title": "Best vitamin C serum recommended by dermatologist",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+recommended+by+dermatologist&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhMEAE"
+      },
+      {
+        "title": "Best vitamin C serum for sensitive skin UK",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+for+sensitive+skin+UK&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhbEAE"
+      },
+      {
+        "title": "Best vitamin c serum for sensitive skin boots",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+c+serum+for+sensitive+skin+boots&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhaEAE"
+      },
+      {
+        "title": "Best affordable vitamin C serum recommended by dermatologist",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+affordable+vitamin+C+serum+recommended+by+dermatologist&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhZEAE"
+      },
+      {
+        "title": "Dermatologist recommended Vitamin C serum for sensitive skin",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Dermatologist+recommended+Vitamin+C+serum+for+sensitive+skin&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhYEAE"
+      },
+      {
+        "title": "Best Vitamin C serum for hyperpigmentation",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+Vitamin+C+serum+for+hyperpigmentation&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhXEAE"
+      },
+      {
+        "title": "Best vitamin c serum for sensitive skin amazon",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+c+serum+for+sensitive+skin+amazon&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhWEAE"
+      },
+      {
+        "title": "Best vitamin C serum UK",
+        "url": "https://www.google.co.uk/search?sca_esv=7fe2d86af3c866b1&hl=en&gl=GB&q=Best+vitamin+C+serum+UK&sa=X&ved=2ahUKEwinxvO_sfaVAxU4mGoFHeR3OmQQ1QJ6BAhNEAE"
+      }
+    ],
+    "paidResults": [],
+    "paidProducts": [],
+    "organicResults": [
+      {
+        "title": "The best vitamin C serums in the UK for every skin type ...",
+        "websiteTitle": "The Guardian",
+        "url": "https://www.theguardian.com/thefilter/2026/apr/16/best-vitamin-c-serum-tested-uk",
+        "displayedUrl": "https://www.theguardian.com › thefilter › apr › best-vit...",
+        "description": "The best vitamin C serums in the UK for every skin type and budget, tested ; Best vitamin C serum overall: CeraVe skin renewing vitamin C serum.Read more",
+        "date": "2026-04-16T12:00:00.000Z",
+        "emphasizedKeywords": [
+          "CeraVe skin renewing vitamin C serum"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 1
+      },
+      {
+        "title": "The Best Vitamin C Serums That Deliver Glowy Results",
+        "websiteTitle": "Forbes",
+        "url": "https://www.forbes.com/sites/forbes-personal-shopper/article/best-vitamin-c-serum/",
+        "displayedUrl": "https://www.forbes.com › ... › Skincare",
+        "description": "For first-time users, we recommend TruSkin's Vitamin C, a gentle formula. Best Vitamin C Serum For Sensitive Skin: L'Oréal Paris Revitalift 12% ...",
+        "date": "2026-07-23T22:09:38.762Z",
+        "emphasizedKeywords": [
+          "TruSkin's Vitamin C"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 2
+      },
+      {
+        "title": "Vitamin C Serum For Sensitive Skin",
+        "websiteTitle": "Amazon UK",
+        "url": "https://www.amazon.co.uk/vitamin-c-serum-sensitive-skin/s?k=vitamin+c+serum+for+sensitive+skin",
+        "displayedUrl": "https://www.amazon.co.uk › vitamin-c-serum-sensitive-s...",
+        "description": "Choice CeraVe Skin Renewing Vitamin C Serum for Sensitive & All Skin Types, with 10% Pure Vitamin C, 3 Essential Ceramides, Hyaluronic Acid, L-Ascorbic Acid, & ...",
+        "emphasizedKeywords": [
+          "Choice CeraVe Skin Renewing Vitamin C Serum"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 3
+      },
+      {
+        "title": "I Tested The World's Most Popular Vitamin C Serums — These ...",
+        "websiteTitle": "YouTube · Dr. Sam Ellis",
+        "url": "https://www.youtube.com/watch?v=L2SLL8a6qxA",
+        "displayedUrl": "YouTube › Dr. Sam Ellis",
+        "description": "CERAVE | Skin Renewing Pure Vitamin C Serum with Ceramides*: · COSRX | The Vitamin C 23 Serum*: · Skinceuticals C E Ferulic (1 Fl)*: · TIMELESS ...",
+        "emphasizedKeywords": [],
+        "siteLinks": [],
+        "productInfo": {},
+        "views": "194.6k+ views",
+        "lastUpdated": "6 months ago",
+        "type": "organic",
+        "position": 4
+      },
+      {
+        "title": "7 Best Vitamin C Serums for Sensitive Skin That Deliver ...",
+        "websiteTitle": "Allure",
+        "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin",
+        "displayedUrl": "https://www.allure.com › Skin › shopping",
+        "description": "Our Top Vitamin C Serums for Sensitive Skin · Best Overall: Skinfix Brighten + Firm 15% Vitamin C Serum, $69 · Best for Combo Skin: Medik8 C- ...Read more",
+        "date": "2026-05-08T12:00:00.000Z",
+        "emphasizedKeywords": [
+          "Skinfix Brighten + Firm 15% Vitamin C Serum"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 5
+      },
+      {
+        "title": "Best Vitamin C Serum for My Skin Type: An In-Depth Guide",
+        "websiteTitle": "imageskincare.co.uk",
+        "url": "https://imageskincare.co.uk/blogs/skincare-blog/best-vitamin-c-serum-for-my-skin-type-an-in-depth-guide?srsltid=AfmBOorRkUBCcwnqIewVjwmTV5osxAhXXRp_hY1LQIjuleTy6qrNrdM2",
+        "displayedUrl": "https://imageskincare.co.uk › IMAGE Skincare Blog",
+        "description": "Sensitive Skin: Lower concentrations (around 10%) of vitamin C or derivatives like magnesium ascorbyl phosphate may be better tolerated by ...Read more",
+        "date": "2026-01-21T12:00:00.000Z",
+        "emphasizedKeywords": [
+          "Lower concentrations (around 10%) of vitamin C"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 6
+      },
+      {
+        "title": "The Best Vitamin C Serums For Your Face 2026",
+        "websiteTitle": "John Lewis",
+        "url": "https://www.johnlewis.com/content/beauty-hair/best-vitamin-c-serums",
+        "displayedUrl": "https://www.johnlewis.com › content › beauty-hair › be...",
+        "description": "Best for sensitive skin. Clinique Moisture Surge Active Glow Serum. The first serum from Clinique's most-loved Moisture Surge line combines ...Read more",
+        "date": "2026-03-12T12:00:00.000Z",
+        "emphasizedKeywords": [
+          "Clinique Moisture Surge Active Glow Serum"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 7
+      },
+      {
+        "title": "9 best vitamin C serums to glow up in 2026, reviewed",
+        "websiteTitle": "Glamour UK",
+        "url": "https://www.glamourmagazine.co.uk/gallery/best-vitamin-c-serums",
+        "displayedUrl": "https://www.glamourmagazine.co.uk › ... › Shopping",
+        "description": "Best Vitamin C Serum for Sensitive Skin: First Aid Beauty 10% Vitamin C Brightening Serum. Best for: A gentle glow and hydration made for  ...",
+        "date": "2026-05-28T12:00:00.000Z",
+        "emphasizedKeywords": [
+          "First Aid Beauty 10% Vitamin C Brightening Serum"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 8
+      },
+      {
+        "title": "Vitamin C for Skin",
+        "websiteTitle": "Face the Future",
+        "url": "https://www.facethefuture.co.uk/collections/vitamin-c-serums?srsltid=AfmBOoo_dYLQmDVkMbzmUW9IMZ6qkRzqHmIoCtIU6y_Br-exooOtXCEL",
+        "displayedUrl": "https://www.facethefuture.co.uk › vitamin-c-serums",
+        "description": "Look for a gentle vitamin C serum with a lower concentration (around 10%) or one formulated with derivatives like sodium ascorbyl phosphate, which are less ...Read more",
+        "emphasizedKeywords": [
+          "gentle vitamin C serum with a lower concentration (around 10"
+        ],
+        "siteLinks": [],
+        "productInfo": {},
+        "type": "organic",
+        "position": 9
+      }
+    ],
+    "suggestedResults": [],
+    "peopleAlsoAsk": [
+      {
+        "answer": "Our Top Vitamin C Serums for Sensitive Skin\nBest Overall: Skinfix Brighten + Firm 15% Vitamin C Serum, $69.Best for Combo Skin: Medik8 C-Tetra Advanced 20% Vitamin C Gel-Serum, $76.Best for Dry Skin: Paula's Choice Resist Super Antioxidant Concentrate Serum, $49.",
+        "question": "What are the best vitamin C serums for sensitive skin?",
+        "title": "7 Best Vitamin C Serums for Sensitive Skin That Deliver Glow ...",
+        "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin",
+        "date": "8 May 2026"
+      },
+      {
+        "answer": null,
+        "question": "Which vitamin C is good for sensitive skin?",
+        "title": null,
+        "url": null,
+        "date": null
+      },
+      {
+        "answer": null,
+        "question": "Is vitamin C serum good for a sensitive skin?",
+        "title": null,
+        "url": null,
+        "date": null
+      },
+      {
+        "answer": null,
+        "question": "What vitamin C serum do most dermatologists recommend?",
+        "title": null,
+        "url": null,
+        "date": null
+      }
+    ],
+    "aiOverview": {
+      "type": "static",
+      "content": "The best vitamin c serums for sensitive skin use gentle, stable derivatives or lower percentages, featuring top choices like Medik8 C-Tetra, First Aid Beauty 10% Vitamin C Brightening Serum, and CeraVe Skin Renewing Vitamin C Serum.Medik8 C-Tetra Lipid Vitamin C Radiance Serum (30ml)Price: £45.00Key Ingredients: 7% Tetrahexyldecyl Ascorbate (stable, oil-soluble vitamin C) and Vitamin E.Why it fits: Highly stable, non-stinging, and infused with nourishing jojoba oil designed specifically for beginners and reactive skin types",
+      "sources": [
+        {
+          "url": "https://www.theguardian.com/thefilter/2026/apr/16/best-vitamin-c-serum-tested-uk",
+          "title": "",
+          "description": ""
+        },
+        {
+          "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin",
+          "title": "",
+          "description": ""
+        },
+        {
+          "url": "https://www.amazon.co.uk/vitamin-c-serum-sensitive-skin/s?k=vitamin+c+serum+for+sensitive+skin",
+          "title": "",
+          "description": ""
+        }
+      ]
+    },
+    "customData": null,
+    "aiModeResult": {
+      "text": "The best overall vitamin C serum for sensitive skin balances efficacy with barrier-supporting ingredients to prevent stinging, redness, and inflammation. Dermatologists typically recommend sensitive skin types look for lower concentrations of pure Vitamin C (L-ascorbic acid under 10-12%) or stable, pH-neutral derivatives like Tetrahexyldecyl (THD) Ascorbat, 3-O Ethyl Ascorbate, or Ascorbyl Glucoside. clearstem +3 The top 3 specific product options for sensitive skin, categorized by their distinct strengths, include: Vanicream Face Serum for Sensitive Skin$24.99 Ulta Beauty& more 4.5 (667) Go to product viewer dialog for this item. Best for highly reactive skin and budget. It uses a non-stinging vitamin C derivative paired with a five-ceramide complex to restore the moisture barrier. It is formulated explicitly without common chemical irritants, dyes, fragrances, or botanical extracts. Allure +2 SkinCeuticals Serum 10$85.00 Bluemercury& more 4.7 (1.7K) Go to product viewer dialog for this item. Best dermatologist-recommended introductory formula. Instead of the highly intense 15% concentration found in their iconic C E Ferulic, this version drops the pure L-ascorbic acid to a milder 10% and pairs it with 0.2% ferulic acid. This allows sensitive skin to achieve traditional anti-aging and free-radical protection safely. Skinfix Brighten + Firm 15% Vitamin C Serum$69.00 Sephora& more 4.6 (552) Go to product viewer dialog for this item. Best for eczema-prone or dry skin. This serum holds the National Eczema Association's stamp of approval. It leverages a high 15% concentration of THD Ascorbate, an oil-soluble form that comfortably penetrates the skin without the acidic bite of traditional raw vitamin C. Allure Show less Top Vitamin C Serums for Sensitive Skin Product Vitamin C Type Key Support Ingredients Best For Price Range Vanicream Vitamin C Serum Stable Derivative Ceramide Complex Allergen-Free & Budget$18 - $25 SkinCeuticals Serum 10 10% L-Ascorbic Acid 0.2% Ferulic Acid First-time Active Users$84 - $85 Skinfix Brighten + Firm Vitamin C 15% THD Ascorbate Peptides & Glycerin Eczema-Prone Skin$69 Obagi Professional-C Serum 10% Go to product viewer dialog for this item. 10% L-Ascorbic Acid Hyaluronic Acid Dry & Irritated Skin$56 - $115 Crucial Buying & Application Tips Check the Form: Look for THD Ascorbate or Ascorby Glucoside on the label if pure L-ascorbic acid has made your skin turn red or sting in the past. clearstem +1 Prioritize Packaging: Always pick airless pumps or opaque bottles. Vitamin C degrades rapidly when exposed to air and light, and oxidized serum can cause greater skin irritation. YouTube · Dr. Arsalan Aspires Introduce Slowly: Apply your serum in the morning on clean, dry skin. Start using it every other day. Always follow with moisturizer and a broad-spectrum SPF. Rodan + Fields +1 To help narrow down the perfect match, let me know: What is your primary skin goal? (e.g., fading dark spots, smoothing fine lines, or overall glow) Is your skin dry, oily, or acne-prone alongside being sensitive? What other active ingredients (like retinol or AHAs) are you currently using? Forbes +3",
+      "sources": [
+        {
+          "id": 1,
+          "title": "7 Best Vitamin C Serums for Sensitive Skin That Deliver Glow, Not Irritation",
+          "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 2,
+          "title": "If You Have Sensitive Skin, This Form of Vitamin C Is for You | Allure",
+          "url": "https://www.allure.com/story/best-vitamin-c-for-sensitive-skin",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 3,
+          "title": "Vitamin C Serum for Sensitive Skin: Brighten Without Irritation - clearstem",
+          "url": "https://clearstem.com/blogs/skin-care-learning-center/what-is-the-best-vitamin-c-serum-for-sensitive-skin-that-doesn-t-cause-irritation",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 4,
+          "title": "Best Vitamin C Serums 2026 - Forbes Vetted",
+          "url": "https://www.forbes.com/sites/forbes-personal-shopper/article/best-vitamin-c-serum/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 5,
+          "title": "Stop Wasting Money! Pick the Right Vitamin C Serum for Your Skin",
+          "url": "https://www.youtube.com/watch?v=UHdCOMoi9o0",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 6,
+          "title": "Best Vitamin C Serum Recommended By Dermatologists | Rodan + Fields®",
+          "url": "https://www.rodanandfields.com/en-us/blog/skincare-guides/best-vitamin-c-serum-recommended-by-dermatologists/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 7,
+          "title": "Which Is the Best Vitamin C Serum Recommended by Dermatologists?",
+          "url": "https://dermondemand.com/blog/best-vitamin-c-serum-recommended-by-dermatologists/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 8,
+          "title": "Vitamin C in Skincare – Doctor Rogers Skin Care",
+          "url": "https://www.doctorrogers.com/blogs/blog/vitamin-c-in-skincare",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 9,
+          "title": "Buy SkinCeuticals | in Naples, Florida",
+          "url": "https://www.skinwellnessflorida.com/skincare-products.html",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 10,
+          "title": "Find the Right Vitamin C Serum for Your Skin Type",
+          "url": "https://www.skinceuticals.co.uk/en_GB/find-the-right-vitamin-c-serum-for-your-skin-type.html",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 11,
+          "title": "16 Best Vitamin-C Serums | The Strategist",
+          "url": "https://nymag.com/strategist/article/best-vitamin-c-serums.html",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 12,
+          "title": "The 6 Best Vitamin C Serums of 2026 | Reviews by Wirecutter",
+          "url": "https://www.nytimes.com/wirecutter/reviews/best-vitamin-c-serums/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 13,
+          "title": "Best Vitamin C Serum of 2025: 10 Glow-Worthy Picks for Every Skin Type",
+          "url": "https://www.vogue.com/article/best-vitamin-c-serums",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 14,
+          "title": "Best Skin Care for Combination Skin, Tested",
+          "url": "https://www.everydayhealth.com/skin-hair-products/combination-skin-care-routine/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 15,
+          "title": "Vitamin C vs. Retinol: Which is Best Anti-Aging Ingredient?",
+          "url": "https://thedailyaesthetics.com/blog/vitamin-c-vs-retinol-best-anti-aging-ingredient/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 16,
+          "title": "Medik8 C-Tetra Vitamin C Serum",
+          "url": "https://blancskin.com.au/products/medik8-c-tetra",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 17,
+          "title": "Vichy Liftactiv Vitamin C Serum",
+          "url": "https://www.haarspullen.nl/en/products/vichy-liftactiv-supreme-vitamine-c-serum",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 18,
+          "title": "Vanicream Vitamin C Serum",
+          "url": "https://www.vanicream.com/face-products",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 19,
+          "title": "Timeless Skin Care 20% Vitamin C + E Ferulic Acid Serum",
+          "url": "https://shopping.yahoo.com/beauty/makeup/article/11-beauty-products-you-should-replace-immediately-according-to-experts-163740862.html",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 20,
+          "title": "The INKEY List 15% Vitamin C and EGF Serum",
+          "url": "https://www.meagherspharmacy.ie/blogs/meaghers-blog/affordable-skincare-face-serums",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 21,
+          "title": "Sunday Riley C.E.O. 15% Vitamin C Brightening Serum",
+          "url": "https://incidecoder.com/products/sunday-riley-c-e-o-rapid-flash-brightening-serum",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 22,
+          "title": "Paula's Choice C15 Super Booster",
+          "url": "https://btyaly.com/reviews/mini-review-paulas-choice-c15-super-booster/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 23,
+          "title": "Biossance Squalane + Vitamin C Dark Spot Serum",
+          "url": "https://www.purewow.com/beauty/biossance-squalane-vitamin-c-dark-spot-serum",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 24,
+          "title": "Obagi Professional C Serum 20%",
+          "url": "https://southwilliamclinic.com/products/obagi-professional-c-serum-20",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 25,
+          "title": "Glow Recipe Guava Dark Spot Serum Vitamin C 5ml",
+          "url": "https://www.ubuy.com.zm/product/BZNW4SLFI-glow-recipe-guava-dark-spot-serum-vitamin-c-5ml",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 26,
+          "title": "Revision C+ Correcting Complex 30% Sample X 12",
+          "url": "https://ellemesmedspa.com/skincare/is-revision-skincare-worth-it/",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 27,
+          "title": "E.l.f. Bright Icon Vitamin C + E + Ferulic Serum",
+          "url": "https://www.today.com/shop/best-vitamin-c-serums-t213237",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 28,
+          "title": "Vanicream Vitamin C Serum Review — DermApproved",
+          "url": "https://dermapproved.com/products/vanicream-vitamin-c-serum/",
+          "description": "",
+          "section": "citations"
+        }
+      ],
+      "query": "best vitamin C serum for sensitive skin",
+      "provider": "Google",
+      "engine": "AI Mode"
+    },
+    "perplexitySearchResult": {
+      "text": "For **sensitive skin**, the safest pick is usually a **gentler, lower-strength vitamin C serum** rather than the strongest L-ascorbic acid formula.[2][4][9] Among the products in your results, **La Roche-Posay Pure Vitamin C 10 Serum** is the clearest “best for sensitive skin” recommendation, while **Clinique Moisture Surge Active Glow Serum** and **Mad Hippie Vitamin C Serum** are also highlighted for sensitive-skin use.[3][7][10]\n\nWhat to look for:\n- **Lower concentration**: sources recommend starting around **5–10%** vitamin C for sensitive skin.[4][9]\n- **Less irritating forms**: sensitive or rosacea-prone skin may react to **L-ascorbic acid**, so gentler derivatives can be better tolerated.[2][13]\n- **Barrier-friendly formulas**: ingredients like **hyaluronic acid**, **thermal water**, or other soothing/supportive components can help reduce irritation risk.[3][7][14]\n\nIf you want the simplest answer, choose **La Roche-Posay Pure Vitamin C 10 Serum** first.[3] If your skin is very reactive, consider starting even more cautiously with a **low-strength formula** and using it every other day at first.[4][9]\n\nIf you want, I can also give you a **ranked shortlist by budget, fragrance-free options, or rosacea-prone skin**.",
+      "sources": [
+        {
+          "title": "The Best Vitamin C Serums That Deliver Glowy Results",
+          "url": "https://www.forbes.com/sites/forbes-personal-shopper/article/best-vitamin-c-serum/",
+          "snippet": "#### Best Vitamin C Serum for Sensitive Skin\n**Active Ingredients:**12% C,alur acid  ",
+          "date": "2026-07-23",
+          "lastUpdated": "2026-05-24",
+          "source": "web"
+        },
+        {
+          "title": "The best vitamin C serums in the UK for every skin type and budget, tested",
+          "url": "https://www.theguardian.com/thefilter/2026/apr/16/best-vitamin-c-serum-tested-uk",
+          "snippet": "According to pharmacist and skincare specialist Dr. Sonal Chavda-Sitaram, those with sensitive, reactive, or rosacea-prone skin should be cautious with L-ascorbic acid, the most prevalent active form of vitamin C used in skincare, as it may provoke inflammation in compromised skin barriers.",
+          "date": "2026-04-16",
+          "lastUpdated": "2026-04-16",
+          "source": "web"
+        },
+        {
+          "title": "9 best vitamin C serums to glow up in 2026, reviewed",
+          "url": "https://www.glamourmagazine.co.uk/gallery/best-vitamin-c-serums",
+          "snippet": "| Our full reviews** **Reviewed, the best vitamin C serums of 2024:** **Best Vitamin C Serum Overall**: Medik8 C-Tetra **Best Dermatologist-Approved Vitamin C Serum**: SkinCeuticals C E Ferulic Antioxidant Vitamin C Serum **Best Brightening Vitamin C Serum**: Sunday Riley C.E.O.\n15% Vitamin C Bright...",
+          "date": "2026-05-28",
+          "lastUpdated": "2025-11-03",
+          "source": "web"
+        },
+        {
+          "title": "15 best vitamin C serum in 2026, tested by dermatologists",
+          "url": "https://www.cosmopolitan.com/uk/beauty-hair/skincare/g24392195/best-vitamin-c-serum/",
+          "snippet": "- **Beginners or those with sensitive skin:** Start with a**5-10% L-ascorbic acid**, as this is enough to brighten and provide anti-oxidant protection without causing irritation.\n...\n|Who's it best for?|All, including sensitive, acne-prone and oily|",
+          "date": "2026-07-02",
+          "lastUpdated": "2026-07-17",
+          "source": "web"
+        },
+        {
+          "title": "Best Vitamin C Serums for ALL Skin Types (i.e. Sensitive Skin, Acne, and Rosacea) | Dr. Swati Kannan",
+          "url": "https://www.youtube.com/watch?v=qK3pY_34igM",
+          "snippet": "{ts:535} in general if you have rosacea or very sensitive skin do not use Alice sorbic acid that's strengths greater than 10\n{ts:541} percent you really want to stick to the lower strength of L ascorbic acid or just use the other forms of vitamin C\n…",
+          "date": "2022-11-20",
+          "lastUpdated": "2026-07-08",
+          "source": "web"
+        },
+        {
+          "title": "A Guide to the Best Vitamin C Serums for Brighter Skin",
+          "url": "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums",
+          "snippet": "- **Best for sensitive skin: ** Geologie Vitamin C+E Ferulic Serum | Skip to review\n- **Best for acne-prone skin: ** La Roche-Posay Vitamin C Serum | Skip to review\n...\n> If you have dry, dehydrated, sensitized, or sensitive skin, you may want to opt for lighter vitamin C serums that have less than ...",
+          "date": "2019-06-10",
+          "lastUpdated": "2026-07-17",
+          "source": "web"
+        },
+        {
+          "title": "The Best Vitamin C Serums For Your Face 2026",
+          "url": "https://www.johnlewis.com/content/beauty-hair/best-vitamin-c-serums",
+          "snippet": "### Best for sensitive skin\n**Clinique Moisture Surge Active Glow Serum**\nThe first serum from Clinique’s most-loved Moisture Surge line combines vitamin C with powerful actives – lactic acid and hyaluronic acid – yet is gentle enough for the most sensitive skin.",
+          "date": "2026-03-12",
+          "lastUpdated": "2026-07-27",
+          "source": "web"
+        },
+        {
+          "title": "Best vitamin C serums 2025",
+          "url": "https://www.independent.co.uk/extras/indybest/fashion-beauty/skincare/best-vitamin-c-serums-skin-b2126347.html",
+          "snippet": "- **Best** Vitamin C serum for sensitive skin\n- **Size** 30ml",
+          "date": "2026-01-16",
+          "lastUpdated": "2026-02-21",
+          "source": "web"
+        },
+        {
+          "title": "The 13 Best Vitamin C Serums for Sensitive Skin",
+          "url": "https://www.elle.com/beauty/makeup-skin-care/g61559943/best-vitamin-c-serum-for-sensitive-skin/",
+          "snippet": "“Start low and go slow.\nAvoid starting vitamin C at the same time as other potent actives, like retinoids or alpha-hydroxy acid.\n...\nStart with a lower concentration [of vitamin C], less than 10 percent, and increase gradually.\nYou may also start every other day and increase to daily as tolerated.",
+          "date": "2024-08-06",
+          "lastUpdated": "2026-06-30",
+          "source": "web"
+        },
+        {
+          "title": "Tested and Reviewed: 15+ Best Vitamin C Serums of 2026",
+          "url": "https://www.nbcnews.com/select/shopping/best-vitamin-c-serums-rcna240620",
+          "snippet": "### Best for sensitive skin\n## Mad Hippie Vitamin C Serum",
+          "date": "2025-10-29",
+          "lastUpdated": "2026-07-27",
+          "source": "web"
+        },
+        {
+          "title": "Sensitive Skin Approved: Must-Try Vitamin C Products",
+          "url": "https://www.youtube.com/watch?v=tL76eObwQxM",
+          "snippet": "My\n{ts:1036} number one vitamin C for anyone with a sensitive skin is from Dr. Sams.",
+          "date": "2025-07-29",
+          "lastUpdated": "2026-07-20",
+          "source": "web"
+        },
+        {
+          "title": "How to Actually Choose a Vitamin C Serum (Dermatologist Guide)",
+          "url": "https://www.youtube.com/watch?v=HaRDOYm8ctk",
+          "snippet": "If we broke this\n{ts:491} down, a very budget-friendly option if you're starting off and you have sensitive skin, go for CeraVe's\n{ts:497} vitamin C serum.\nIf you have dry, dehydrated skin, go for Vichy's LiftActive.",
+          "date": "2026-05-02",
+          "lastUpdated": "2026-07-27",
+          "source": "web"
+        },
+        {
+          "title": "Vitamin C for Skin",
+          "url": "https://www.facethefuture.co.uk/collections/vitamin-c-serums",
+          "snippet": "What is the best vitamin C serum for sensitive skin?\nLook for a gentle vitamin C serum with a lower concentration (around 10%) or one formulated with derivatives like sodium ascorbyl phosphate, which are less likely to irritate sensitive skin.",
+          "date": "2026-03-11",
+          "lastUpdated": "2026-03-11",
+          "source": "web"
+        },
+        {
+          "title": "Vitamin C Serum for Sensitive Skin: Brighten Without Irritation",
+          "url": "https://clearstem.com/blogs/skin-care-learning-center/what-is-the-best-vitamin-c-serum-for-sensitive-skin-that-doesn-t-cause-irritation",
+          "snippet": "In other words, the best serum is not the strongest (aka the harshest) one.\n...\nSo what actually makes the best vitamin C serum for sensitive skin?\nIn general, it’s a formula that can help brighten the skin and improve tone without causing stinging, dryness, breakouts, or barrier disruption.\nFor sen...",
+          "date": "2026-05-12",
+          "lastUpdated": "2026-07-10",
+          "source": "web"
+        }
+      ],
+      "citationUrls": [
+        "https://www.forbes.com/sites/forbes-personal-shopper/article/best-vitamin-c-serum/",
+        "https://www.theguardian.com/thefilter/2026/apr/16/best-vitamin-c-serum-tested-uk",
+        "https://www.glamourmagazine.co.uk/gallery/best-vitamin-c-serums",
+        "https://www.cosmopolitan.com/uk/beauty-hair/skincare/g24392195/best-vitamin-c-serum/",
+        "https://www.youtube.com/watch?v=qK3pY_34igM",
+        "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums",
+        "https://www.johnlewis.com/content/beauty-hair/best-vitamin-c-serums",
+        "https://www.independent.co.uk/extras/indybest/fashion-beauty/skincare/best-vitamin-c-serums-skin-b2126347.html",
+        "https://www.elle.com/beauty/makeup-skin-care/g61559943/best-vitamin-c-serum-for-sensitive-skin/",
+        "https://www.nbcnews.com/select/shopping/best-vitamin-c-serums-rcna240620",
+        "https://www.youtube.com/watch?v=tL76eObwQxM",
+        "https://www.youtube.com/watch?v=HaRDOYm8ctk",
+        "https://www.facethefuture.co.uk/collections/vitamin-c-serums",
+        "https://clearstem.com/blogs/skin-care-learning-center/what-is-the-best-vitamin-c-serum-for-sensitive-skin-that-doesn-t-cause-irritation"
+      ],
+      "relatedQuestions": [],
+      "images": [],
+      "query": "best vitamin C serum for sensitive skin",
+      "provider": "Perplexity",
+      "engine": "Perplexity"
+    },
+    "chatGptSearchResult": {
+      "text": "For **sensitive skin**, the best vitamin C serums are usually **10% or lower** or use **gentler vitamin C derivatives** (such as sodium ascorbyl phosphate or tetrahexyldecyl ascorbate) rather than very high-strength L-ascorbic acid. Dermatologists also recommend fragrance-free formulas and introducing them gradually. \\[1\\]\n\nHere are some excellent options:\n\n![Dear Klairs Freshly Juiced Vitamin Drop](https://images.openai.com/thumbnails/url/YELQsXicDclJDoIwFADQEzGJA5gYI4qIRKEaI7ohUBpoKlD4lelQ3sfb6Nu-7ycXgsNSUUiJm4ELkkoiKXU5AxELimVcFQrkFee0zNb16n_LzTk1HYwitQkXJ5s9CqNFpyM4umYxsnmiKVGbmxVPHvblnNQjZ8xllAeQeijEdG701LUgu0JHOu19mOZ11M5UBsN7H8C22GnZMEq94bcdQX4Xpv3LlSzPt1XTvNx_P7w-lA) \n\n### Dear Klairs Freshly Juiced Vitamin Drop\n\n₹1,413•Amazon.in + others\n\n4.7 (22K)\n\n₹1,413•Amazon.in + others•\n\n4.7 (22K)\n\nA favorite for beginners and sensitive skin. It contains a low concentration of pure vitamin C (5%), making it less likely to sting while still helping brighten skin over time. \\[2\\]\n\nOther good choices:\n\n![Minimalist Vitamin C Face Serum](https://images.openai.com/thumbnails/url/iJoodXicDcnbDoIgAADQLzJps0i31krKmnhJ0y4vjpCoTDRgrvyo_qe_qfN6vp-r1q1yTJMJKt-tZqWhzwIMuNJE3-iANrWprk3b3gSfPaf_c-ZhaXt0S4OLtUw0lPih97KCKy8_0HVd4HRXIlv0aNRgP7zHm5wpw3jBzJNjHyIgZcWad3HpSJIWPFMk9oGXbtQBHu1JACzSKRwvelKghFtR3MkIA47dkzuUYvEDHMg9ew) \n\nMinimalist Vitamin C Face Serum\n\n₹284•Lightweight serum with vitamin C for brightening skin.\n\n4.1\n\n![Deconstruct Face Serum](https://images.openai.com/thumbnails/url/-RKgV3icDclbCoJAFADQFaUoTpoQIWY-Mk2kRH9ER7k-x7EZo1xOu2o3dX7P99NwTpkuijXBjzfldbXhJZEFYLzgLRbwNIqsmShtCRzm_f90I6h2No6SNaY3k5h22OVzhsYLUjRlKZ0jqYf06Us3VXUbJINnAKh-GCRub-cAryUuDXbqAozSxipW56yFyZDS1pPubbVccQbRwqqM91adA43G7Q87vTpr) \n\nDeconstruct Face Serum\n\n₹468•Hydrating face serum with deconstructing formula.\n\n4.4\n\n![C-VIT Liposomal Serum](https://images.openai.com/thumbnails/url/kT1aenicDclJDoIwFADQExUwRqbEGEEckOJAHFgZ-EAhaCn0J5XjeCxvo2_7vp8aUUhX10sOwyiwLAjm3NCYxAwb0KB76bLuhGg4W_Tz_7nLuHA2kGRWzTANIlmt3g237Lsf295RtkF9UX2QtruTny-lDM1z8DAYfZIos8PtgSg2zrhT7CNKYOpl_QgJIDXHsFNrSOFGqeqoSZLrICsfJ-oHDgw5nQ) \n\nC-VIT Liposomal Serum\n\n₹2,849•Liposomal vitamin C serum for intense skin nourishment.\n\n4.7\n\n![Plum 15% Vitamin C Face Serum](https://images.openai.com/thumbnails/url/d73MJHicDcnbEkJAAADQL1qiCDNNUw1GoyaXFr2xbiux2V2Gr-p3-ps6r-f7qRkj1BDFokPDTFiRA5Z1slBRljKMBNS_RFr3hOCu2r93_zMO11y3UUgdsuhxa8JqXPjDDLzQl_gMYbBuSlq4yuRb6tr1jxqAWR9jT48ilQJEYwJWTsLuY5eE0-xczhxp3sQtSdbLBeG0rRRAtnEgR-n4tE98QANumwRLt009m9MPz-4_ig) \n\nPlum 15% Vitamin C Face Serum\n\n₹299•Affordable vitamin C serum for radiance and skin clarity.\n\n4.5\n\n*   **Minimalist Vitamin C Face Serum** – A good balance of effectiveness and gentleness, especially if you choose the lower-strength version.\n    \n*   **Deconstruct Face Serum** – Suitable if your skin barrier is easily irritated and you want a milder brightening serum.\n    \n*   **C-VIT Liposomal Serum** – Uses a gentler vitamin C delivery system and is often recommended for sensitive or mature skin.\n    \n*   **Plum 15% Vitamin C Face Serum** – Effective, but 15% may be too strong if your skin is very reactive; introduce slowly. \\[3\\]\n    \n\nA few tips for sensitive skin:\n\n*   Patch test on a small area for 24–48 hours before using it on your face.\n    \n*   Start by applying it **2–3 mornings per week**, then increase as tolerated.\n    \n*   Follow with a moisturizer and use **broad-spectrum SPF 30+ sunscreen** every morning.\n    \n*   If your skin burns or stays red for more than a few minutes, reduce frequency or switch to a gentler formula. \\[4\\]\n    \n\nIf you also tell me:\n\n*   **your budget** (e.g. under ₹500, ₹1,000, or premium),\n    \n*   whether your skin is **dry, oily, acne-prone, or rosacea-prone**,\n    \n\nI can narrow it down to the best option for your specific skin.",
+      "queryFanOut": [],
+      "widgets": [],
+      "sources": [
+        {
+          "id": "1",
+          "title": "Tested and Reviewed: 15+ Best Vitamin C Serums of 2026",
+          "url": "https://www.nbcnews.com/select/shopping/best-vitamin-c-serums-ncna1262849?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "2",
+          "title": "The Best Vitamin C Serums for Sensitive Skin, According to Derms | NewBeauty",
+          "url": "https://www.newbeauty.com/view/best-vitamin-c-serums-for-sensitive-skin?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "3",
+          "title": "These Vitamin C Serums Boost Glow Without Irritating Sensitive Skin | Allure",
+          "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "4",
+          "title": "Best Vitamin C serum (India)-Dermatologist Pick 2025 - Dermatocare",
+          "url": "https://dermatocare.com/best-vitamin-c-serum-india-dermatologist-pick-2025/?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "5",
+          "title": "10 Best Vitamin C Serums, According to Dermatologists and Testers",
+          "url": "https://www.goodhousekeeping.com/beauty/anti-aging/g71536873/vitamin-c-serums/?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "6",
+          "title": "Best Vitamin C Serum for Sensitive Skin 2026: 7 Dermatologist-Tested Picks That Won't Irritate",
+          "url": "https://reviewdermatica.com/best-vitamin-c-serum-for-sensitive-skin/?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "7",
+          "title": "These Korean Vitamin C Serums Deliver Instant Glow Anytime, Anywhere | Allure",
+          "url": "https://www.allure.com/story/best-korean-vitamin-c-serums?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "8",
+          "title": "These Vitamin C Serums Boost Glow Without Irritating Sensitive Skin | Allure",
+          "url": "https://www.allure.com/story/best-vitamin-c-serums-for-sensitive-skin?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "9",
+          "title": "20 Best Vitamin C Serums of 2026, According to Dermatologists",
+          "url": "https://www.oprahdaily.com/beauty/g28640232/best-vitamin-c-serums/?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "10",
+          "title": "A Guide to the Best Vitamin C Serums for Brighter Skin",
+          "url": "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums%23intro?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "11",
+          "title": "10 Best vitamin C serums, recommended by experts | Vogue India",
+          "url": "https://www.vogue.in/beauty/content/best-vitamin-c-serums-for-brighter-smoother-skin-recommended-by-dermats?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "12",
+          "title": "Vitamin C Serum: Benefits, How to Apply",
+          "url": "https://health.clevelandclinic.org/vitamin-c-serum?utm_source=chatgpt.com",
+          "section": "citations"
+        },
+        {
+          "id": "13",
+          "title": "The Best Vitamin C Serums, Ranked by a Dermatologist (2026) — Sarah Skin MD",
+          "url": "https://sarahskinmd.com/vitamin-c-serums?utm_source=chatgpt.com",
+          "section": "citations"
+        }
+      ],
+      "query": "best vitamin C serum for sensitive skin",
+      "provider": "OpenAI",
+      "engine": "ChatGPT"
+    },
+    "geminiSearchResult": {
+      "text": "When you have sensitive skin, finding the right vitamin C serum can be tricky because pure forms of vitamin C (like L-ascorbic acid) can sometimes cause stinging, redness, or irritation. The best formulas for sensitive skin usually feature lower percentages, gentler vitamin C derivatives, or are blended with soothing, barrier-protecting ingredients like hyaluronic acid, ceramides, or vitamin E.\n\nwww.forbes.com \\+ 1\n\n### Top Vitamin C Serums for Sensitive Skin\n\n| Product | Key Ingredients & Benefits | Why It Works for Sensitive Skin |\n| --- | --- | --- |\n| **CeraVe Skin Renewing Vitamin C Serum** | 10% L-Ascorbic Acid, Hyaluronic Acid, 3 Essential Ceramides | Combines a moderate strength of vitamin C with ceramides to actively protect and repair your skin barrier. |\n| **La Roche-Posay Pure Vitamin C10 Serum** | 10% Pure Vitamin C, Salicylic Acid, Neurosensine | Specifically formulated for sensitive skin; includes soothing agents to minimize irritation while smoothing texture. |\n| **Mad Hippie Vitamin C Serum** | Sodium Ascorbyl Phosphate (a gentle vitamin C derivative), Vitamin E, Ferulic Acid | Uses a stable, non-acidic form of vitamin C that works at a skin-friendly pH, meaning virtually no stinging or redness. |\n| **TruSkin Vitamin C Serum** | Sodium Ascorbyl Phosphate, Botanical Hyaluronic Acid, Vitamin E | A budget-friendly, highly rated option that relies on gentle derivatives and hydrating ingredients rather than harsh acids. |\n| **Vanicream Vitamin C Serum** | Tetrahexyldecyl Ascorbate (gentle oil-soluble vitamin C) | Free of common irritants like fragrance, dyes, parabens, and essential oils, making it ideal for easily reactive skin. |\n\n### Tips for Introducing Vitamin C to Sensitive Skin\n\n*   **Check the concentration:** If you are new to vitamin C or have reactive skin, look for percentages between **10% and 12%** rather than high-potency 20% formulas.\n    \n*   **Look for derivatives:** Ingredients like _Sodium Ascorbyl Phosphate_ or _Tetrahexyldecyl Ascorbate_ are much less likely to cause irritation than pure L-ascorbic acid.\n    \n    truskin.com\n    \n*   **Do a patch test:** Always test a small drop of the serum on your inner wrist or jawline and wait 24 hours to ensure you don't react before applying it all over your face.\n    \n*   **Use the \"Buffer\" Method:** If a serum still feels slightly strong, apply a thin layer of your regular moisturizer first, let it dry down slightly, and then apply your vitamin C serum over it to slow down absorption.\n    \n*   **Never skip sunscreen:** Vitamin C helps protect your skin from environmental stressors during the day, but it must always be paired with a broad-spectrum SPF in the morning to prevent UV sensitivity.\n    \n    www.elle.com",
+      "sources": [
+        {
+          "id": 1,
+          "title": "Best Vitamin C Serums 2026 - Forbes Vetted",
+          "url": "https://www.forbes.com/sites/forbes-personal-shopper/article/best-vitamin-c-serum/#:~:text=While%20this%20serum%20has%20great,Mad%20Hippie%20Vitamin%20C",
+          "description": "While this serum has great value in terms of effectiveness, it can potentially be harsh on sensitive skin. Our next pick from L'Oréal Paris is a good ...",
+          "section": "citations"
+        },
+        {
+          "id": 2,
+          "title": "The 13 Best Vitamin C Serums for Sensitive Skin - ELLE",
+          "url": "https://www.elle.com/beauty/makeup-skin-care/g61559943/best-vitamin-c-serum-for-sensitive-skin/#:~:text=Nava%20Greenfield%2C%20an%20NYC%2Dbased,%2C%20niacinamide%2C%20or%20hyaluronic%20acid.",
+          "description": "",
+          "section": "citations"
+        },
+        {
+          "id": 3,
+          "title": "The Best Vitamin C Serums for Sensitive Skin: A 2026 Guide | TruSkin",
+          "url": "https://truskin.com/blogs/general/best-vitamin-c-serum-for-sensitive-skin#:~:text=TruSkin's%20Vitamin%20C%20Serum%20uses,acidic%20environment%20that%20causes%20redness.",
+          "description": "TruSkin's Vitamin C Serum uses Sodium Ascorbyl Phosphate (SAP), a stable, gentle form of vitamin C that works at a skin-friendly pH of 6.0—meaning no stinging ...",
+          "section": "citations"
+        },
+        {
+          "id": 4,
+          "title": "The 13 Best Vitamin C Serums for Sensitive Skin - ELLE",
+          "url": "https://www.elle.com/beauty/makeup-skin-care/g61559943/best-vitamin-c-serum-for-sensitive-skin/#:~:text=Best%20Overall,facial%20sunscreen%20no%20matter%20what.",
+          "description": "",
+          "section": "citations"
+        }
+      ],
+      "query": "best vitamin C serum for sensitive skin",
+      "provider": "Google",
+      "engine": "Gemini"
+    },
+    "htmlSnapshotUrl": "https://api.apify.com/v2/key-value-stores/E4noftkA00bQBOEMg/records/FKSxSeBHkDH0qqR-0.html?signature=11rApTyEP71BOSDZMouUU"
+  }
+]

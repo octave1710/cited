@@ -4673,5 +4673,85 @@
     "answer": "{\"urls\": [\"https://www.bmj.com/content/376/n1340\", \"https://www.bmj.com/content/376/n1341\", \"https://www.bmj.com/content/376/n1342\"]}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-28T21:14:36.810Z"
+  },
+  "5e56faadffc0d08cbd0736bd10e66175f7597e5a": {
+    "answer": "{\"questions\": [\"What is vitamin C serum?\", \"What benefits does vitamin C serum provide for the skin?\", \"How does vitamin C serum work to improve skin health?\", \"What are the key ingredients in vitamin C serum?\", \"How should I apply vitamin C serum for the best results?\", \"Are there any side effects of using vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:39.311Z"
+  },
+  "0d81863f39d33f54c9917e9400d01261fb1825af": {
+    "answer": "{\"questions\": [\"How much should I expect to pay for a good vitamin C serum?\", \"Is a more expensive vitamin C serum worth the investment?\", \"What are the differences between cheap and expensive vitamin C serums?\", \"Are there any budget-friendly vitamin C serums that are effective?\", \"What factors contribute to the price of vitamin C serums?\", \"How do I determine if a vitamin C serum is worth the price?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:39.794Z"
+  },
+  "4d540cb1a50cdad160c1b8472797d59258dfafd4": {
+    "answer": "{\"questions\": [\"How do I use vitamin C serum effectively?\", \"When is the best time to apply vitamin C serum?\", \"How often should I use vitamin C serum in my skincare routine?\", \"In what order should I apply vitamin C serum with other products?\", \"Can I use vitamin C serum in the morning and evening?\", \"What should I avoid when using vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:39.976Z"
+  },
+  "b59a44660b59439c8f5d9a25081ae75444822145": {
+    "answer": "{\"questions\": [\"What should I look for in a vitamin C serum?\", \"How do I choose the right vitamin C serum for my skin type?\", \"What ingredients should I avoid in a vitamin C serum?\", \"Are there specific concentrations of vitamin C that are more effective?\", \"How can I tell if a vitamin C serum is high quality?\", \"What packaging is best for preserving the potency of vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:39.986Z"
+  },
+  "44ef91faf43bad31eea36faeb6d79076314205a1": {
+    "answer": "{\"questions\": [\"Does vitamin C serum actually work for skin improvement?\", \"What do studies say about the effectiveness of vitamin C serum?\", \"How strong is the evidence supporting the use of vitamin C serum?\", \"Are there any clinical trials that demonstrate the benefits of vitamin C serum?\", \"What are the common claims made about vitamin C serum and are they backed by research?\", \"How does the concentration of vitamin C in a serum affect its efficacy?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:40.003Z"
+  },
+  "6c7ea0bbcea68ba467701fa2dfca1e8198251182": {
+    "answer": "{\"questions\": [\"How does vitamin C serum compare to hyaluronic acid for skin hydration?\", \"What are the differences between vitamin C serum and retinol for anti-ageing benefits?\", \"Is vitamin C serum more effective than niacinamide for brightening the skin?\", \"How does the absorption of vitamin C serum stack up against other serums like peptides?\", \"What are the pros and cons of using vitamin C serum versus glycolic acid for exfoliation?\", \"Can vitamin C serum provide better results than other antioxidants like vitamin E for skin health?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:40.181Z"
+  },
+  "1a58386ed17af47f9e9e2237538f57e47ae3b006": {
+    "answer": "{\"questions\": [\"What are the potential side effects of using vitamin C serum?\", \"Are there any interactions between vitamin C serum and other skincare products?\", \"Who should avoid using vitamin C serum?\", \"Can vitamin C serum cause allergic reactions?\", \"Is it safe to use vitamin C serum during pregnancy?\", \"What should I do if I experience irritation from vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:40.200Z"
+  },
+  "c8f4c3e3949aaa49f7e24163543e1567148f8e30": {
+    "answer": "{\"questions\": [\"How long does it take to see results from vitamin C serum?\", \"What kind of results can I realistically expect from using vitamin C serum?\", \"Is there a typical timeline for improvements when using vitamin C serum?\", \"How often should I apply vitamin C serum to see the best results?\", \"Are there factors that can affect how quickly I see results from vitamin C serum?\", \"What should I do if I don't see results from vitamin C serum after a certain period?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:32:40.275Z"
+  },
+  "fca9b0881217a8bca19e86ad95780e10b89891af": {
+    "answer": "{\"questions\": [\"What are the potential side effects of using vitamin C serum?\", \"Can vitamin C serum cause skin irritation?\", \"Is it normal to experience redness after applying vitamin C serum?\", \"Are there any allergic reactions associated with vitamin C serum?\", \"How can I tell if I'm having a negative reaction to vitamin C serum?\", \"Can vitamin C serum interact with other skincare products?\", \"Should I avoid using vitamin C serum with retinol?\", \"Is it safe to use vitamin C serum with hyaluronic acid?\", \"Who should not use vitamin C serum?\", \"Are there any skin types that should avoid vitamin C serum?\", \"Can pregnant or breastfeeding women use vitamin C serum?\", \"Is vitamin C serum suitable for sensitive skin?\", \"What should I do if I experience side effects from vitamin C serum?\", \"Can vitamin C serum worsen certain skin conditions?\", \"Are there any contraindications for using vitamin C serum?\", \"How do I know if vitamin C serum is right for my skin type?\", \"What are the signs that I should stop using vitamin C serum?\", \"Can vitamin C serum cause breakouts?\", \"Is it safe to use vitamin C serum on broken skin?\", \"What precautions should I take when using vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:48.646Z"
+  },
+  "465a7cb5d431da2b908ca646d1446dab937836a3": {
+    "answer": "{\"questions\": [\"How do I apply vitamin C serum?\", \"What is the best way to use vitamin C serum?\", \"When should I apply vitamin C serum in my skincare routine?\", \"How often should I use vitamin C serum?\", \"Can I use vitamin C serum in the morning or evening?\", \"What order should I apply vitamin C serum in my skincare routine?\", \"Should I apply vitamin C serum before or after moisturiser?\", \"Is it necessary to use a toner before applying vitamin C serum?\", \"Can I layer vitamin C serum with other products?\", \"How long should I wait after applying vitamin C serum before using other products?\", \"What should I do if I experience irritation from vitamin C serum?\", \"Can I use vitamin C serum with retinol?\", \"Is it safe to use vitamin C serum every day?\", \"How much vitamin C serum should I use each time?\", \"Should I apply vitamin C serum on damp or dry skin?\", \"Can I use vitamin C serum with sunscreen?\", \"What are the signs that I am using vitamin C serum correctly?\", \"How do I store vitamin C serum for maximum effectiveness?\", \"What should I do if my vitamin C serum changes colour?\", \"Are there any specific techniques for applying vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:48.857Z"
+  },
+  "8d5253e15157347806055408af2d9c5b562d5df6": {
+    "answer": "{\"questions\": [\"What are the benefits of vitamin C serum compared to hyaluronic acid?\", \"How does vitamin C serum stack up against retinol for anti-ageing?\", \"Is vitamin C serum more effective than niacinamide for brightening skin?\", \"What are the differences between vitamin C serum and vitamin E oil?\", \"How does vitamin C serum compare to glycolic acid in terms of exfoliation?\", \"Is vitamin C serum better than a moisturiser for hydration?\", \"What are the pros and cons of using vitamin C serum versus a face mask?\", \"How does vitamin C serum perform against other antioxidants like ferulic acid?\", \"Is vitamin C serum more suitable for sensitive skin than salicylic acid?\", \"What are the differences between using vitamin C serum and a vitamin C-rich diet?\", \"How does vitamin C serum compare to other serums for acne treatment?\", \"Is vitamin C serum more effective than a daily sunscreen for skin protection?\", \"What are the advantages of vitamin C serum over a traditional toner?\", \"How does vitamin C serum fare against peptides in skincare?\", \"Is vitamin C serum a better choice than a clay mask for oily skin?\", \"What are the differences between vitamin C serum and a facial oil?\", \"How does vitamin C serum compare to collagen supplements for skin health?\", \"Is vitamin C serum more beneficial than a regular moisturiser for dull skin?\", \"What are the key differences between vitamin C serum and a brightening cream?\", \"How does vitamin C serum measure up against other serums for uneven skin tone?\", \"Is vitamin C serum more effective than a chemical peel for skin rejuvenation?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.048Z"
+  },
+  "e7ec84da12689805c47ba2ad3be73c1f72bf602d": {
+    "answer": "{\"questions\": [\"What is vitamin C serum?\", \"What are the main ingredients in vitamin C serum?\", \"How does vitamin C serum benefit the skin?\", \"What skin concerns can vitamin C serum address?\", \"How does vitamin C serum work on the skin?\", \"Can vitamin C serum help with dark spots?\", \"Is vitamin C serum suitable for all skin types?\", \"How often should I use vitamin C serum?\", \"What is the best way to apply vitamin C serum?\", \"Can I use vitamin C serum with other skincare products?\", \"What should I look for when choosing a vitamin C serum?\", \"How long does it take to see results from vitamin C serum?\", \"Are there any side effects of using vitamin C serum?\", \"Can vitamin C serum help with fine lines and wrinkles?\", \"What is the difference between vitamin C serum and vitamin C cream?\", \"Should I use vitamin C serum in the morning or evening?\", \"How should I store vitamin C serum?\", \"What is the shelf life of vitamin C serum?\", \"Can vitamin C serum be used during pregnancy?\", \"What are the signs of a good quality vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.069Z"
+  },
+  "d854ec8283c9a46d120d6428825dae0011ecf6cc": {
+    "answer": "{\"questions\": [\"Does vitamin C serum actually work for skin improvement?\", \"What benefits does vitamin C serum provide for the skin?\", \"Are there any scientific studies supporting the effectiveness of vitamin C serum?\", \"How strong is the evidence for vitamin C serum in reducing wrinkles?\", \"Can vitamin C serum help with hyperpigmentation?\", \"What do dermatologists say about the efficacy of vitamin C serum?\", \"Is there any research on vitamin C serum's impact on skin hydration?\", \"How does vitamin C serum compare to other skincare ingredients?\", \"What concentrations of vitamin C are most effective in serums?\", \"Are there any side effects associated with using vitamin C serum?\", \"How long does it take to see results from using vitamin C serum?\", \"What types of vitamin C are used in serums, and do they differ in effectiveness?\", \"Is there any evidence that vitamin C serum can protect against UV damage?\", \"How often should I use vitamin C serum for optimal results?\", \"What do clinical trials say about the long-term use of vitamin C serum?\", \"Are there specific skin types that benefit more from vitamin C serum?\", \"What is the best way to incorporate vitamin C serum into my skincare routine?\", \"Can vitamin C serum be used alongside other active ingredients?\", \"What are the common misconceptions about vitamin C serum?\", \"How do I choose a high-quality vitamin C serum based on evidence?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.074Z"
+  },
+  "61e9bf4334d5d3ad0f880d0282761f4e57f4058b": {
+    "answer": "{\"questions\": [\"What is the average price of vitamin C serums in the UK?\", \"Are expensive vitamin C serums worth the investment?\", \"What are the benefits of using a high-end vitamin C serum?\", \"Can I find effective vitamin C serums at a lower price?\", \"What should I look for in a budget-friendly vitamin C serum?\", \"How do the ingredients in cheap vitamin C serums compare to expensive ones?\", \"Is there a significant difference in effectiveness between cheap and expensive vitamin C serums?\", \"What are some affordable vitamin C serums that actually work?\", \"How much should I expect to spend on a quality vitamin C serum?\", \"Are there any vitamin C serums that offer good value for money?\", \"What factors influence the price of vitamin C serums?\", \"Do higher-priced vitamin C serums have better packaging or branding?\", \"How can I determine if a vitamin C serum is worth its price?\", \"What are the risks of using a cheap vitamin C serum?\", \"Are there any specific brands known for their affordable vitamin C serums?\", \"How often should I use vitamin C serum to see results, regardless of price?\", \"What are the common price ranges for vitamin C serums?\", \"Is it possible to find a vitamin C serum that is both effective and inexpensive?\", \"What do reviews say about the value of different vitamin C serums?\", \"How do I know if I'm overpaying for a vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.472Z"
+  },
+  "bcbbba4a684e2b9b9568b365d5c891a7814eb9dc": {
+    "answer": "{\"questions\": [\"What should I look for in a vitamin C serum?\", \"How do I choose the right vitamin C serum for my skin type?\", \"What concentration of vitamin C is best for a serum?\", \"Are there specific ingredients I should look for in a vitamin C serum?\", \"What are the benefits of using vitamin C serum?\", \"How do I know if a vitamin C serum is effective?\", \"What should I avoid on the label of a vitamin C serum?\", \"Is there a difference between L-ascorbic acid and other forms of vitamin C?\", \"How can I tell if a vitamin C serum is fresh and not expired?\", \"What packaging is best for vitamin C serums to maintain potency?\", \"Should I consider the pH level of a vitamin C serum?\", \"Are there any harmful ingredients to watch out for in vitamin C serums?\", \"How often should I apply vitamin C serum for best results?\", \"Can I use vitamin C serum with other skincare products?\", \"What is the ideal storage condition for vitamin C serum?\", \"How long does a vitamin C serum last once opened?\", \"What are the signs of a bad vitamin C serum?\", \"Is it necessary to use a vitamin C serum with a sunscreen?\", \"How do I incorporate vitamin C serum into my skincare routine?\", \"What are the common misconceptions about vitamin C serums?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.545Z"
+  },
+  "676b29843048cf13aa239fd8c5a67cee33bd3dd0": {
+    "answer": "{\"questions\": [\"How long does it take to see results from vitamin C serum?\", \"What results can I realistically expect from using vitamin C serum?\", \"Is it normal for vitamin C serum to take a while to show effects?\", \"What is the average timeframe for visible improvements with vitamin C serum?\", \"Can I expect immediate results from vitamin C serum?\", \"How often should I use vitamin C serum to see results?\", \"What factors influence how quickly I see results from vitamin C serum?\", \"Are there different types of vitamin C serum that work faster?\", \"How long should I use vitamin C serum before expecting to see changes?\", \"What signs indicate that vitamin C serum is working?\", \"Is it possible to see results in less than a month with vitamin C serum?\", \"How do I know if the vitamin C serum I'm using is effective?\", \"What should I do if I don't see results from my vitamin C serum?\", \"Can I combine vitamin C serum with other products for faster results?\", \"What are the common results people see from vitamin C serum?\", \"How long do the effects of vitamin C serum last once achieved?\", \"Are there any tips to enhance the effectiveness of vitamin C serum?\", \"What should I realistically expect in terms of skin improvement?\", \"How does skin type affect the results from vitamin C serum?\", \"What is the best way to track my progress with vitamin C serum?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T22:48:49.622Z"
   }
 }
