@@ -515,6 +515,9 @@ function Owners({ map }: { map: CitationMap }) {
       <p className="m-sm meta" style={{ marginTop: 12, textTransform: "none", letterSpacing: 0.2 }}>
         Counted on questions where the domain is named first.
       </p>
+      <a className="btn btn--primary" href={`/api/bundle?map=${encodeURIComponent(map.id)}`} style={{ marginTop: 20 }} download>
+        Download the map as files
+      </a>
     </div>
   );
 }
