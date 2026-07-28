@@ -123,9 +123,39 @@ export function openaiLLM(opts: OpenAIOpts = {}): LLMClient {
   return client;
 }
 
-/** Mode switch lives in .env (LLM_MODE=mock|real). The demo runs fully offline on mock. */
+/**
+ * Mode switch lives in .env.
+ *
+ *   auto (default)  a key is present, so call the API and record every answer. Without a
+ *                   key, replay. This is the only setting under which the app works on a
+ *                   topic nobody has run before.
+ *   real            always call.
+ *   mock            never call, replay only. Offline demo.
+ *
+ * The default used to be `mock`, which meant the tool answered exactly one topic: the one
+ * whose answers were on disk. Any other query failed with a message about recordings.
+ * A tool that only runs its own fixtures is a slideshow.
+ */
 export function getLLM(opts: OpenAIOpts = {}): LLMClient {
-  const mode = process.env.LLM_MODE ?? "mock";
-  if (mode === "real") return openaiLLM({ record: process.env.RECORD === "1", ...opts });
+  const mode = process.env.LLM_MODE ?? "auto";
+  const hasKey = Boolean(process.env.OPENAI_API_KEY);
+
+  if (mode === "mock") return mockLLM(opts.recordingsPath);
+  if (mode === "real" || (mode === "auto" && hasKey)) {
+    // cache and record are on by default in auto: a re-run of the same question is free,
+    // and every live answer lands on disk so the demo replays offline afterwards
+    return openaiLLM({ cache: true, record: true, ...opts, ...(process.env.RECORD === "0" ? { record: false } : {}) });
+  }
   return mockLLM(opts.recordingsPath);
+}
+
+/** What the UI shows in the status bar, without needing a client instance. */
+export function llmMode(): { mode: string; live: boolean; why: string } {
+  const mode = process.env.LLM_MODE ?? "auto";
+  const hasKey = Boolean(process.env.OPENAI_API_KEY);
+  if (mode === "mock") return { mode: "replay", live: false, why: "LLM_MODE=mock, answers replay from the recording" };
+  if (mode === "real") return { mode: "live", live: true, why: "LLM_MODE=real" };
+  return hasKey
+    ? { mode: "live", live: true, why: "a key is present, so any topic runs live and is recorded" }
+    : { mode: "replay", live: false, why: "no OPENAI_API_KEY, so only recorded topics can run" };
 }

@@ -913,5 +913,245 @@
     "answer": "{\"urls\": []}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-28T15:17:58.744Z"
+  },
+  "9d5f68bbd879afd1a14d6c44b8c428a15560cdc7": {
+    "answer": "{\"questions\": [\"What should I look for on a GLP-1 label when choosing a product?\", \"Are there specific ingredients I should avoid in GLP-1 medications?\", \"How can I determine the effectiveness of a GLP-1 product from its label?\", \"What are the key features to consider when selecting a GLP-1 medication?\", \"What common pitfalls should I be aware of when reading GLP-1 labels?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:46.317Z"
+  },
+  "83bad98482f3bd46af692f6bba73b09d890cfa58": {
+    "answer": "{\"questions\": [\"What are the main differences between GLP-1 medications and other weight loss drugs?\", \"How does GLP-1 compare to traditional diet and exercise methods for weight loss?\", \"What are the side effects of GLP-1 compared to other diabetes medications?\", \"In terms of effectiveness, how does GLP-1 stack up against SGLT-2 inhibitors?\", \"Are there any advantages of using GLP-1 over insulin therapy for managing blood sugar levels?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:46.387Z"
+  },
+  "c17bd649e2f46b4ed9cbfc8cac670d567dd7cd69": {
+    "answer": "{\"questions\": [\"What is GLP-1?\", \"What does GLP-1 do in the body?\", \"How does GLP-1 work to regulate blood sugar?\", \"What are the benefits of GLP-1 for weight management?\", \"Are there any side effects associated with GLP-1 medications?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:46.548Z"
+  },
+  "5685310c031954f6cfd9887d14127a718c7a0492": {
+    "answer": "{\"questions\": [\"How long does it typically take to see results from GLP-1 medications?\", \"What kind of weight loss can I realistically expect from using GLP-1 treatments?\", \"Are there any factors that can affect how quickly I see results with GLP-1?\", \"What should I do if I don't see results within the expected timeframe for GLP-1?\", \"How do GLP-1 results compare to other weight loss methods in terms of time and effectiveness?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:46.688Z"
+  },
+  "8f11a3ebc2a67a886fc9290b0f9389066023c2a1": {
+    "answer": "{\"questions\": [\"How do I use GLP-1 medication?\", \"When should I take GLP-1 injections?\", \"How often do I need to administer GLP-1?\", \"What is the correct order for using GLP-1 with other medications?\", \"Are there specific times of day that are best for using GLP-1?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:47.089Z"
+  },
+  "a55ff61f577421ff0efa7eb61a275f15022a32ed": {
+    "answer": "{\"questions\": [\"What are the common side effects of GLP-1 medications?\", \"Are there any serious side effects associated with GLP-1 treatments?\", \"What drug interactions should I be aware of when using GLP-1 medications?\", \"Who should avoid using GLP-1 medications?\", \"What precautions should be taken before starting GLP-1 therapy?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:47.203Z"
+  },
+  "3b26124e0de20575c40b282e387f94bb12e3cb09": {
+    "answer": "{\"questions\": [\"What is the average price of GLP-1 medications in the UK?\", \"Are there cheaper alternatives to GLP-1 medications that are effective?\", \"How do the costs of GLP-1 medications compare to other weight loss treatments?\", \"Is it worth paying more for branded GLP-1 medications versus generic options?\", \"What factors should I consider when evaluating the price of GLP-1 medications?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:47.772Z"
+  },
+  "39f9cc1191b78f3bbe99427e85f6df0750abb56b": {
+    "answer": "{\"questions\": [\"What is GLP-1 and how does it work in the body?\", \"What do recent studies say about the effectiveness of GLP-1 medications for weight loss?\", \"How strong is the evidence supporting the use of GLP-1 for managing diabetes?\", \"Are there any long-term studies on the safety and efficacy of GLP-1 treatments?\", \"What are the potential side effects of GLP-1 medications according to current research?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:47.925Z"
+  },
+  "a08a1bb44de756bc3c454c1e4a5a26ed392a0a2b": {
+    "answer": "{\"answer\": \"GLP-1, or glucagon-like peptide-1, is a hormone that helps regulate blood sugar levels by enhancing insulin secretion, inhibiting glucagon release, and slowing gastric emptying, which can aid in weight management. It also plays a role in promoting satiety and reducing appetite.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\", \"webmd.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:49.419Z"
+  },
+  "06cd9f834a9c33342644469953a98fb055fb43ae": {
+    "answer": "{\"answer\": \"GLP-1, or glucagon-like peptide-1, helps regulate blood sugar by enhancing insulin secretion in response to meals, inhibiting glucagon release, and slowing gastric emptying, which together lower blood glucose levels. It also promotes satiety, reducing food intake and further aiding in blood sugar control.\", \"sources\": [\"diabetes.co.uk\", \"nhs.uk\", \"healthline.com\", \"mayoclinic.org\", \"webmd.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:49.561Z"
+  },
+  "e940af3ab5d390bb27a9ffd5f26d85ee2cefa7f3": {
+    "answer": "{\"answer\": \"Yes, GLP-1 medications can cause side effects such as nausea, vomiting, diarrhea, and potential risk of pancreatitis. It's important to consult a healthcare professional for personalized advice and monitoring while using these medications.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:49.732Z"
+  },
+  "068df9ce60f3cf509f21ab1b4afe62c9c3cb2c08": {
+    "answer": "{\"answer\": \"GLP-1, or glucagon-like peptide-1, is a hormone that plays a crucial role in glucose metabolism by enhancing insulin secretion, inhibiting glucagon release, and promoting satiety. It is produced in the intestines in response to food intake and helps regulate blood sugar levels.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\", \"webmd.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:49.922Z"
+  },
+  "905753af71ff53929ab020e8d96479128abe21fd": {
+    "answer": "{\"answer\": \"GLP-1 (glucagon-like peptide-1) medications can aid in weight management by reducing appetite, increasing feelings of fullness, and improving glucose metabolism, which can lead to significant weight loss in individuals with obesity. These medications also have the added benefit of improving cardiovascular health and reducing the risk of type 2 diabetes.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:50.936Z"
+  },
+  "d2f8d8cf47985ebe45512e21e4b4476c8b640d83": {
+    "answer": "{\"answer\": \"Recent studies indicate that GLP-1 medications, such as semaglutide, are effective for weight loss, showing significant reductions in body weight among participants compared to placebo groups. These medications work by enhancing feelings of fullness and reducing appetite, making them a promising option for obesity management in the UK.\", \"sources\": [\"thelancet.com\", \"nejm.org\", \"diabetesjournals.org\", \"bmj.com\", \"ncbi.nlm.nih.gov\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:51.065Z"
+  },
+  "a064434f6221e116878f778375bd7d827ef78de2": {
+    "answer": "{\"answer\": \"The evidence supporting the use of GLP-1 receptor agonists for managing diabetes is strong, with numerous clinical trials demonstrating their effectiveness in lowering blood sugar levels and promoting weight loss in patients with type 2 diabetes. These medications are recommended in guidelines due to their cardiovascular benefits and overall safety profile.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"bmj.com\", \"thelancet.com\", \"diabetesjournals.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:51.148Z"
+  },
+  "f7df2ecb5802a72f6d52f926866e12b4f252afa5": {
+    "answer": "{\"answer\": \"Yes, there are long-term studies that have evaluated the safety and efficacy of GLP-1 treatments, particularly in relation to weight management and type 2 diabetes. These studies generally indicate that GLP-1 receptor agonists are effective for weight loss and have a favorable safety profile over extended periods.\", \"sources\": [\"diabetes.co.uk\", \"nhs.uk\", \"thelancet.com\", \"diabetesjournals.org\", \"ncbi.nlm.nih.gov\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:51.746Z"
+  },
+  "8982e0f68e3c4d636ec612bb4b81b7631522273c": {
+    "answer": "{\"answer\": \"Potential side effects of GLP-1 medications include nausea, vomiting, diarrhea, and potential risk of pancreatitis. Other concerns may include weight loss and possible thyroid tumors, although these are less common.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:52.048Z"
+  },
+  "2883ce73847c0b16c7b4c4a163c8fb6176d708b6": {
+    "answer": "{\"answer\": \"In GLP-1 medications, it's important to be cautious of ingredients that may cause allergic reactions or gastrointestinal side effects, such as certain preservatives or fillers. Always consult with a healthcare professional for personalized advice regarding specific ingredients to avoid based on your health history.\", \"sources\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:52.155Z"
+  },
+  "9907c7f465dd3ea33368162978e22c8898f5d9ab": {
+    "answer": "{\"answer\": \"When choosing a GLP-1 product, look for the active ingredient, dosage form, administration method (e.g., injection or oral), and any specific indications or contraindications listed on the label. Additionally, check for potential side effects and any guidance on how to use the medication effectively.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"medicines.org.uk\", \"diabetes.co.uk\", \"healthline.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:52.558Z"
+  },
+  "3650947e712d0434b59cbdfd18bffe19594c8946": {
+    "answer": "{\"answer\": \"To determine the effectiveness of a GLP-1 product from its label, look for clinical trial data, indications for use, dosage recommendations, and any reported outcomes related to weight loss or glycemic control. Additionally, check for any warnings or contraindications that may affect its use in specific populations.\", \"sources\": [\"gov.uk\", \"nhs.uk\", \"ema.europa.eu\", \"clinicaltrials.gov\", \"healthline.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:52.828Z"
+  },
+  "bcfd3c92ccaa1f369e894953d7cd83a7b2402af6": {
+    "answer": "{\"answer\": \"Key features to consider when selecting a GLP-1 medication include the mode of administration (injection vs. oral), dosing frequency, efficacy in weight loss and glycemic control, side effects, and cost. Additionally, patient preferences and any existing health conditions should also be taken into account.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"bmj.com\", \"endocrineweb.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:52.948Z"
+  },
+  "fefbd3de2f07e0eb4a6823cbea695d3c08696e24": {
+    "answer": "{\"answer\": \"When reading GLP-1 labels, be aware of potential pitfalls such as misunderstanding dosage instructions, overlooking side effects, and not recognizing the importance of lifestyle changes alongside medication. Additionally, ensure you understand the specific indications and contraindications for the medication prescribed to you.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:53.877Z"
+  },
+  "6d264b589ef96902bfe971446b13d6ce362b1229": {
+    "answer": "{\"answer\": \"GLP-1, or glucagon-like peptide-1, is a hormone that plays a crucial role in glucose metabolism and appetite regulation, often used in diabetes treatment and weight management. It enhances insulin secretion, inhibits glucagon release, and promotes satiety.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:54.236Z"
+  },
+  "53cacf9f6323d293d21edf16c9458713bbafb520": {
+    "answer": "{\"answer\": \"GLP-1 receptor agonists are generally more effective than SGLT-2 inhibitors for weight loss and glycemic control in type 2 diabetes, but SGLT-2 inhibitors also provide cardiovascular and renal benefits. The choice between them often depends on individual patient needs and health profiles.\", \"sources\": [\"diabetes.co.uk\", \"nhs.uk\", \"bmj.com\", \"thelancet.com\", \"diabetesjournals.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:54.258Z"
+  },
+  "c944300c85d0fd7c5ecb6d6fc50f5edf8d900222": {
+    "answer": "{\"answer\": \"GLP-1 medications, such as semaglutide, primarily work by mimicking the hormone GLP-1 to regulate appetite and glucose metabolism, leading to weight loss, while other weight loss drugs may function through different mechanisms, such as appetite suppression or fat absorption inhibition. Additionally, GLP-1 medications often have a dual benefit of improving glycemic control in individuals with type 2 diabetes, which is not a feature of many other weight loss drugs.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:54.385Z"
+  },
+  "d339b2602ba5b9d07bc1b892a99611d14b0abdb2": {
+    "answer": "{\"answer\": \"GLP-1 medications have been shown to produce greater weight loss compared to traditional diet and exercise methods, particularly in individuals with obesity or overweight. These medications work by enhancing feelings of fullness and reducing appetite, which can lead to more significant and sustained weight loss results than lifestyle changes alone.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"bmj.com\", \"thelancet.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:54.492Z"
+  },
+  "5f0dc1a684fd75437fa8860f2221c814e55688b4": {
+    "answer": "{\"answer\": \"GLP-1 receptor agonists can cause side effects such as nausea, vomiting, diarrhea, and potential pancreatitis, which may be less common with other diabetes medications like metformin or sulfonylureas. However, GLP-1s are often associated with weight loss, which is a benefit not typically seen with other diabetes treatments.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\", \"endocrineweb.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:54.691Z"
+  },
+  "d1be7e1b30149df61ad72171f1e54bc19a1cb5c3": {
+    "answer": "{\"answer\": \"Yes, GLP-1 treatments can have serious side effects, including pancreatitis, kidney problems, and gastrointestinal issues. It's important to discuss potential risks with a healthcare provider before starting treatment.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:55.603Z"
+  },
+  "b4b106468d456fe1c62459be40fe8c9ff8025f19": {
+    "answer": "{\"answer\": \"Individuals with a personal or family history of medullary thyroid carcinoma or multiple endocrine neoplasia syndrome type 2 should avoid using GLP-1 medications. Additionally, those with a history of pancreatitis or severe gastrointestinal disorders may also be advised against their use.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:55.731Z"
+  },
+  "fd168857b74a7562042109a42ab35ca6685ae4fb": {
+    "answer": "{\"answer\": \"Common side effects of GLP-1 medications include nausea, vomiting, diarrhea, and potential weight loss. Some patients may also experience abdominal pain and constipation.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:56.019Z"
+  },
+  "f56e3d87f47c6120d8dd1e8d551b4ca079f908a4": {
+    "answer": "{\"answer\": \"Before starting GLP-1 therapy, patients should consult with their healthcare provider to assess their medical history, including any history of pancreatitis, kidney issues, or thyroid tumors. It's also important to discuss potential side effects and ensure proper monitoring during treatment.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:56.248Z"
+  },
+  "f7256bc29942104c11e5e843ee6a64b48c0df9f6": {
+    "answer": "{\"answer\": \"Yes, GLP-1 receptor agonists can promote weight loss, have a lower risk of hypoglycemia compared to insulin, and may improve cardiovascular outcomes. They also provide a more convenient dosing schedule, often requiring less frequent administration than insulin injections.\", \"sources\": [\"diabetes.co.uk\", \"nhs.uk\", \"diabetes.org\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:56.414Z"
+  },
+  "9969d1e283060c91c8fa141b3d842d20c0e43b34": {
+    "answer": "{\"answer\": \"GLP-1 receptor agonists are typically administered once a week or once a day, depending on the specific medication prescribed. It's important to follow your healthcare provider's instructions regarding the dosing schedule.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:57.103Z"
+  },
+  "8239844ef12e55a618dadea631af0e01d3328466": {
+    "answer": "{\"answer\": \"GLP-1 medications are typically administered via injection and should be used as prescribed by your healthcare provider, often in conjunction with a healthy diet and exercise. It's important to follow the dosing schedule and guidelines provided by your doctor to manage conditions like type 2 diabetes or obesity effectively.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:57.109Z"
+  },
+  "d2323f6e8396f26dd3039907deec0f2f06f49fcc": {
+    "answer": "{\"answer\": \"GLP-1 injections should be taken as prescribed by your healthcare provider, typically once a week or daily depending on the specific medication and your treatment plan. It's important to follow your doctor's instructions regarding timing and dosage for optimal results.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\", \"drugs.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:57.123Z"
+  },
+  "7d93095fff773f94f18bdd47fa79c6c76924d4e9": {
+    "answer": "{\"answer\": \"In the UK, GLP-1 receptor agonists are typically used alongside metformin as the first-line treatment for type 2 diabetes, and can be added to other medications like sulfonylureas or insulin if needed. It's important to follow a healthcare provider's guidance for individual treatment plans.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"nice.org.uk\", \"bmj.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:57.857Z"
+  },
+  "495d4488b85df9f2444564397cd5a848f3d9d61c": {
+    "answer": "{\"answer\": \"GLP-1 medications are typically recommended to be taken before meals to enhance their effectiveness in controlling blood sugar levels. However, the specific timing can vary based on the individual and the medication prescribed, so it's best to follow your healthcare provider's guidance.\", \"sources\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:58.308Z"
+  },
+  "1b284c08ea8cafa53752fc994f074602f787854a": {
+    "answer": "{\"answer\": \"Typically, patients may start to see results from GLP-1 medications within a few weeks, but optimal results often take several months of consistent use. Individual responses can vary based on factors such as dosage and adherence to lifestyle changes.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:58.332Z"
+  },
+  "a7d9f333e6ef3648c5e451544ab8584bba192340": {
+    "answer": "{\"answer\": \"Yes, factors such as individual metabolism, dosage, adherence to diet and exercise, and the specific GLP-1 medication used can all influence how quickly you see results. Additionally, underlying health conditions may also play a role in the effectiveness of GLP-1 treatments.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\", \"webmd.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:58.598Z"
+  },
+  "e79a7abdb2eacfbd707d6a4989c8dc514910e862": {
+    "answer": "{\"answer\": \"When using GLP-1 medications, be aware of potential interactions with insulin and other antidiabetic drugs, as they may increase the risk of hypoglycemia. Additionally, certain medications that slow gastric emptying, such as opioids, may also interact with GLP-1 drugs, affecting their absorption and efficacy.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"drugs.com\", \"medlineplus.gov\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:59.301Z"
+  },
+  "2e831011d5279b9adc211806eb83e19eba4286a3": {
+    "answer": "{\"answer\": \"If you don't see results within the expected timeframe for GLP-1 medications, consult your healthcare provider to discuss your progress and any necessary adjustments to your treatment plan. It's important to ensure that the medication is being used correctly and to rule out any underlying issues that may be affecting its efficacy.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:59.348Z"
+  },
+  "21b9f441d36b5b04ebda23966a341b04ffb65702": {
+    "answer": "{\"answer\": \"Patients using GLP-1 treatments can expect an average weight loss of about 5% to 10% of their body weight over a period of several months, depending on individual factors and adherence to treatment. Some individuals may experience even greater weight loss, particularly when combined with lifestyle changes such as diet and exercise.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:13:59.491Z"
+  },
+  "72ca38506313c863c850a5a5b7d76028f12c0325": {
+    "answer": "{\"answer\": \"In the UK, alternatives to GLP-1 medications include lifestyle changes, metformin, and other diabetes medications, which may be more cost-effective. However, the effectiveness of these alternatives can vary based on individual health needs and conditions.\", \"sources\": [\"nhs.uk\", \"diabetes.co.uk\", \"gov.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:00.186Z"
+  },
+  "23f92715f957908b2815d3d0e656da6dfeab42d4": {
+    "answer": "{\"answer\": \"GLP-1 medications tend to be more expensive than traditional weight loss treatments, such as lifestyle changes or over-the-counter options, but they may offer more significant weight loss results. The cost can vary widely depending on the specific medication and healthcare provider recommendations in the UK.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"bmj.com\", \"healthline.com\", \"diabetes.co.uk\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:00.749Z"
+  },
+  "f608e2824c26a026518208a4b4ab4c270328a46e": {
+    "answer": "{\"answer\": \"When evaluating the price of GLP-1 medications in the UK, consider factors such as the specific medication's effectiveness, the duration of treatment, potential side effects, and whether the medication is available on the NHS or requires private prescription. Additionally, compare prices across different pharmacies and consider any available patient assistance programs or discounts.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"bmj.com\", \"healthline.com\", \"drugs.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:00.777Z"
+  },
+  "68298bf668744b56ad57dfc87edaca3ef1953fe6": {
+    "answer": "{\"answer\": \"In the UK, branded GLP-1 medications may offer more consistent dosing and proven efficacy, while generics can be more cost-effective but may vary in formulation. Ultimately, the choice depends on individual health needs and preferences, so consulting a healthcare professional is advisable.\", \"sources\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:01.605Z"
+  },
+  "54ca2a8141d0cd3aa7faf85d6493e4511b35442f": {
+    "answer": "{\"answer\": \"GLP-1 receptor agonists have shown significant effectiveness in weight loss, often leading to greater reductions in body weight compared to traditional methods like diet and exercise alone, typically within a few months of treatment. However, individual results can vary, and these medications may take longer to show results compared to more immediate lifestyle changes.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"diabetes.co.uk\", \"healthline.com\", \"mayoclinic.org\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:01.730Z"
+  },
+  "cd7d1354946acb2012a98816afd48ce3ac75b4f5": {
+    "answer": "{\"answer\": \"The average price of GLP-1 medications in the UK can vary, but they typically range from £60 to £150 per month, depending on the specific medication and dosage. Prices may also differ based on whether the medication is prescribed through the NHS or purchased privately.\", \"sources\": [\"nhs.uk\", \"gov.uk\", \"healthline.com\", \"drugs.com\", \"bmj.com\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T18:14:08.058Z"
   }
 }

@@ -224,6 +224,7 @@ export function MapScreen() {
       )}
 
       <div className="gut">
+        <div className="shell">
         {!total && !busy && <MapEmpty />}
 
         {(busy || total > 0) && (
@@ -255,6 +256,7 @@ export function MapScreen() {
 
         {map && signals && <Queue map={map} signals={signals} />}
         {map && delta && <DeltaPanel delta={delta.delta} noBaselineReason={delta.noBaselineReason} />}
+        </div>
       </div>
     </div>
   );
@@ -272,7 +274,8 @@ function MapBar(p: {
 }) {
   return (
     <div className="rule-b gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", position: "sticky", top: "var(--bar-h)", zIndex: 40 }}>
-      <form onSubmit={(e) => { e.preventDefault(); if (!p.busy) p.onRun(); }} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+      <div className="shell">
+      <form onSubmit={(e) => { e.preventDefault(); if (!p.busy) p.onRun(); }} className="bar">
         <input className="field" style={{ flex: "1 1 340px" }} value={p.topic} onChange={(e) => p.setTopic(e.target.value)} placeholder="Category, e.g. vitamin c serum" aria-label="Category" />
         <input className="field" style={{ width: 210 }} value={p.brand} onChange={(e) => p.setBrand(e.target.value)} aria-label="Brand name" />
         <input className="field" style={{ width: 230 }} value={p.domain} onChange={(e) => p.setDomain(e.target.value)} placeholder="yourdomain.com" aria-label="Your domain" />
@@ -283,6 +286,7 @@ function MapBar(p: {
       </form>
       <div style={{ marginTop: 14 }}>
         <History currentId={p.currentId} onOpen={p.onOpen} />
+      </div>
       </div>
     </div>
   );
@@ -567,7 +571,11 @@ function Owners({ map }: { map: CitationMap }) {
       {top.map((d, i) => (
         <div key={d.domain} style={{ padding: "13px 0", borderTop: "1px solid var(--rule-soft)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ width: 14, height: 14, flex: "none", background: ink(d, i) }} />
+            {d.isBrand ? (
+              <span style={{ width: 18, height: 18, flex: "none", background: "var(--red)" }} />
+            ) : (
+              <Favicon domain={d.domain} />
+            )}
             <span style={{ fontSize: 17, fontWeight: 600, color: d.isBrand ? "var(--red)" : "var(--ink)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {d.domain}{d.isBrand ? " (you)" : ""}
             </span>
@@ -600,7 +608,11 @@ function Owners({ map }: { map: CitationMap }) {
  */
 function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
-  const rows = signals.entryPoints.filter((e) => difficulty === "all" || e.difficulty === difficulty).slice(0, 12);
+  const [showAll, setShowAll] = useState(false);
+  const all = signals.entryPoints.filter((e) => difficulty === "all" || e.difficulty === difficulty);
+  // showing twelve of a hundred and fifty and calling the filter "All" is a lie about
+  // what is on screen. The full list is one click away and the CSV is next to it.
+  const rows = showAll ? all : all.slice(0, 12);
   const counts = signals.entryPoints.reduce<Record<string, number>>((a, e) => ({ ...a, [e.difficulty]: (a[e.difficulty] ?? 0) + 1 }), {});
 
   return (
@@ -613,35 +625,55 @@ function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
         Taking the seat held by a site that wins nothing anywhere is a page.
       </p>
 
-      <div style={{ display: "flex", gap: 8, marginTop: 30, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, marginTop: 30, flexWrap: "wrap", alignItems: "center" }}>
         {([
-          ["all", `All ${signals.entryPoints.length}`],
-          ["open", `Nobody cited · ${counts.open ?? 0}`],
-          ["contested", `Split · ${counts.contested ?? 0}`],
-          ["monopoly", `One site owns it · ${counts.monopoly ?? 0}`],
-        ] as const).map(([key, label]) => (
+          ["all", `All ${signals.entryPoints.length}`, "Every question you do not currently hold."],
+          ["open", `Nobody cited · ${counts.open ?? 0}`, "The engine named no commercial page. Nothing to beat, a page to write."],
+          ["contested", `Split · ${counts.contested ?? 0}`, "Several sites are cited and none of them owns the category."],
+          ["monopoly", `One site owns it · ${counts.monopoly ?? 0}`, "The first-cited site also wins a large share of the whole map."],
+        ] as const).map(([key, label, help]) => (
           <button
             key={key}
+            title={help}
             className={`btn btn--sm ${difficulty === key ? "btn--primary" : "btn--ghost"}`}
-            onClick={() => setDifficulty(key as Difficulty | "all")}
+            onClick={() => {
+              setDifficulty(key as Difficulty | "all");
+              setShowAll(false);
+            }}
           >
             {label}
           </button>
         ))}
+        <a
+          className="btn btn--sm"
+          href={`/api/bundle?map=${encodeURIComponent(map.id)}`}
+          download
+          style={{ marginLeft: "auto" }}
+        >
+          Export all {signals.entryPoints.length} to CSV
+        </a>
       </div>
+
+      <p style={{ fontSize: 15.5, lineHeight: 1.6, marginTop: 14, maxWidth: "88ch" }}>
+        {difficulty === "all"
+          ? "Sorted easiest first. Every row names the site holding the weakest seat in that answer, with its record across the whole map."
+          : difficulty === "open"
+            ? "The engine named no commercial page on these. There is nothing to outrank, only a page to write."
+            : difficulty === "contested"
+              ? "Several sites are cited here and none of them owns the category, so the incumbent is beatable."
+              : "The site cited first also wins a large share of the whole map. The way in is the weaker site sitting beside it, named on each row."}
+      </p>
 
       <div style={{ marginTop: 30, borderTop: "1px solid var(--rule)" }}>
         {rows.length === 0 && <p style={{ fontSize: 16, padding: "18px 0" }}>Nothing in this route on this map.</p>}
         {rows.map((e, i) => (
           <div key={e.id} style={{ padding: "18px 0", borderBottom: "1px solid var(--rule-soft)" }}>
             <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-              <span
-                style={{
-                  width: 14, height: 14, flex: "none",
-                  background: e.difficulty === "open" ? "transparent" : RANK_INK[e.difficulty === "monopoly" ? 0 : 2],
-                  border: e.difficulty === "open" ? "1px solid var(--ink)" : "none",
-                }}
-              />
+              {e.weakest ? (
+                <Favicon domain={e.weakest.domain} />
+              ) : (
+                <span style={{ width: 18, height: 18, flex: "none", border: "1px solid var(--ink)" }} />
+              )}
               <span style={{ fontSize: 16.5, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{sentence(e.text)}</span>
               {e.weakest ? (
                 <a
@@ -665,7 +697,47 @@ function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
           </div>
         ))}
       </div>
+
+      {all.length > rows.length && (
+        <button className="btn" style={{ marginTop: 22 }} onClick={() => setShowAll(true)}>
+          Show the other {all.length - rows.length}
+        </button>
+      )}
     </section>
+  );
+}
+
+/**
+ * The site's own favicon, from Google's public S2 service. Sixteen grey squares told
+ * the user nothing about who was in the room; a logo is recognised before it is read.
+ * Falls back to the first letter when the service has nothing, so a row is never blank.
+ */
+function Favicon({ domain, size = 18 }: { domain: string; size?: number }) {
+  const [failed, setFailed] = useState(false);
+  if (failed || !domain) {
+    return (
+      <span
+        aria-hidden
+        style={{
+          width: size, height: size, flex: "none", display: "inline-flex", alignItems: "center",
+          justifyContent: "center", border: "1px solid var(--rule)", fontFamily: "var(--mono)",
+          fontSize: size * 0.55, color: "var(--meta)", textTransform: "uppercase",
+        }}
+      >
+        {domain.replace(/^www\./, "")[0] ?? "?"}
+      </span>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`}
+      alt=""
+      width={size}
+      height={size}
+      onError={() => setFailed(true)}
+      style={{ flex: "none", display: "block" }}
+    />
   );
 }
 

@@ -66,13 +66,13 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   return (
     <div style={{ paddingBottom: 140 }}>
       <div className="rule-b gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", position: "sticky", top: "var(--bar-h)", zIndex: 40 }}>
-        <form onSubmit={(e) => { e.preventDefault(); if (!busy) run(); }} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <form onSubmit={(e) => { e.preventDefault(); if (!busy) run(); }} className="bar">
           <input className="field" style={{ flex: "1 1 380px" }} value={ourUrl} onChange={(e) => setOurUrl(e.target.value)} placeholder="Your page URL" aria-label="Your page URL" />
           <input className="field" style={{ width: 210 }} value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="competitor.com" aria-label="Competitor domain" />
           <input className="field" style={{ flex: "1 1 320px" }} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="The question they win" aria-label="The question they win" />
           <button className="btn btn--primary" type="submit" disabled={busy}>{busy ? "Reading both pages…" : "Run the autopsy"}</button>
         </form>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 12 }}>
+        <div className="bar" style={{ marginTop: 12 }}>
           <span className="m" style={{ color: "var(--meta)" }}>OR PASTE THEIR EXACT PAGE</span>
           <input className="field" style={{ flex: "1 1 420px", maxWidth: 620 }} value={theirUrl} onChange={(e) => setTheirUrl(e.target.value)} placeholder="https://competitor.com/the-winning-page" aria-label="Competitor page URL" />
         </div>
@@ -85,7 +85,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
         </div>
       )}
 
-      <div className="gut">
+      <div className="gut shell">
         {!data && !busy && <AutopsyEmpty />}
         {busy && (
           <div style={{ paddingTop: 84 }}>

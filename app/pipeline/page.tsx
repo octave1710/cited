@@ -90,7 +90,7 @@ function PipelineScreen() {
       )}
 
       <div className="gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", borderBottom: "1px solid var(--rule)" }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="bar shell">
           <input className="field" style={{ flex: "1 1 420px" }} value={topic} onChange={(e) => setTopic(e.target.value)} aria-label="Topic" />
           <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase" }}>UK · SE · DK</span>
           <button className="btn btn--primary" onClick={start} disabled={busy !== null}>
@@ -107,7 +107,7 @@ function PipelineScreen() {
         </div>
       )}
 
-      <div className="gut" style={{ maxWidth: 1500, paddingBottom: 120 }}>
+      <div className="gut shell" style={{ paddingBottom: 120 }}>
         <div className="sec" style={{ paddingTop: 52 }}>
           <div className="kicker" style={{ color: "var(--meta)" }}>PART B · MULTI-MARKET CONTENT ENGINE</div>
           <h1 className="h1" style={{ maxWidth: "22ch", marginTop: 24 }}>

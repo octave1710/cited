@@ -100,7 +100,7 @@ export function InputBar({
           e.preventDefault();
           if (!busy) onRun({ url, brand, market });
         }}
-        style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}
+        className="bar"
       >
         <input
           className="field"

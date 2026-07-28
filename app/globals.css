@@ -76,6 +76,20 @@ body {
 /* the container owns the gutter; sections never override it */
 .gut { padding-left: var(--gutter); padding-right: var(--gutter); }
 
+/**
+ * One measure for the whole product. Nothing had a max width, so on a wide screen every
+ * row stretched to the window and the input bar ran past the right edge, which is why the
+ * run buttons on /pipeline and /autopsy were off screen and the tool looked broken.
+ */
+.shell { width: 100%; max-width: var(--measure); margin: 0 auto; }
+:root { --measure: 1560px; }
+
+/* an input bar must wrap before it clips: no control is ever allowed off screen */
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; width: 100%; }
+.bar > * { min-width: 0; }
+.bar .field { flex: 1 1 260px; max-width: 100%; }
+.bar .btn { flex: 0 0 auto; }
+
 /* ---------- buttons: every number gets one ---------- */
 
 .btn {
