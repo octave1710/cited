@@ -155,6 +155,11 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
 const CONTENT_FIRST = /(content|article|blog|page|post|guide|condition|medicine|health|news)/i;
 const CONTENT_LAST = /(profile|dentist|gp|pharmacy|gdos|video|image|campaign|location|store|branch)/i;
 
+/** Bounds on a scan that now walks several declared sitemaps and nested indexes. */
+const MAX_SITEMAP_FILES = 40;
+const MAX_SCANNED = 120_000;
+const MAX_DEPTH = 2;
+
 /**
  * Streams every URL of a domain's sitemap through a scorer without keeping them.
  *
@@ -172,26 +177,38 @@ export async function scanSitemap(
   const origin = new URL(normaliseUrl(siteUrl).toString()).origin;
   const declared = sitemapsFromRobots(robotsBody);
   const attempts: { url: string; outcome: string }[] = [];
+  const seen = new Set<string>();
   let scanned = 0;
+  let source = "";
 
-  for (const candidate of [...declared, `${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`]) {
-    const got = await fetchXml(candidate);
+  const read = async (url: string, depth: number): Promise<boolean> => {
+    if (seen.has(url) || seen.size >= MAX_SITEMAP_FILES || scanned >= MAX_SCANNED) return false;
+    seen.add(url);
+
+    const got = await fetchXml(url);
     if ("error" in got) {
-      attempts.push({ url: candidate, outcome: got.error });
-      continue;
+      attempts.push({ url, outcome: got.error });
+      return false;
     }
     const parsed = parseSitemapXml(got.xml);
     if (parsed.kind === "none") {
-      attempts.push({ url: candidate, outcome: "answered, but the body is not a sitemap" });
-      continue;
+      attempts.push({ url, outcome: "answered, but the body is not a sitemap" });
+      return false;
     }
 
     if (parsed.kind === "urlset") {
       score(parsed.entries);
       scanned += parsed.entries.length;
-      attempts.push({ url: candidate, outcome: `${parsed.entries.length} URLs scanned` });
-      return { source: candidate, urlsScanned: scanned, attempts };
+      attempts.push({ url, outcome: `${parsed.entries.length} URLs scanned` });
+      return parsed.entries.length > 0;
     }
+
+    attempts.push({ url, outcome: `index of ${parsed.entries.length} sitemaps` });
+    /**
+     * An index whose children are indexes too. Scoring those entries directly would
+     * offer a .xml file as the competitor's article, so they are followed, never scored.
+     */
+    if (depth >= MAX_DEPTH) return false;
 
     // editorial children first: a directory of 40,000 GP profiles will never hold the answer
     const children = [...parsed.entries].sort((a, b) => {
@@ -199,20 +216,24 @@ export async function scanSitemap(
       return rank(a.loc) - rank(b.loc);
     });
 
-    attempts.push({ url: candidate, outcome: `index of ${parsed.entries.length} sitemaps` });
-    for (const child of children.slice(0, maxChildren)) {
-      const childGot = await fetchXml(child.loc);
-      if ("error" in childGot) {
-        attempts.push({ url: child.loc, outcome: childGot.error });
-        continue;
-      }
-      const childParsed = parseSitemapXml(childGot.xml);
-      score(childParsed.entries);
-      scanned += childParsed.entries.length;
-      attempts.push({ url: child.loc, outcome: `${childParsed.entries.length} URLs scanned` });
-    }
-    return { source: candidate, urlsScanned: scanned, attempts };
+    let any = false;
+    for (const child of children.slice(0, maxChildren)) any = (await read(child.loc, depth + 1)) || any;
+    return any;
+  };
+
+  /**
+   * Every sitemap robots.txt declares, not just the first that parses.
+   *
+   * healthline.com declares two. The first is an index whose children hold 47 URLs
+   * between them; the second holds 11,252 articles. Stopping at the first one left the
+   * site that wins the whole category unresolvable, and the resolver fell through to a
+   * model that offered three /nutrition/ URLs, all of which 404.
+   */
+  for (const candidate of [...declared, `${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`]) {
+    const ok = await read(candidate, 0);
+    if (ok && !source) source = candidate;
+    if (scanned >= MAX_SCANNED) break;
   }
 
-  return { source: "", urlsScanned: 0, attempts };
+  return { source, urlsScanned: scanned, attempts };
 }

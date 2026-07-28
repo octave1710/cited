@@ -9,6 +9,19 @@ import { Favicon } from "./Territory";
 const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
 
 /**
+ * Three pairs whose competitor page resolves from the site's own sitemap, each one
+ * run and confirmed. A blank form that fails on the first domain someone types is
+ * how this screen read before; these are the proof that resolution works, and the
+ * shape to copy for a domain of your own.
+ */
+const OUR_PAGE = "https://theordinary.com/en-us/azelaic-acid-suspension-10-exfoliator-100407.html";
+const WORKING = [
+  { domain: "healthline.com", question: "What are the benefits of vitamin C for skin?", ourUrl: OUR_PAGE },
+  { domain: "nhs.uk", question: "Is vitamin C good for skin?", ourUrl: OUR_PAGE },
+  { domain: "medicalnewstoday.com", question: "What does vitamin C do for the skin?", ourUrl: "" },
+] as const;
+
+/**
  * The device here is a facing bar: one axis down the middle, their page growing
  * right, yours growing left, rows ordered by the weighted gap. The widest
  * asymmetry is the work order, and it is visible before anything is read.
@@ -27,7 +40,8 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   const [open, setOpen] = useState<string | null>(null);
   const barsRef = useRef<HTMLDivElement>(null);
 
-  const run = useCallback(async () => {
+  // overrides so an example can run on its own values without waiting for a re-render
+  const run = useCallback(async (over?: Partial<Record<"ourUrl" | "domain" | "question" | "theirUrl" | "theirHtml", string>>) => {
     setBusy(true);
     setError(null);
     setData(null);
@@ -36,7 +50,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
       const res = await fetch("/api/autopsy", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ourUrl, domain, question, theirUrl, theirHtml }),
+        body: JSON.stringify({ ourUrl, domain, question, theirUrl, theirHtml, ...over }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? `Request failed (${res.status}).`);
@@ -76,7 +90,30 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
           <button className="btn btn--primary" type="submit" disabled={busy}>{busy ? "Reading both pages…" : "Run the autopsy"}</button>
         </form>
         <div className="bar" style={{ marginTop: 12 }}>
-          <span className="m" style={{ color: "var(--meta)" }}>OR THEIR EXACT PAGE</span>
+          <span className="m" style={{ color: "var(--meta)", minWidth: 132 }}>CHECKED WORKING</span>
+          {WORKING.map((w) => (
+            <button
+              key={w.domain}
+              type="button"
+              className="btn btn--ghost btn--sm"
+              disabled={busy}
+              onClick={() => {
+                setOurUrl(w.ourUrl);
+                setDomain(w.domain);
+                setQuestion(w.question);
+                setTheirUrl("");
+                setTheirHtml("");
+                run({ ourUrl: w.ourUrl, domain: w.domain, question: w.question, theirUrl: "", theirHtml: "" });
+              }}
+              title={`${w.domain} — ${w.question}`}
+            >
+              {w.domain}
+            </button>
+          ))}
+        </div>
+
+        <div className="bar" style={{ marginTop: 12 }}>
+          <span className="m" style={{ color: "var(--meta)", minWidth: 132 }}>OR THEIR EXACT PAGE</span>
           <input className="field" style={{ flex: "1 1 380px", maxWidth: 560 }} value={theirUrl} onChange={(e) => setTheirUrl(e.target.value)} placeholder="https://competitor.com/the-winning-page" aria-label="Competitor page URL" />
           <button type="button" className={`btn btn--sm ${showPaste ? "btn--primary" : "btn--ghost"}`} onClick={() => setShowPaste((v) => !v)}>
             {theirHtml ? `Source pasted, ${Math.round(theirHtml.length / 1024)} KB` : "Paste the source instead"}
@@ -120,7 +157,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
 
         {data && (
           <>
-            <div style={{ paddingTop: 54, display: "grid", gridTemplateColumns: "minmax(0,1fr) 420px", gap: 88, alignItems: "start" }}>
+            <div style={{ paddingTop: 54, display: "grid", gridTemplateColumns: "minmax(0,1fr) 600px", gap: 64, alignItems: "start" }}>
               <div>
                 <h1 className="h1" style={{ maxWidth: "20ch" }}>
                   {!data.theirs
@@ -244,7 +281,7 @@ function AutopsyEmpty() {
     ["The question", "the exact wording the engine was asked"],
   ];
   return (
-    <div style={{ paddingTop: 56, display: "grid", gridTemplateColumns: "minmax(0,1fr) 420px", gap: 56, alignItems: "start" }}>
+    <div style={{ paddingTop: 56, display: "grid", gridTemplateColumns: "minmax(0,1fr) 600px", gap: 56, alignItems: "start" }}>
       <div>
         <h1 className="h1" style={{ maxWidth: "16ch" }}>Why does their page win?</h1>
         <p className="lede" style={{ maxWidth: "56ch", marginTop: 20 }}>
@@ -320,7 +357,9 @@ function Sides({ data }: { data: Autopsy }) {
     </div>
   );
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    /* side by side, not stacked: two tall cards in a narrow column left ~220px of dead
+       space under the headline, which is the void that gets reported every time */
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, alignItems: "start" }}>
       {side("THE PAGE BEING QUOTED", data.theirs, "var(--d3)")}
       {data.ours ? (
         side("YOUR PAGE", data.ours, "var(--brand)")
@@ -394,8 +433,28 @@ function Row({ d, open, onToggle }: { d: FactorDiff; open: boolean; onToggle: ()
                 transformOrigin: behind ? "right center" : "left center",
               }}
             />
-            <Dot at={d.theirs} colour="var(--d3)" title={`Their page: ${d.theirs}`} />
-            <Dot at={d.ours} colour="var(--brand)" title={`Your page: ${d.ours}`} ring />
+            {d.ours === d.theirs ? (
+              /* equal scores put both dots on the same pixel and the second paints over the
+                 first, so a tie read as "only your page is on this axis". One marker, split. */
+              <span
+                title={`Both pages: ${d.ours}`}
+                style={{
+                  position: "absolute",
+                  left: `${d.ours}%`,
+                  top: 6,
+                  width: 16,
+                  height: 14,
+                  marginLeft: -8,
+                  background: "linear-gradient(90deg, var(--brand) 0 50%, var(--d3) 50% 100%)",
+                  boxShadow: "0 0 0 2px var(--void)",
+                }}
+              />
+            ) : (
+              <>
+                <Dot at={d.theirs} colour="var(--d3)" title={`Their page: ${d.theirs}`} />
+                <Dot at={d.ours} colour="var(--brand)" title={`Your page: ${d.ours}`} ring />
+              </>
+            )}
           </span>
 
           <span style={{ display: "flex", gap: 14, justifyContent: "flex-end", alignItems: "baseline" }}>

@@ -78,7 +78,7 @@ function PipelineScreen() {
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      <TopBar engineMode="mock" profoundMode="mock" />
+      <TopBar />
 
       {brief && (
         <div

@@ -106,7 +106,7 @@ export default function Page() {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <TopBar runId={run?.id} engineMode="mock" profoundMode="mock" />
+      <TopBar runId={run?.id} />
       <InputBar onRun={start} busy={busy === "run"} />
 
       {error && (

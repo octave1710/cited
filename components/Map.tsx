@@ -53,8 +53,8 @@ const LAST = "cited.lastMap";
 
 export function MapScreen() {
   const [topic, setTopic] = useState("vitamin c serum");
-  const [brand, setBrand] = useState("Meridian Skin Lab");
-  const [domain, setDomain] = useState("meridianskinlab.com");
+  const [brand, setBrand] = useState("The Ordinary");
+  const [domain, setDomain] = useState("theordinary.com");
   const [market, setMarket] = useState("UK");
 
   const [questions, setQuestions] = useState<MapQuestion[]>([]);

@@ -5,7 +5,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ d
   const sp = await searchParams;
   return (
     <div style={{ minHeight: "100vh" }}>
-      <TopBar engineMode="mock" profoundMode="off" />
+      <TopBar />
       <AutopsyScreen initialDomain={sp.domain} initialQuestion={sp.q} />
     </div>
   );

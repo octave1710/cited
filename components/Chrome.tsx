@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { DEMO_PAGES } from "../engine/demoPages";
+import { DEMO_PAGES, REAL_PAGES } from "../engine/demoPages";
+
+const LABEL: React.CSSProperties = {
+  fontFamily: "var(--mono)",
+  fontSize: 11,
+  letterSpacing: 1.3,
+  textTransform: "uppercase",
+  color: "var(--ink)",
+  marginRight: 6,
+  minWidth: 132,
+};
 
 /** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
 const ROUTES = [
@@ -38,7 +48,15 @@ function Nav() {
   );
 }
 
-export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; engineMode: string; profoundMode: string }) {
+export function TopBar({ runId }: { runId?: string }) {
+  // asked for, never assumed: the bar reported MOCK while the engine answered live
+  const [mode, setMode] = useState<{ engine: string; engineWhy: string; profound: string } | null>(null);
+  useEffect(() => {
+    fetch("/api/mode")
+      .then((r) => r.json())
+      .then(setMode)
+      .catch(() => {});
+  }, []);
   const [clock, setClock] = useState("");
   useEffect(() => {
     const tick = () => setClock(new Date().toISOString().slice(11, 19));
@@ -66,8 +84,14 @@ export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; en
         <span style={{ color: "var(--red)" }}>■</span> CITED
       </span>
       <Nav />
-      <span className="m-sm meta">ENGINE {engineMode.toUpperCase()}</span>
-      <span className="m-sm meta">PROFOUND {profoundMode.toUpperCase()}</span>
+      <span
+        className="m-sm"
+        style={{ color: mode?.engine === "live" ? "var(--d2)" : "var(--meta)" }}
+        title={mode?.engineWhy ?? ""}
+      >
+        ENGINE {(mode?.engine ?? "…").toUpperCase()}
+      </span>
+      <span className="m-sm meta">PROFOUND {(mode?.profound ?? "…").toUpperCase()}</span>
       <span className="m-sm meta">WEIGHTS LOCKED</span>
       <span style={{ marginLeft: "auto" }} className="m-sm meta">
         {runId ? `RUN ${runId.toUpperCase()}` : "NO RUN"}
@@ -89,7 +113,7 @@ export function InputBar({
   disabled?: boolean;
 }) {
   const [url, setUrl] = useState("");
-  const [brand, setBrand] = useState("Meridian Skin Lab");
+  const [brand, setBrand] = useState("The Ordinary");
   const [market, setMarket] = useState("UK");
 
   return (
@@ -139,18 +163,27 @@ export function InputBar({
       </form>
 
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 16, flexWrap: "wrap" }}>
-        <span
-          style={{
-            fontFamily: "var(--mono)",
-            fontSize: 11,
-            letterSpacing: 1.3,
-            textTransform: "uppercase",
-            color: "var(--ink)",
-            marginRight: 6,
-          }}
-        >
-          Or run a bundled demo page
-        </span>
+        <span style={LABEL}>Live pages</span>
+        {REAL_PAGES.map((p) => (
+          <button
+            key={p.url}
+            className="btn btn--ghost btn--sm"
+            type="button"
+            disabled={busy || disabled}
+            onClick={() => {
+              setUrl(p.url);
+              onRun({ url: p.url, brand, market });
+            }}
+            title={p.url}
+          >
+            {p.note}
+          </button>
+        ))}
+      </div>
+
+      {/* the loop that closes only on a page we hold: you cannot publish a fix to nhs.uk */}
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
+        <span style={LABEL}>Pages in this repo</span>
         {DEMO_PAGES.map((d) => (
           <button
             key={d.id}
@@ -163,6 +196,9 @@ export function InputBar({
             {d.note}
           </button>
         ))}
+        <span style={{ fontSize: 13.5, color: "var(--meta)", marginLeft: 4 }}>
+          the only pages a fix can be applied to and re-scored
+        </span>
       </div>
     </div>
   );

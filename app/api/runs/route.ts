@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Malformed request body." }, { status: 400 });
   }
 
-  const brand = (body.brand ?? "").trim() || "Meridian Skin Lab";
+  const brand = (body.brand ?? "").trim() || "The Ordinary";
   const market = (body.market ?? "").trim() || "UK";
 
   const run: Run = {

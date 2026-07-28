@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const brandDomain = toDomain(rawDomain);
   if (!brandDomain)
     return new Response(
-      JSON.stringify({ error: `"${rawDomain}" is not a domain. Enter something like meridianskinlab.com.` }),
+      JSON.stringify({ error: `"${rawDomain}" is not a domain. Enter something like theordinary.com.` }),
       { status: 400 },
     );
 
