@@ -102,3 +102,30 @@ STOPPED at checkpoint (a) for Octave's judgment, per the contract.
 Apply + re-test works in one click. Verified with real OpenAI calls, then replayed offline:
 2/5 to 5/5 cited, score 33 to 78, 7 fixes applied, 1 refused (needs a fact nobody supplied).
 Remaining: Profound panel (D8) and Part B pipeline with the blocking gate (D9).
+
+### Loop 4 - v2 front of the funnel (F1, F2, F8)
+
+**F1 citation map** (`/map`). 158 questions generated across eight buyer intents, each asked
+to a live engine, each answer parsed for the domains it names. Measured on vitamin c serum /
+UK: healthline.com owns 118, theordinary.com is quoted on 2, 8 are unclaimed. 166 calls,
+33,838 tokens, $0.0123 at the published rate. Cached, so a re-run is free and the demo
+replays offline (verified: `LLM_MODE=mock` reproduces all 158 with 0 live calls).
+
+**F2 competitor autopsy** (`/autopsy`). Same nine factors on their page and ours, ordered by
+weighted gap, evidence from both sides on every row. Verified on two live fetches.
+
+**F8 artefact bundle** (`GET /api/bundle`). Store-only ZIP writer, no dependency. Verified by
+opening the archive in a real unzip, all CRCs valid.
+
+**Two findings the build surfaced, both stated in the UI rather than hidden:**
+- healthline.com, which owns 118 of 158 questions, answers our crawler with HTTP 500. The
+  autopsy reports the block as a finding with the attempt log, then runs on a pasted URL.
+- gpt-4o-mini returns an empty URL list rather than invent one, for most domains. Automatic
+  competitor-page resolution is a convenience, never a guarantee.
+
+70 tests, typecheck clean, production build clean. Screenshots at 1858x1027, 1280 and 390.
+
+**Known weak, not hidden:** `owned` is 0 for a brand the engine has never heard of, which is
+honest but makes a fictional-brand demo look empty; use a real domain. The `open` bucket is
+strict (8 of 158) because a category with a consolidated owner genuinely has few holes.
+Mobile is usable but was not designed for; this is a desktop instrument.

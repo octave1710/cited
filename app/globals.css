@@ -205,6 +205,22 @@ body {
   .map-grid { grid-template-columns: repeat(auto-fill, 42px); width: 100%; }
 }
 
+/* narrow: a 72px gutter and 42px cells turn the map into a column of confetti.
+   The grid stays the dominant object by shrinking with the viewport instead. */
+@media (max-width: 720px) {
+  :root { --gutter: 20px; }
+  .map-grid { grid-template-columns: repeat(auto-fill, minmax(26px, 1fr)); gap: 4px; }
+  .cell { width: auto; height: auto; aspect-ratio: 1; }
+  .h1 { font-size: clamp(30px, 8vw, 44px); }
+  /* the waiting grid is a preview, not the data: 40 cells say the same thing as 160 */
+  .ghost-grid .cell:nth-child(n + 41) { display: none; }
+}
+
+/* the status bar is a fixed row of machine state: let it scroll rather than wrap
+   into three lines or push the page sideways */
+.topbar { overflow-x: auto; scrollbar-width: none; }
+.topbar::-webkit-scrollbar { display: none; }
+
 .cell {
   width: 42px; height: 42px; padding: 0;
   border: 1px solid var(--rule-soft);

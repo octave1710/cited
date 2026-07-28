@@ -240,7 +240,7 @@ function MapBar(p: {
 function MapEmpty() {
   return (
     <div className="map-layout" style={{ paddingTop: 84, paddingBottom: 96 }}>
-      <div className="map-grid" aria-hidden>
+      <div className="map-grid ghost-grid" aria-hidden>
         {Array.from({ length: 160 }, (_, i) => (
           <span key={i} className="cell ghost" style={{ animationDelay: `${(i % 16) * 40 + Math.floor(i / 16) * 70}ms` }} />
         ))}

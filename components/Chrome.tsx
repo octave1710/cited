@@ -49,12 +49,13 @@ export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; en
 
   return (
     <div
-      className="rule-b gut"
+      className="rule-b gut topbar"
       style={{
         height: "var(--bar-h)",
         display: "flex",
         alignItems: "center",
         gap: 26,
+        whiteSpace: "nowrap",
         background: "var(--void)", // opaque: a translucent bar lets scrolled text bleed through
         position: "sticky",
         top: 0,
