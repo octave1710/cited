@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 nul
 .probe/
 _probe_tmp.ts
+.shot.mjs

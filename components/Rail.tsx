@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { Entity, Label, Num, useEntry } from "./da";
+import { Awaiting, Entity, Label, Num, useEntry } from "./da";
 
 /**
  * The track and the wall. The device for the pipeline screen.
@@ -102,10 +102,13 @@ export function Rail({
   useEffect(() => {
     if (!ref.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      // the wall drops after the track has laid itself, so the reader watches it stop
-      gsap.from("[data-wall]", { scaleY: 0, transformOrigin: "top center", duration: 0.55, ease: "expo.out", delay: 0.42, stagger: 0.06 });
-      gsap.from("[data-door]", { scaleX: 0, transformOrigin: "center center", duration: 0.5, ease: "back.out(1.7)", delay: 0.5, stagger: 0.06 });
+    const ctx = gsap.context((self) => {
+      // the wall drops after the track has laid itself, so the reader watches it stop.
+      // both selectors are empty in legitimate states, and gsap warns on an empty target
+      const wall = self.selector?.("[data-wall]") ?? [];
+      const door = self.selector?.("[data-door]") ?? [];
+      if (wall.length) gsap.from(wall, { scaleY: 0, transformOrigin: "top center", duration: 0.55, ease: "expo.out", delay: 0.42, stagger: 0.06 });
+      if (door.length) gsap.from(door, { scaleX: 0, transformOrigin: "center center", duration: 0.5, ease: "back.out(1.7)", delay: 0.5, stagger: 0.06 });
     }, ref);
     return () => ctx.revert();
   }, [stateKey, signKey]);
@@ -125,7 +128,15 @@ export function Rail({
     el.scrollLeft = Math.min(max, Math.max(0, left - el.clientWidth * 0.55));
   }, [stateKey, signKey]);
 
-  if (!nodes.length) return null;
+  // a blank column reads as a bug: say what will appear and what has to happen first
+  if (!nodes.length) {
+    return (
+      <Awaiting
+        title="Nothing has run yet."
+        what="Seven steps take one topic across three markets. The track below fills as each step lands, and publishing stops at the gate until a named person signs each market."
+      />
+    );
+  }
 
   const cols = `${LABEL_W}px ${nodes.map((_, i) => (i === wallIndex ? `${WALL_W}px` : "minmax(0,1fr)")).join(" ")}`;
   const opened = nodes.find((n) => n.id === open) ?? null;
@@ -135,7 +146,7 @@ export function Rail({
     <div ref={ref}>
       {/* overflow-y would compute to auto beside an auto x, and a 2px rounding overflow
           was drawing a scrollbar down the side of the device */}
-      <div style={{ overflowX: "auto", overflowY: "hidden" }}>
+      <div ref={scroller} style={{ overflowX: "auto", overflowY: "hidden" }}>
         <div style={{ minWidth: 860 }}>
           {/* the nodes name themselves. The wall column carries no name: it is not a step, it is a stop */}
           <div style={{ display: "grid", gridTemplateColumns: cols, columnGap: GAP, alignItems: "end", paddingBottom: 14 }}>
@@ -204,7 +215,7 @@ export function Rail({
 
                     if (isWall) {
                       return (
-                        <div key={n.id} style={{ height: LANE_H, position: "relative", overflow: "hidden" }}>
+                        <div key={n.id} data-wallcell style={{ height: LANE_H, position: "relative", overflow: "hidden" }}>
                           {isSigned ? (
                             <>
                               {/* the slice is cut out: the frame stays, the track runs through */}
@@ -286,8 +297,9 @@ export function Rail({
                           </span>
                         )}
 
+                        {/* nowrap: wrapped, this caption drops into the lane below it */}
                         {sealed && (
-                          <span style={{ position: "absolute", left: 0, top: CAPTION_TOP }}>
+                          <span style={{ position: "absolute", left: 0, top: CAPTION_TOP, whiteSpace: "nowrap" }}>
                             <Label tone="brand">NO NAME · UNREACHABLE</Label>
                           </span>
                         )}
@@ -352,7 +364,7 @@ function Legend({ floor }: { floor: number }) {
   const item = (mark: React.ReactNode, text: React.ReactNode) => (
     <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>
       {mark}
-      <span style={{ fontSize: 14.5, color: "var(--ink)" }}>{text}</span>
+      <span style={{ fontSize: 16, color: "var(--ink)" }}>{text}</span>
     </span>
   );
   return (

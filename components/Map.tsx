@@ -681,12 +681,12 @@ function Tip({
   brandDomain: string;
 }) {
   const st = stateOf(r, final);
-  const left = typeof window !== "undefined" ? Math.min(x, window.innerWidth - 400) : x;
-  const top = typeof window !== "undefined" ? Math.min(y, window.innerHeight - 260) : y;
+  const left = typeof window !== "undefined" ? Math.max(8, Math.min(x, window.innerWidth - 396)) : x;
+  const top = typeof window !== "undefined" ? Math.max(8, Math.min(y, window.innerHeight - 250)) : y;
   return (
     <Panel
       accent={st === "mine" ? "var(--brand)" : st === "open" || st === "reference" ? "var(--d1)" : "var(--d3)"}
-      style={{ position: "fixed", left, top, width: 380, zIndex: 60, pointerEvents: "none" }}
+      style={{ position: "fixed", left, top, width: "min(380px, calc(100vw - 16px))", zIndex: 60, pointerEvents: "none" }}
     >
       <Label>{q.intent.toUpperCase()} · {TILE[st].name}</Label>
       <p style={{ fontSize: 17, lineHeight: 1.4, fontWeight: 600, marginTop: 10 }}>{sentence(q.text)}</p>
@@ -698,7 +698,7 @@ function Tip({
             <Num size={12} tone="meta">{i + 1}</Num>
             <Favicon domain={d} size={16} />
             <span style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: d === brandDomain ? "var(--brand)" : "var(--ink)" }}>
-              {d}{d === brandDomain ? "  ← you" : ""}
+              {d}
             </span>
           </span>
         ))}
@@ -758,7 +758,17 @@ function Shortlist({
     setCopied("idle");
   }, [selected]);
 
-  if (list.length === 0) return null;
+  if (list.length === 0) {
+    return (
+      <Section>
+        <Label tone="d1">NOTHING SHORTLISTED YET</Label>
+        <p style={{ fontSize: 16.5, lineHeight: 1.55, marginTop: 10, maxWidth: "62ch" }}>
+          Click any tile above to add its question here. The shortlist copies out as plain text and
+          exports with the three spreadsheets.
+        </p>
+      </Section>
+    );
+  }
 
   const copy = async () => {
     try {
@@ -968,7 +978,10 @@ function Ledger({
           <Label>EVERY ROW ROUTES AT THE WEAKEST SITE IN THAT ANSWER, RINGED IN ORANGE</Label>
         </p>
 
-        <div style={{ borderTop: "1px solid var(--line-strong)" }}>
+        {/* the row is four fixed jobs and cannot compress below its own columns, so on a
+            narrow window it scrolls inside this box rather than pushing the page sideways */}
+        <div style={{ overflowX: "auto", borderTop: "1px solid var(--line-strong)" }}>
+          <div style={{ minWidth: 620 }}>
           {ordered.map((q) => {
             const r = results[q.id];
             const st = stateOf(r, final);
@@ -1054,6 +1067,7 @@ function Ledger({
               </div>
             );
           })}
+          </div>
         </div>
 
         {mapId && (

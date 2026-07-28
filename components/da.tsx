@@ -20,6 +20,8 @@ export function Label({ children, tone = "meta", style }: { children: React.Reac
         fontSize: 10.5,
         letterSpacing: 1.1,
         textTransform: "uppercase",
+        // labels carry live counts in half the screens; without this they reflow at 9 to 10
+        fontVariantNumeric: "tabular-nums",
         color: colour,
         ...style,
       }}
