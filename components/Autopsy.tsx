@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import type { Autopsy, FactorDiff } from "../autopsy/run";
+import type { Autopsy, FactorDiff, PageSide } from "../autopsy/run";
+import { Favicon } from "./Territory";
 
 /** Factor names are written for the ledger. A headline needs the first clause only. */
 const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
@@ -123,7 +124,28 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
             </div>
 
             {data.theirs && (
-              <div ref={barsRef} style={{ marginTop: 52 }}>
+              <div ref={barsRef} style={{ marginTop: 40 }}>
+                <div
+                  style={{ display: "grid", gridTemplateColumns: "minmax(200px,260px) 74px minmax(0,1fr) 120px", gap: 18, alignItems: "end", paddingBottom: 8 }}
+                >
+                  <span className="m" style={{ color: "var(--meta)" }}>FACTOR, HEAVIEST GAP FIRST</span>
+                  <span className="m" style={{ color: "var(--meta)" }}>GAP</span>
+                  <span style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span className="m" style={{ color: "var(--meta)" }}>0</span>
+                    <span style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                      <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <span style={{ width: 10, height: 10, background: "var(--brand)" }} />
+                        <span className="m-sm" style={{ color: "var(--meta)" }}>YOU</span>
+                      </span>
+                      <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <span style={{ width: 10, height: 10, background: "var(--d3)" }} />
+                        <span className="m-sm" style={{ color: "var(--meta)" }}>THEM</span>
+                      </span>
+                    </span>
+                    <span className="m" style={{ color: "var(--meta)" }}>100</span>
+                  </span>
+                  <span />
+                </div>
                 {data.diffs.map((d) => (
                   <Row key={d.key} d={d} open={open === d.key} onToggle={() => setOpen(open === d.key ? null : d.key)} />
                 ))}
@@ -139,91 +161,173 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
 }
 
 function AutopsyEmpty() {
+  const steps = [
+    ["Your page URL", "the page of yours that should be winning this question"],
+    ["Their domain", "arrives filled in when you come from a seat on the map"],
+    ["The question", "the exact wording the engine was asked"],
+  ];
   return (
-    <div style={{ paddingTop: 92, maxWidth: 980 }}>
-      <h1 className="h1" style={{ maxWidth: "15ch", fontSize: "clamp(48px,4.8vw,82px)" }}>
-        Why does their page win?
-      </h1>
-      <p className="lede" style={{ maxWidth: "56ch", marginTop: 28, fontSize: 19 }}>
-        The same nine factors, run on the page that is actually being quoted and on yours.
-        The advice stops being an opinion and becomes a measurement.
-      </p>
-    </div>
-  );
-}
-
-function Sides({ data }: { data: Autopsy }) {
-  const side = (label: string, url: string, title: string, words: number, score: number, color: string) => (
-    <div style={{ borderTop: `2px solid ${color}`, paddingTop: 14 }}>
-      <div className="m" style={{ color }}>{label}</div>
-      <div style={{ fontSize: 17, fontWeight: 600, marginTop: 8, lineHeight: 1.35 }}>{title || url}</div>
-      <div className="m-sm meta" style={{ marginTop: 8, textTransform: "none", letterSpacing: 0.2, wordBreak: "break-all" }}>{url}</div>
-      <div style={{ display: "flex", gap: 22, marginTop: 12, alignItems: "baseline" }}>
-        <span style={{ fontFamily: "var(--mono)", fontSize: 22, color }}>{score}<span className="meta" style={{ fontSize: 12 }}>/100</span></span>
-        <span className="m-sm meta">{words.toLocaleString("en-US")} WORDS</span>
+    <div style={{ paddingTop: 56, display: "grid", gridTemplateColumns: "minmax(0,1fr) 420px", gap: 56, alignItems: "start" }}>
+      <div>
+        <h1 className="h1" style={{ maxWidth: "16ch" }}>Why does their page win?</h1>
+        <p className="lede" style={{ maxWidth: "56ch", marginTop: 20 }}>
+          The same nine factors, run on the page that is actually being quoted and on yours, on one axis.
+          The advice stops being an opinion and becomes a measurement of the page that is winning.
+        </p>
+        <div style={{ marginTop: 26 }}>
+          {steps.map(([label, help], i) => (
+            <div key={label} style={{ display: "flex", gap: 14, padding: "11px 0", borderTop: "1px solid var(--line)" }}>
+              <span className="num" style={{ color: "var(--brand)", fontSize: 13, fontWeight: 700, width: 18 }}>{i + 1}</span>
+              <span style={{ fontSize: 15, fontWeight: 600, width: 150 }}>{label}</span>
+              <span style={{ fontSize: 14.5, color: "var(--meta)", flex: 1 }}>{help}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card" style={{ padding: "18px 20px" }}>
+        <div className="m" style={{ color: "var(--meta)" }}>WHAT YOU LEAVE WITH</div>
+        <ul style={{ listStyle: "none", marginTop: 12, display: "flex", flexDirection: "column", gap: 10 }}>
+          {[
+            "The nine factors on both pages, ordered by the gap that costs you most",
+            "The exact text pulled off each page for every factor",
+            "The rewrites that close that gap, and a corrected HTML file",
+          ].map((t) => (
+            <li key={t} style={{ display: "flex", gap: 10, fontSize: 14.5, lineHeight: 1.5 }}>
+              <span style={{ width: 6, height: 6, background: "var(--brand)", flex: "none", marginTop: 7 }} />
+              {t}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-      {data.theirs ? (
-        side("THE PAGE BEING QUOTED", data.theirs.url, data.theirs.title, data.theirs.words, data.theirs.audit.overall, "var(--ink)")
+}
+
+/**
+ * The two pages, side by side, each with its own favicon and score. A page header that
+ * does not show whose page it is makes the reader hold the domain in their head while
+ * reading nine rows of numbers.
+ */
+function Sides({ data }: { data: Autopsy }) {
+  const side = (label: string, page: PageSide | undefined, colour: string) => (
+    <div className="card" style={{ padding: "14px 16px", borderTop: `2px solid ${colour}` }}>
+      <div className="m" style={{ color: colour }}>{label}</div>
+      {page ? (
+        <>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 10 }}>
+            <Favicon domain={hostOf(page.url)} size={22} />
+            <span style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.3, flex: 1, minWidth: 0 }}>{page.title || hostOf(page.url)}</span>
+          </div>
+          <a
+            href={page.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "block", fontFamily: "var(--mono)", fontSize: 11, color: "var(--meta)", marginTop: 8, wordBreak: "break-all" }}
+          >
+            {page.url}
+          </a>
+          <div style={{ display: "flex", gap: 18, marginTop: 12, alignItems: "baseline" }}>
+            <span className="num" style={{ fontSize: 30, fontWeight: 700, color: colour }}>
+              {page.audit.overall}
+              <span style={{ fontSize: 12, color: "var(--meta)", fontWeight: 400 }}>/100</span>
+            </span>
+            <span className="m-sm" style={{ color: "var(--meta)" }}>{page.words.toLocaleString("en-US")} WORDS</span>
+          </div>
+        </>
       ) : (
-        <div style={{ borderTop: "2px solid var(--rule)", paddingTop: 14 }}>
-          <div className="m meta">THE PAGE BEING QUOTED</div>
-          <div style={{ fontSize: 17, fontWeight: 600, marginTop: 8 }}>Not readable from here</div>
-          <div className="m-sm" style={{ color: "var(--red)", marginTop: 10 }}>NOTHING MEASURED</div>
-        </div>
+        <>
+          <div style={{ fontSize: 15, fontWeight: 600, marginTop: 10 }}>Not readable from here</div>
+          <div className="m-sm" style={{ color: "var(--brand)", marginTop: 10 }}>NOTHING MEASURED</div>
+        </>
       )}
-      {side("YOUR PAGE", data.ours.url, data.ours.title, data.ours.words, data.ours.audit.overall, "var(--red)")}
+    </div>
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {side("THE PAGE BEING QUOTED", data.theirs, "var(--d3)")}
+      {side("YOUR PAGE", data.ours, "var(--brand)")}
     </div>
   );
 }
 
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+};
+
+/**
+ * A dumbbell on one 0-100 axis: your dot, their dot, the segment between them is the
+ * gap. Facing bars split the eye across two scales and made a 10-point gap look like a
+ * 60-point one; a single axis is the form for comparing two paired values, and the row
+ * with the longest segment is literally the work order.
+ */
 function Row({ d, open, onToggle }: { d: FactorDiff; open: boolean; onToggle: () => void }) {
   const behind = d.theirs > d.ours;
+  const lo = Math.min(d.ours, d.theirs);
+  const hi = Math.max(d.ours, d.theirs);
+
   return (
-    <div style={{ borderTop: "1px solid var(--rule-soft)" }}>
+    <div style={{ borderTop: "1px solid var(--line)" }}>
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        style={{ width: "100%", background: "transparent", border: "none", padding: "15px 0 16px", cursor: "pointer", textAlign: "left", color: "var(--ink)" }}
+        style={{ width: "100%", background: "transparent", border: "none", padding: "13px 0", cursor: "pointer", textAlign: "left", color: "var(--ink)" }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 9 }}>
-          <span style={{ fontSize: 18, fontWeight: 600 }}>{d.name}</span>
-          <span className="m-sm meta">{d.weight === null ? "GATE" : `${Math.round(d.weight * 100)}% OF SCORE`}</span>
-          <span className="m-sm" style={{ marginLeft: "auto", color: behind ? "var(--red)" : "var(--meta)" }}>
-            {behind ? `${d.theirs - d.ours} POINTS BEHIND` : d.ours === d.theirs ? "LEVEL" : `${d.ours - d.theirs} AHEAD`}
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(200px,260px) 74px minmax(0,1fr) 120px", gap: 18, alignItems: "center" }}>
+          <span>
+            <span style={{ display: "block", fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{d.name}</span>
+            <span className="m-sm" style={{ color: "var(--meta)" }}>
+              {d.weight === null ? "BINARY GATE" : `${Math.round(d.weight * 100)}% OF SCORE`}
+            </span>
           </span>
-        </div>
 
-        {/* facing bars on one axis, yours left and theirs right. Full strength is
-            reserved for the side that is winning, so the rows to act on stand out
-            instead of nine equally loud stripes. */}
-        <div style={{ display: "grid", gridTemplateColumns: "48px 1fr 1px 1fr 48px", alignItems: "center", gap: 12 }}>
-          <span style={{ fontFamily: "var(--mono)", fontSize: 14, textAlign: "right", color: behind ? "var(--red)" : "var(--ink)" }}>{d.ours}</span>
-          <span style={{ display: "flex", justifyContent: "flex-end", height: 16 }}>
-            <span data-bar style={{ display: "block", height: 16, width: `${d.ours}%`, background: behind ? "var(--red)" : "rgba(255,59,59,.42)", transformOrigin: "right center" }} />
+          <span
+            className="num"
+            style={{ fontSize: 14, fontWeight: 700, color: behind ? "var(--brand)" : d.ours === d.theirs ? "var(--meta)" : "var(--d2)" }}
+          >
+            {behind ? `-${d.theirs - d.ours}` : d.ours === d.theirs ? "level" : `+${d.ours - d.theirs}`}
           </span>
-          <span style={{ height: 28, background: "var(--rule)" }} />
-          <span style={{ display: "flex", height: 16 }}>
-            <span data-bar style={{ display: "block", height: 16, width: `${d.theirs}%`, background: behind ? "var(--ink)" : "rgba(236,235,231,.42)", transformOrigin: "left center" }} />
+
+          {/* the axis. One scale, two dots, one connecting segment. */}
+          <span style={{ position: "relative", height: 26, display: "block" }}>
+            <span style={{ position: "absolute", left: 0, right: 0, top: 12, height: 2, background: "var(--s2)" }} />
+            <span
+              data-bar
+              style={{
+                position: "absolute",
+                left: `${lo}%`,
+                width: `${hi - lo}%`,
+                top: 11,
+                height: 4,
+                background: behind ? "var(--brand)" : "var(--d2)",
+                transformOrigin: behind ? "right center" : "left center",
+              }}
+            />
+            <Dot at={d.theirs} colour="var(--d3)" title={`Their page: ${d.theirs}`} />
+            <Dot at={d.ours} colour="var(--brand)" title={`Your page: ${d.ours}`} ring />
           </span>
-          <span style={{ fontFamily: "var(--mono)", fontSize: 14 }}>{d.theirs}</span>
+
+          <span style={{ display: "flex", gap: 14, justifyContent: "flex-end", alignItems: "baseline" }}>
+            <span className="num" style={{ fontSize: 15, fontWeight: 700, color: "var(--brand)" }}>{d.ours}</span>
+            <span className="num" style={{ fontSize: 15, fontWeight: 700, color: "var(--d3)" }}>{d.theirs}</span>
+          </span>
         </div>
       </button>
 
       {open && (
-        <div style={{ padding: "4px 0 26px" }}>
-          {/* the factor definition is a property of the factor, not of either page:
-              printing it in both columns just says the same thing twice */}
-          <p style={{ fontSize: 16.5, lineHeight: 1.55, maxWidth: "78ch" }}>{d.theirReasoning || d.ourReasoning}</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, marginTop: 22 }}>
-            <Evidence label="PULLED OFF YOUR PAGE" color="var(--red)" items={d.ourEvidence} />
-            <Evidence label="PULLED OFF THEIRS" color="var(--ink)" items={d.theirEvidence} />
+        <div style={{ padding: "2px 0 22px" }}>
+          <p style={{ fontSize: 15, lineHeight: 1.55, maxWidth: "82ch", color: "var(--meta)" }}>
+            {d.theirReasoning || d.ourReasoning}
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 26, marginTop: 18 }}>
+            <Evidence label="PULLED OFF YOUR PAGE" colour="var(--brand)" items={d.ourEvidence} />
+            <Evidence label="PULLED OFF THEIRS" colour="var(--d3)" items={d.theirEvidence} />
           </div>
-          <p className="m-sm meta" style={{ marginTop: 20, textTransform: "none", letterSpacing: 0.2, lineHeight: 1.7 }}>
+          <p className="m-sm" style={{ color: "var(--meta)", marginTop: 16, textTransform: "none", letterSpacing: 0.2, lineHeight: 1.6 }}>
             Weight source: {d.source}
           </p>
         </div>
@@ -232,20 +336,51 @@ function Row({ d, open, onToggle }: { d: FactorDiff; open: boolean; onToggle: ()
   );
 }
 
-function Evidence({ label, color, items }: { label: string; color: string; items: string[] }) {
+function Dot({ at, colour, title, ring }: { at: number; colour: string; title: string; ring?: boolean }) {
+  return (
+    <span
+      title={title}
+      style={{
+        position: "absolute",
+        left: `${at}%`,
+        top: 6,
+        width: 14,
+        height: 14,
+        marginLeft: -7,
+        background: colour,
+        // a 2px ring in the ground colour keeps the two dots readable when they overlap
+        boxShadow: ring ? "0 0 0 2px var(--void)" : "0 0 0 2px var(--void)",
+        borderRadius: 0,
+      }}
+    />
+  );
+}
+
+/** The receipt: the exact strings the scorer pulled off each page, never a paraphrase. */
+function Evidence({ label, colour, items }: { label: string; colour: string; items: string[] }) {
   return (
     <div>
-      <div className="m" style={{ color }}>{label}</div>
+      <div className="m" style={{ color: colour }}>{label}</div>
       {items.length > 0 ? (
-        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 9 }}>
+        <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
           {items.slice(0, 6).map((t, i) => (
-            <span key={i} style={{ fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.6, borderLeft: `1px solid ${color}`, paddingLeft: 12 }}>
+            <span
+              key={i}
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: 12,
+                lineHeight: 1.6,
+                borderLeft: `2px solid ${colour}`,
+                background: "var(--s1)",
+                padding: "8px 12px",
+              }}
+            >
               {t}
             </span>
           ))}
         </div>
       ) : (
-        <p style={{ fontSize: 16, marginTop: 12 }}>Nothing on the page matched this check.</p>
+        <p style={{ fontSize: 15, marginTop: 12, color: "var(--meta)" }}>Nothing on the page matched this check.</p>
       )}
     </div>
   );

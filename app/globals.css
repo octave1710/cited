@@ -169,12 +169,12 @@ body {
 
 /* ---------- run step states ---------- */
 
-.dot { width: 7px; height: 7px; flex: none; display: inline-block; }
-.dot--queued { background: #2a2a2a; }
-.dot--running { background: var(--amber); animation: pulse 1s steps(2) infinite; }
-.dot--done { background: var(--go); }
-.dot--blocked { background: var(--red); }
-.dot--failed { background: var(--red); }
+.dot { width: 9px; height: 9px; flex: none; display: inline-block; }
+.dot--queued { background: var(--s3); }
+.dot--running { background: var(--d1); animation: pulse 1s steps(2) infinite; }
+.dot--done { background: var(--d2); }
+.dot--blocked { background: var(--brand); }
+.dot--failed { background: var(--brand); }
 
 @keyframes pulse { 50% { opacity: 0.25; } }
 

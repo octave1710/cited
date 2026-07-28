@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 import type { FactorEvent, TraceEvent } from "../lib/stream";
+
+/** One colour per weighted factor, in the fixed data order. Identity, never rank. */
+const SEGMENT = ["var(--d1)", "var(--d2)", "var(--d3)", "var(--d4)", "var(--d5)", "var(--d6)", "var(--d-rest)", "var(--brand)"];
 
 const MEASURES: Record<string, string> = {
   crawlability: "Can answer-engine bots read the page at all. Nothing else counts until this passes.",
@@ -21,6 +25,123 @@ const HEADLINE: Record<string, string> = {
   likely: "Close, but engines still prefer others.",
   cited: "This page is quotable.",
 };
+
+/**
+ * The score as a budget, not as a number.
+ *
+ * A big numeral says "43" and stops there. Every factor owns a share of the 100 points,
+ * so the bar is nine segments whose WIDTH is the weight and whose FILL is what was
+ * earned of it. The empty part of each segment is exactly the points that were lost,
+ * and where they went is visible without reading a table.
+ */
+function ScoreBudget({
+  summary,
+  factors,
+  busy,
+  onFixes,
+  hasFixes,
+}: {
+  summary: { overall: number; grade: string; zeros: number; lostWeight: number; totalMs: number; checks: number };
+  factors: FactorEvent[];
+  busy: string | null;
+  onFixes: () => void;
+  hasFixes: boolean;
+}) {
+  const weighted = factors.filter((f) => f.weight !== null && f.weight > 0);
+  const gate = factors.find((f) => f.gate);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!weighted.length || !barRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      gsap.from("[data-earned]", { scaleX: 0, transformOrigin: "left center", duration: 0.7, ease: "expo.out", stagger: 0.05 });
+    }, barRef);
+    return () => ctx.revert();
+  }, [weighted.length]);
+
+  return (
+    <div className="sec" style={{ paddingTop: 34 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 300px", gap: 40, alignItems: "end" }}>
+        <div>
+          <div className="m" style={{ color: "var(--meta)", marginBottom: 10 }}>
+            WHERE THE 100 POINTS WENT
+          </div>
+
+          <div ref={barRef} style={{ display: "flex", gap: 2, height: 74 }}>
+            {weighted.map((f, i) => {
+              const colour = SEGMENT[i % SEGMENT.length];
+              const earned = Math.max(0, Math.min(100, f.score)) / 100;
+              return (
+                <div
+                  key={f.key}
+                  title={`${f.name}: ${f.score}/100 of a ${Math.round((f.weight ?? 0) * 100)}% weight`}
+                  style={{ flex: `${(f.weight ?? 0) * 100} 0 0`, position: "relative", background: "var(--s2)", minWidth: 4 }}
+                >
+                  <div
+                    data-earned
+                    style={{ position: "absolute", inset: 0, transform: `scaleX(${earned})`, transformOrigin: "left center", background: colour }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ display: "flex", gap: 2, marginTop: 6 }}>
+            {weighted.map((f, i) => (
+              <div key={f.key} style={{ flex: `${(f.weight ?? 0) * 100} 0 0`, minWidth: 4, overflow: "hidden" }}>
+                <span
+                  className="num"
+                  style={{ fontSize: 11, color: f.score === 0 ? "var(--brand)" : "var(--meta)", whiteSpace: "nowrap" }}
+                >
+                  {Math.round((f.weight ?? 0) * 100)}%
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--meta)", marginTop: 12, maxWidth: "80ch" }}>
+            Segment width is what the factor is worth. Filled is what this page earned of it. The unfilled part is the
+            points on the table.
+            {gate && gate.score === 0 && (
+              <strong style={{ color: "var(--brand)" }}> Crawlability failed, which zeroes the whole score whatever the rest says.</strong>
+            )}
+          </p>
+        </div>
+
+        <div className="card" style={{ padding: "18px 20px" }}>
+          <div className="m" style={{ color: "var(--meta)" }}>CITABILITY SCORE</div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 8 }}>
+            <span
+              className="num"
+              style={{ fontSize: 58, fontWeight: 700, lineHeight: 1, color: summary.overall < 40 ? "var(--brand)" : "var(--ink)" }}
+            >
+              {summary.overall}
+            </span>
+            <span className="num" style={{ fontSize: 13, color: "var(--meta)" }}>/100</span>
+            <span
+              className="m-sm"
+              style={{
+                marginLeft: "auto",
+                color: summary.overall < 40 ? "var(--brand)" : "var(--d2)",
+                border: `1px solid ${summary.overall < 40 ? "var(--brand)" : "var(--d2)"}`,
+                padding: "5px 9px",
+              }}
+            >
+              {summary.grade}
+            </span>
+          </div>
+          <button className="btn btn--primary" style={{ marginTop: 16, width: "100%" }} onClick={onFixes} disabled={busy !== null}>
+            {busy === "fixes" ? "Writing the rewrites…" : hasFixes ? "Fix plan ready" : "Write the fix plan"}
+          </button>
+          <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--meta)", marginTop: 10 }}>
+            Turns every unfilled segment above into a before and after rewrite you can paste.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function AuditPanel({
   url,
@@ -68,55 +189,7 @@ export function AuditPanel({
         )}
       </div>
 
-      {/* ---------------- score + action ---------------- */}
-      {summary && (
-        <div
-          className="sec"
-          style={{ display: "flex", alignItems: "flex-end", gap: 64, flexWrap: "wrap", paddingTop: 44 }}
-        >
-          <div>
-            <div className="kicker" style={{ marginBottom: 14, color: "var(--meta)" }}>
-              CITABILITY SCORE
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-              <span
-                className="h1"
-                style={{
-                  fontSize: 132,
-                  lineHeight: 0.8,
-                  color: summary.overall < 40 ? "var(--red)" : "var(--ink)",
-                }}
-              >
-                {summary.overall}
-              </span>
-              <span style={{ fontFamily: "var(--mono)", fontSize: 15, color: "var(--meta)" }}>/100</span>
-              <span
-                style={{
-                  fontFamily: "var(--mono)",
-                  fontSize: 12,
-                  letterSpacing: 1.4,
-                  textTransform: "uppercase",
-                  color: summary.overall < 40 ? "var(--red)" : "var(--ink)",
-                  border: `1px solid ${summary.overall < 40 ? "var(--red)" : "var(--ink)"}`,
-                  padding: "7px 11px",
-                  marginLeft: 12,
-                }}
-              >
-                {summary.grade}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ paddingBottom: 10 }}>
-            <button className="btn btn--primary" onClick={onFixes} disabled={busy !== null}>
-              {busy === "fixes" ? "Writing the rewrites…" : hasFixes ? "Fix plan ready" : "Write the fix plan"}
-            </button>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 11.5, color: "var(--meta)", marginTop: 12 }}>
-              NEXT STEP · TURNS THESE FINDINGS INTO REWRITES
-            </div>
-          </div>
-        </div>
-      )}
+      {summary && <ScoreBudget summary={summary} factors={factors} busy={busy} onFixes={onFixes} hasFixes={hasFixes} />}
 
       {/* ---------------- the trace: proof of work ---------------- */}
       <div className="sec">

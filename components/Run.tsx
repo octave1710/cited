@@ -16,7 +16,8 @@ export function RunRail({
   return (
     <aside
       style={{
-        borderRight: "1px solid var(--rule)",
+        borderRight: "1px solid var(--line)",
+        background: "var(--s1)",
         paddingTop: 34,
         paddingBottom: 60,
         position: "sticky",
@@ -36,7 +37,7 @@ export function RunRail({
           color: "var(--ink)",
         }}
       >
-        Run steps {live && <span style={{ color: "var(--amber)" }}>· working</span>}
+        Run steps {live && <span style={{ color: "var(--d1)" }}>· working</span>}
       </div>
 
       {STEP_ORDER.map((id) => {
@@ -53,9 +54,9 @@ export function RunRail({
               width: "100%",
               textAlign: "left",
               padding: "18px 30px 19px",
-              background: isActive ? "rgba(236,235,231,.05)" : "transparent",
-              borderLeft: isActive ? "2px solid var(--red)" : "2px solid transparent",
-              borderTop: "1px solid var(--rule-soft)",
+              background: isActive ? "var(--s2)" : "transparent",
+              borderLeft: isActive ? "2px solid var(--brand)" : "2px solid transparent",
+              borderTop: "1px solid var(--line)",
               cursor: "pointer",
               color: "inherit",
             }}
@@ -77,7 +78,7 @@ export function RunRail({
                 letterSpacing: reached ? 0 : 1.2,
                 textTransform: reached ? "none" : "uppercase",
                 lineHeight: 1.4,
-                color: state === "failed" ? "var(--red)" : "var(--ink)",
+                color: state === "failed" ? "var(--brand)" : reached ? "var(--ink)" : "var(--meta)",
               }}
             >
               {step?.error ?? step?.note ?? (state === "queued" ? "not started" : state)}

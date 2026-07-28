@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { TopBar } from "../../components/Chrome";
 import { NODES, type PipelineRun } from "../../pipeline/nodes";
+import { Rail } from "../../components/Rail";
 
 /**
  * useSearchParams opts a client component out of static prerendering unless it sits
@@ -120,36 +121,28 @@ function PipelineScreen() {
           </p>
         </div>
 
+        {!run && (
+          <div className="sec">
+            {/* the seven nodes waiting, so the shape of the run is legible before it starts */}
+            <Rail
+              nodes={NODES.map((n) => ({ id: n.id, label: n.label, what: n.what, state: "queued" as const }))}
+            />
+          </div>
+        )}
+
         {run && (
           <>
-            <div className="sec trace">
-              {NODES.map((n, i) => {
-                const st = run.nodes[n.id];
-                return (
-                  <div key={n.id} className="tr" style={{ gridTemplateColumns: "26px minmax(0,240px) minmax(0,1fr) 130px" }}>
-                    <span className="tr__i">{String(i + 1).padStart(2, "0")}</span>
-                    <span>
-                      <span className="tr__name" style={{ display: "block", color: st.state === "blocked" ? "var(--red)" : "var(--ink)" }}>
-                        {n.label}
-                      </span>
-                      <span style={{ display: "block", fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 1.1, textTransform: "uppercase", color: "var(--meta)", paddingTop: 5 }}>
-                        {st.state}
-                      </span>
-                    </span>
-                    <span>
-                      <span style={{ display: "block", fontSize: 15.5, fontWeight: 500 }}>{n.what}</span>
-                      {(st.note || st.error) && (
-                        <span style={{ display: "block", fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.7, paddingTop: 6, color: st.error ? "var(--red)" : "var(--ink)" }}>
-                          {st.error ?? st.note}
-                        </span>
-                      )}
-                    </span>
-                    <span style={{ textAlign: "right" }}>
-                      <i className={`dot dot--${st.state === "queued" ? "queued" : st.state}`} />
-                    </span>
-                  </div>
-                );
-              })}
+            <div className="sec">
+              <Rail
+                nodes={NODES.map((n) => ({
+                  id: n.id,
+                  label: n.label,
+                  what: n.what,
+                  state: run.nodes[n.id].state,
+                  note: run.nodes[n.id].note,
+                  error: run.nodes[n.id].error,
+                }))}
+              />
             </div>
 
             {run.nodes.gate.state !== "done" && run.plans.length > 0 && (
