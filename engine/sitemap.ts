@@ -150,3 +150,69 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
 
   return { source: "", declaredInRobots: false, entries: [], discovered: 0, truncated: false, childSitemaps: { total: 0, read: 0 }, attempts };
 }
+
+/** Child sitemaps whose name promises editorial pages, tried before directories of profiles. */
+const CONTENT_FIRST = /(content|article|blog|page|post|guide|condition|medicine|health|news)/i;
+const CONTENT_LAST = /(profile|dentist|gp|pharmacy|gdos|video|image|campaign|location|store|branch)/i;
+
+/**
+ * Streams every URL of a domain's sitemap through a scorer without keeping them.
+ *
+ * discoverSitemap caps at 400 URLs because llms.txt only needs a sample. Finding ONE
+ * page is the opposite problem: nhs.uk keeps its editorial pages in a child sitemap of
+ * many thousands, so a 400-URL sample matched nothing and the resolver fell through to
+ * a model that invented URLs. Here the whole file is read and only the best few kept.
+ */
+export async function scanSitemap(
+  siteUrl: string,
+  robotsBody: string,
+  score: (entries: SitemapEntry[]) => void,
+  maxChildren = 6,
+): Promise<{ source: string; urlsScanned: number; attempts: { url: string; outcome: string }[] }> {
+  const origin = new URL(normaliseUrl(siteUrl).toString()).origin;
+  const declared = sitemapsFromRobots(robotsBody);
+  const attempts: { url: string; outcome: string }[] = [];
+  let scanned = 0;
+
+  for (const candidate of [...declared, `${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`]) {
+    const got = await fetchXml(candidate);
+    if ("error" in got) {
+      attempts.push({ url: candidate, outcome: got.error });
+      continue;
+    }
+    const parsed = parseSitemapXml(got.xml);
+    if (parsed.kind === "none") {
+      attempts.push({ url: candidate, outcome: "answered, but the body is not a sitemap" });
+      continue;
+    }
+
+    if (parsed.kind === "urlset") {
+      score(parsed.entries);
+      scanned += parsed.entries.length;
+      attempts.push({ url: candidate, outcome: `${parsed.entries.length} URLs scanned` });
+      return { source: candidate, urlsScanned: scanned, attempts };
+    }
+
+    // editorial children first: a directory of 40,000 GP profiles will never hold the answer
+    const children = [...parsed.entries].sort((a, b) => {
+      const rank = (l: string) => (CONTENT_LAST.test(l) ? 2 : CONTENT_FIRST.test(l) ? 0 : 1);
+      return rank(a.loc) - rank(b.loc);
+    });
+
+    attempts.push({ url: candidate, outcome: `index of ${parsed.entries.length} sitemaps` });
+    for (const child of children.slice(0, maxChildren)) {
+      const childGot = await fetchXml(child.loc);
+      if ("error" in childGot) {
+        attempts.push({ url: child.loc, outcome: childGot.error });
+        continue;
+      }
+      const childParsed = parseSitemapXml(childGot.xml);
+      score(childParsed.entries);
+      scanned += childParsed.entries.length;
+      attempts.push({ url: child.loc, outcome: `${childParsed.entries.length} URLs scanned` });
+    }
+    return { source: candidate, urlsScanned: scanned, attempts };
+  }
+
+  return { source: "", urlsScanned: 0, attempts };
+}

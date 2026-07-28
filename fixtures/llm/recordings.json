@@ -4618,5 +4618,40 @@
     "answer": "{\"answer\": \"Choosing a more expensive GLP-1 medication may offer benefits such as improved efficacy, fewer side effects, and enhanced patient adherence due to more convenient dosing regimens. Additionally, some premium options may provide better long-term weight management and glycaemic control.\", \"sources\": [\"nhs.uk\", \"diabetes.org.uk\", \"bmj.com\", \"healthline.com\", \"drugs.com\"]}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-28T19:45:32.330Z"
+  },
+  "0b777979391af52b05db7486ea8c25fb4cdd579a": {
+    "answer": "{\"urls\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:05:08.225Z"
+  },
+  "9e1c647cc31434099e310836b449a0a671bcb031": {
+    "answer": "{\"urls\": [\"https://www.mayoclinic.org/diseases-conditions/type-2-diabetes/in-depth/glp-1-receptor-agonists/art-20045773\", \"https://www.mayoclinic.org/diseases-conditions/type-2-diabetes/expert-answers/glp-1-receptor-agonists/faq-20057863\", \"https://www.mayoclinic.org/diseases-conditions/type-2-diabetes/in-depth/diabetes-medications/art-20045774\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:06:12.527Z"
+  },
+  "70ddeb9e2d1679a35842291c183cdd624487b4f1": {
+    "answer": "{\"urls\": [\"https://www.bmj.com/content/377/bmj.n2460\", \"https://www.bmj.com/content/377/bmj.n2461\", \"https://www.bmj.com/content/377/bmj.n2462\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:07:09.467Z"
+  },
+  "4363bc2c2fb683299e7b2fb2c9aad84f843034e9": {
+    "answer": "{\"urls\": [\"https://www.nhs.uk/conditions/type-2-diabetes/treatment/medicines/\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:11:27.967Z"
+  },
+  "83d774a7684191a5eb8f13526d9988e6eb23ee1a": {
+    "answer": "{\"urls\": [\"https://www.diabetes.co.uk/glp-1-weight-loss.html\", \"https://www.diabetes.co.uk/glp-1-agonists.html\", \"https://www.diabetes.co.uk/weight-loss.html\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:11:30.788Z"
+  },
+  "3d7cec454cb1ce317b973719a3d152249351849c": {
+    "answer": "{\"urls\": [\"https://www.healthline.com/nutrition/vitamin-c-serum\", \"https://www.healthline.com/health/vitamin-c-serum-benefits\", \"https://www.healthline.com/health/skin-care/vitamin-c-serum\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:13:35.701Z"
+  },
+  "9d552e81c48d475aa8e4353d4f4b3e421f8b5d5d": {
+    "answer": "{\"urls\": [\"https://www.medicalnewstoday.com/articles/what-is-vitamin-c-serum\", \"https://www.medicalnewstoday.com/articles/benefits-of-vitamin-c-serum\", \"https://www.medicalnewstoday.com/articles/how-to-use-vitamin-c-serum\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T20:15:37.313Z"
   }
 }

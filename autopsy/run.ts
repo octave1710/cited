@@ -4,6 +4,9 @@ import { parse } from "../engine/parse";
 import { fetchPage, normaliseUrl } from "../engine/ingest";
 import { FACTORS, GATE_FACTOR } from "../engine/weights.config";
 import type { AuditResult, FactorResult } from "../engine/types";
+import { scanSitemap } from "../engine/sitemap";
+import { checkCrawlerAccess } from "../engine/crawlerAccess";
+import { rankSitemapCandidates } from "./resolve";
 
 export interface PageSide {
   url: string;
@@ -94,13 +97,44 @@ export async function resolveCompetitorPage(
   domain: string,
   question: string,
 ): Promise<{ page?: PageSide; html?: string; attempts: { url: string; outcome: string }[] }> {
-  const res = await llm.call(RESOLVE_SYSTEM, `Website: ${domain}\nQuestion: ${question}`);
-  const candidates = parseUrls(res.text, domain);
   const attempts: { url: string; outcome: string }[] = [];
 
-  if (!candidates.length) {
-    return { attempts: [{ url: `(none on ${domain})`, outcome: "the engine named no URL it could stand behind" }] };
+  /**
+   * The site's own sitemap first. Every URL in it is one the site published, whereas a
+   * model recalls the SHAPE of a publisher's URLs and invents the rest: asked for BMJ
+   * pages on GLP-1 it produced three /content/377/bmj.n246x paths, none of which exists.
+   */
+  let candidates: string[] = [];
+  try {
+    const access = await checkCrawlerAccess(`https://${domain}/`);
+    let best: ReturnType<typeof rankSitemapCandidates> = [];
+    const scan = await scanSitemap(`https://${domain}/`, access.raw, (entries) => {
+      best = rankSitemapCandidates([...best.map((b) => ({ loc: b.loc })), ...entries], question);
+    });
+    candidates = best.map((b) => b.loc);
+    attempts.push(...scan.attempts.slice(0, 3));
+    attempts.push({
+      url: scan.source || `https://${domain}/sitemap.xml`,
+      outcome: scan.urlsScanned
+        ? `${scan.urlsScanned.toLocaleString("en-US")} sitemap URLs scanned, ${candidates.length} match the question`
+        : "no sitemap could be read on this domain",
+    });
+  } catch (e) {
+    attempts.push({ url: `https://${domain}/sitemap.xml`, outcome: (e as Error).message });
   }
+
+  if (!candidates.length) {
+    const res = await llm.call(RESOLVE_SYSTEM, `Website: ${domain}\nQuestion: ${question}`);
+    candidates = parseUrls(res.text, domain);
+    attempts.push({
+      url: `(engine suggestion for ${domain})`,
+      outcome: candidates.length
+        ? `${candidates.length} URL(s) suggested; each is fetched before it is trusted`
+        : "the engine named no URL it could stand behind",
+    });
+  }
+
+  if (!candidates.length) return { attempts };
 
   for (const url of candidates) {
     try {
@@ -187,12 +221,16 @@ export function briefFrom(theirs: PageSide): BriefLine[] {
 
 export async function runAutopsy(
   llm: LLMClient,
-  input: { domain: string; question?: string; ourUrl?: string; theirUrl?: string },
+  input: { domain: string; question?: string; ourUrl?: string; theirUrl?: string; theirHtml?: string; ourHtml?: string },
 ): Promise<Autopsy> {
   // no page of ours is a legitimate state, not an error: you cannot diff against a page
   // that does not exist, but you can still read the one that is winning
   let ours: PageSide | undefined;
-  if (input.ourUrl?.trim()) {
+  if (input.ourHtml?.trim()) {
+    // pasted source: the only route no server can refuse
+    const p = parse(input.ourHtml, input.ourUrl?.trim() || "pasted");
+    ours = { url: input.ourUrl?.trim() || "pasted HTML", title: p.title, words: p.wordCount, audit: audit(p) };
+  } else if (input.ourUrl?.trim()) {
     const ourFetched = await fetchPage(normaliseUrl(input.ourUrl).toString());
     const ourParsed = parse(ourFetched.html, ourFetched.finalUrl);
     ours = {
@@ -206,7 +244,25 @@ export async function runAutopsy(
   let theirs: PageSide | undefined;
   let attempts: { url: string; outcome: string }[] = [];
 
-  if (input.theirUrl) {
+  if (input.theirHtml?.trim()) {
+    /**
+     * Pasted source. mayoclinic.org and bmj.com refuse every automated read, including
+     * their own robots.txt, from behind a WAF. There is no honest way around that, and
+     * pretending to be a browser would contradict the crawler-honesty this tool is built
+     * on. So the user opens the page they can already see, copies the source, and the
+     * same nine factors run on it. This route cannot be blocked.
+     */
+    const p = parse(input.theirHtml, input.theirUrl?.trim() || `https://${input.domain}/`);
+    theirs = {
+      url: input.theirUrl?.trim() || `pasted from ${input.domain}`,
+      title: p.title,
+      words: p.wordCount,
+      audit: audit(p),
+    };
+    attempts = [
+      { url: input.theirUrl?.trim() || `(pasted source, ${input.domain})`, outcome: `pasted by hand, ${p.wordCount.toLocaleString("en-US")} words parsed` },
+    ];
+  } else if (input.theirUrl) {
     const f = await fetchPage(normaliseUrl(input.theirUrl).toString());
     const p = parse(f.html, f.finalUrl);
     theirs = { url: f.finalUrl, title: p.title, words: p.wordCount, audit: audit(p) };

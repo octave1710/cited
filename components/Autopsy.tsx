@@ -18,6 +18,8 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   const [domain, setDomain] = useState(initialDomain ?? "");
   const [question, setQuestion] = useState(initialQuestion ?? "");
   const [theirUrl, setTheirUrl] = useState("");
+  const [theirHtml, setTheirHtml] = useState("");
+  const [showPaste, setShowPaste] = useState(false);
 
   const [data, setData] = useState<Autopsy | null>(null);
   const [busy, setBusy] = useState(false);
@@ -34,7 +36,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
       const res = await fetch("/api/autopsy", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ourUrl, domain, question, theirUrl }),
+        body: JSON.stringify({ ourUrl, domain, question, theirUrl, theirHtml }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? `Request failed (${res.status}).`);
@@ -44,7 +46,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
     } finally {
       setBusy(false);
     }
-  }, [ourUrl, domain, question, theirUrl]);
+  }, [ourUrl, domain, question, theirUrl, theirHtml]);
 
   /* The bars grow out of the axis once, on arrival. Scale on the x axis only,
      so nothing reflows and the numbers stay put. */
@@ -74,9 +76,30 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
           <button className="btn btn--primary" type="submit" disabled={busy}>{busy ? "Reading both pages…" : "Run the autopsy"}</button>
         </form>
         <div className="bar" style={{ marginTop: 12 }}>
-          <span className="m" style={{ color: "var(--meta)" }}>OR PASTE THEIR EXACT PAGE</span>
-          <input className="field" style={{ flex: "1 1 420px", maxWidth: 620 }} value={theirUrl} onChange={(e) => setTheirUrl(e.target.value)} placeholder="https://competitor.com/the-winning-page" aria-label="Competitor page URL" />
+          <span className="m" style={{ color: "var(--meta)" }}>OR THEIR EXACT PAGE</span>
+          <input className="field" style={{ flex: "1 1 380px", maxWidth: 560 }} value={theirUrl} onChange={(e) => setTheirUrl(e.target.value)} placeholder="https://competitor.com/the-winning-page" aria-label="Competitor page URL" />
+          <button type="button" className={`btn btn--sm ${showPaste ? "btn--primary" : "btn--ghost"}`} onClick={() => setShowPaste((v) => !v)}>
+            {theirHtml ? `Source pasted, ${Math.round(theirHtml.length / 1024)} KB` : "Paste the source instead"}
+          </button>
         </div>
+
+        {showPaste && (
+          <div style={{ marginTop: 10 }}>
+            <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--meta)", marginBottom: 8, maxWidth: "88ch" }}>
+              Some publishers refuse every automated read from behind a firewall, including their own robots.txt. Open
+              the page in your browser, press Ctrl+U for the source, select all, copy, and paste it here. The same nine
+              factors run on it and nothing can block that.
+            </p>
+            <textarea
+              className="field"
+              value={theirHtml}
+              onChange={(e) => setTheirHtml(e.target.value)}
+              placeholder="Paste the page source here"
+              aria-label="Competitor page source"
+              style={{ width: "100%", height: 110, padding: 12, lineHeight: 1.5, resize: "vertical" }}
+            />
+          </div>
+        )}
       </div>
 
       {error && (
@@ -101,7 +124,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
               <div>
                 <h1 className="h1" style={{ maxWidth: "20ch" }}>
                   {!data.theirs
-                    ? `${data.domain} will not let us read it.`
+                    ? `We could not reach their page.`
                     : !data.ours
                       ? "Here is the page you have to beat."
                       : top
@@ -111,9 +134,14 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                 <p className="lede" style={{ marginTop: 22, maxWidth: "58ch" }}>
                   {!data.theirs ? (
                     <>
-                      Their server refused our fetch{data.blockedUs ? ` (${data.blockedUs})` : ""}. A site can win
-                      citations while staying closed to everyone except the engines it allows. Paste the page above and
-                      the same nine factors run on it.
+                      Every route was tried and the log below shows what each one returned. Their sitemap was scanned
+                      for the question, then the engine was asked to name a URL, then each candidate was fetched.
+                      {data.blockedUs ? ` Their server refused us (${data.blockedUs}).` : ""} Some publishers block all
+                      automated reads from behind a firewall, and pretending to be a browser would contradict the
+                      crawler honesty this tool measures.
+                      <br />
+                      <br />
+                      <strong>Two ways forward, both take a minute.</strong>
                     </>
                   ) : !data.ours ? (
                     <>
@@ -130,6 +158,45 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
               </div>
               <Sides data={data} />
             </div>
+
+            {!data.theirs && (
+              <div className="card" style={{ padding: "18px 20px", marginTop: 24 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 24 }}>
+                  <div>
+                    <div className="m" style={{ color: "var(--brand)", marginBottom: 8 }}>1 · FIND THE PAGE</div>
+                    <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--meta)" }}>
+                      Ask the engine the question yourself and read which page of theirs it names. That is also how you
+                      check the row on the map is true.
+                    </p>
+                    <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+                      <a
+                        className="btn btn--sm"
+                        href={`https://chatgpt.com/?q=${encodeURIComponent(data.question ?? "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Ask ChatGPT
+                      </a>
+                      <a
+                        className="btn btn--sm"
+                        href={`https://www.google.com/search?q=${encodeURIComponent(`site:${data.domain} ${data.question ?? ""}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Search {data.domain}
+                      </a>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="m" style={{ color: "var(--brand)", marginBottom: 8 }}>2 · GIVE IT TO THE TOOL</div>
+                    <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--meta)" }}>
+                      Paste that URL in the field above. If their server refuses it too, open the page, press Ctrl+U,
+                      copy the source and paste it with the button beside the field. Nothing can block that route.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {data.theirs && data.brief && <Brief lines={data.brief} domain={data.domain} />}
 

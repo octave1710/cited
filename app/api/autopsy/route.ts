@@ -5,7 +5,7 @@ import { IngestError } from "../../../engine/ingest";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  let body: { domain?: string; question?: string; ourUrl?: string; theirUrl?: string };
+  let body: { domain?: string; question?: string; ourUrl?: string; theirUrl?: string; theirHtml?: string; ourHtml?: string };
   try {
     body = await req.json();
   } catch {
@@ -16,7 +16,11 @@ export async function POST(req: Request) {
   const domain = (body.domain ?? "").trim().toLowerCase().replace(/^www\./, "");
   // our page is optional: a question the brand does not answer yet has no page to diff,
   // and reading the winner alone still produces the specification for the one to write
-  if (!domain && !body.theirUrl) return Response.json({ error: "Name the competitor domain, or paste their page URL." }, { status: 400 });
+  const theirHtml = (body.theirHtml ?? "").slice(0, 4_000_000);
+  const ourHtml = (body.ourHtml ?? "").slice(0, 4_000_000);
+  if (!domain && !body.theirUrl && !theirHtml) {
+    return Response.json({ error: "Name the competitor domain, paste their page URL, or paste their page source." }, { status: 400 });
+  }
 
   try {
     const autopsy = await runAutopsy(getLLM({ cache: true, record: true, json: true }), {
@@ -24,6 +28,8 @@ export async function POST(req: Request) {
       question: (body.question ?? "").trim() || undefined,
       ourUrl: ourUrl || undefined,
       theirUrl: (body.theirUrl ?? "").trim() || undefined,
+      theirHtml: theirHtml.trim() || undefined,
+      ourHtml: ourHtml.trim() || undefined,
     });
     return Response.json({ autopsy });
   } catch (e) {
