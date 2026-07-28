@@ -1,13 +1,15 @@
 import type { LLMClient, LLMUsage } from "../adapters/llm";
 import { classify, toDomain } from "./classify";
 import { generateQuestions } from "./questions";
+import { marketOf } from "./markets";
 import type { CitationMap, MapCost, MapQuestion, QuestionResult } from "./types";
 
-const ASK_SYSTEM =
+const askSystem = (language: string, marketLabel: string) =>
   "You are the answer engine behind a consumer AI assistant. Answer the question in at most two " +
-  "sentences, then list the websites you would cite as sources, most authoritative first, as bare " +
-  "domains (example: healthline.com). At most five. If you would not cite any specific website, " +
-  'return an empty list. Reply with JSON: {"answer": "...", "sources": ["domain.com"]}.';
+  `sentences, in ${language}, for a user in ${marketLabel}. Then list the websites you would cite ` +
+  "as sources, most authoritative first, as bare domains (example: healthline.com). Prefer the " +
+  "sources a user in that market would actually be shown. At most five. If you would not cite any " +
+  'specific website, return an empty list. Reply with JSON: {"answer": "...", "sources": ["domain.com"]}.';
 
 /** Published per-million rates, so the cost counter is traceable rather than invented. */
 const RATES: Record<string, { in: number; out: number }> = {
@@ -92,13 +94,15 @@ export async function runCitationMap(llm: LLMClient, opts: MapOptions, events: M
     if (rate && !missingUsage) cost.usd = (cost.inTokens * rate.in + cost.outTokens * rate.out) / 1_000_000;
   };
 
+  const market = marketOf(opts.market);
+  const ask = askSystem(market.language, market.label);
   const brandDomain = toDomain(opts.brandDomain) ?? opts.brandDomain.toLowerCase();
   const questions = await generateQuestions(llm, opts.topic, opts.market, opts.perIntent ?? 20, charge);
   events.onQuestions?.(questions);
 
   const raw = await pool(questions, opts.concurrency ?? 6, async (q) => {
     const t0 = Date.now();
-    const res = await llm.call(ASK_SYSTEM, `Question: ${q.text}\nMarket: ${opts.market}`);
+    const res = await llm.call(ask, `Question: ${q.text}\nMarket: ${market.label}`);
     charge(res.usage, res.replayed);
     const domains = parseSources(res.text);
     const result: QuestionResult = {

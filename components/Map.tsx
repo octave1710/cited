@@ -9,6 +9,7 @@ gsap.registerPlugin(Flip);
 import type { CitationMap, MapCost, MapQuestion, QuestionResult } from "../citationmap/types";
 import { INTENTS } from "../citationmap/questions";
 import { deriveSignals, type Difficulty, type EntryPoint, type MapSignals } from "../citationmap/signals";
+import { MARKETS } from "../citationmap/markets";
 import { DeltaPanel, History } from "./History";
 import { BRAND_COLOUR, Favicon, REST_COLOUR, TerritoryMap, toTerritories } from "./Territory";
 import type { MapDelta } from "../citationmap/compare";
@@ -42,6 +43,13 @@ type CellState =
   | { phase: "done"; result: QuestionResult };
 
 const sentence = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+/**
+ * The screen remembers the run you were on. Navigating to /audit and back reloaded the
+ * page, React state died with it, and the map you had just paid for was gone. Only the
+ * id is kept; the map itself is re-read from the API, so nothing cached can go stale.
+ */
+const LAST = "cited.lastMap";
 
 export function MapScreen() {
   const [topic, setTopic] = useState("vitamin c serum");
@@ -140,6 +148,11 @@ export function MapScreen() {
             setCost(ev.map.cost);
             setSettled(true);
             setPhase("");
+            try {
+              sessionStorage.setItem(LAST, ev.map.id);
+            } catch {
+              // private mode or a full quota: the map still renders, it just will not survive a reload
+            }
             // the baseline is whatever previous run covered the same category, brand
             // and market. Absent, the panel says so rather than showing a zero.
             fetch(`/api/map?id=${encodeURIComponent(ev.map.id)}&delta=1`)
@@ -192,12 +205,24 @@ export function MapScreen() {
       setPicked(null);
       flipState.current = null;
       setDelta({ delta: d.delta ?? null, noBaselineReason: d.noBaselineReason });
+      sessionStorage.setItem(LAST, id);
     } catch (e) {
       setError((e as Error).message);
+      sessionStorage.removeItem(LAST);
     } finally {
       setBusy(false);
     }
   }, []);
+
+  const [restoring, setRestoring] = useState(true);
+  useEffect(() => {
+    const id = typeof window !== "undefined" ? sessionStorage.getItem(LAST) : null;
+    if (!id) {
+      setRestoring(false);
+      return;
+    }
+    void openStored(id).finally(() => setRestoring(false));
+  }, [openStored]);
 
   /** Pure derivation over the finished map, so it costs nothing and needs no round trip. */
   const signals = useMemo(() => (map ? deriveSignals(map) : null), [map]);
@@ -226,7 +251,9 @@ export function MapScreen() {
 
       <div className="gut">
         <div className="shell">
-        {!total && !busy && <MapEmpty />}
+        {/* while a stored run is being re-read, the empty state would flash the "no map
+            yet" copy at someone who has one, so it waits */}
+        {!total && !busy && !restoring && <MapEmpty />}
 
         {(busy || total > 0) && (
           <>
@@ -299,7 +326,11 @@ function MapBar(p: {
         <input className="field" style={{ width: 210 }} value={p.brand} onChange={(e) => p.setBrand(e.target.value)} aria-label="Brand name" />
         <input className="field" style={{ width: 230 }} value={p.domain} onChange={(e) => p.setDomain(e.target.value)} placeholder="yourdomain.com" aria-label="Your domain" />
         <select className="field" style={{ width: 110 }} value={p.market} onChange={(e) => p.setMarket(e.target.value)} aria-label="Market">
-          {["UK", "SE", "DK", "US", "FR"].map((m) => <option key={m} value={m}>{m}</option>)}
+          {MARKETS.map((m) => (
+            <option key={m.code} value={m.code}>
+              {m.code} · {m.language}
+            </option>
+          ))}
         </select>
         <button className="btn btn--primary" type="submit" disabled={p.busy}>{p.busy ? "Mapping…" : "Map the category"}</button>
       </form>

@@ -1,5 +1,6 @@
 import type { LLMClient, LLMUsage } from "../adapters/llm";
 import type { MapQuestion } from "./types";
+import { marketOf } from "./markets";
 
 /**
  * The eight ways a buyer interrogates a category. One generation call per intent,
@@ -16,10 +17,12 @@ export const INTENTS = [
   { id: "value", label: "price and value", brief: "price, whether it is worth it, cheap versus expensive" },
 ] as const;
 
-const SYSTEM =
+const system = (language: string) =>
   "You generate the sub-questions a consumer AI assistant decomposes a shopping topic into. " +
   "Real questions in the wording a person types, sentence case, no numbering, no brand names " +
-  "unless the topic names one. Reply with JSON: {\"questions\": [\"...\", ...]}.";
+  `unless the topic names one. Write every question in ${language}, because that is the language ` +
+  "buyers in this market actually type. Translate the topic into that language if it arrives in " +
+  'another one. Reply with JSON: {"questions": ["...", ...]}.';
 
 /** Strips code fences, then parses. Model output is JSON-moded but fences still slip through. */
 export function parseQuestions(raw: string): string[] {
@@ -50,10 +53,11 @@ export async function generateQuestions(
 ): Promise<MapQuestion[]> {
   const batches = await Promise.all(
     INTENTS.map(async (intent) => {
+      const m = marketOf(market);
       const res = await llm.call(
-        SYSTEM,
-        `Topic: ${topic}\nMarket: ${market}\nAngle: ${intent.brief}\n` +
-          `Write exactly ${perIntent} distinct questions on that angle.`,
+        system(m.language),
+        `Topic: ${topic}\nMarket: ${m.label}\nLanguage: ${m.language}\nAngle: ${intent.brief}\n` +
+          `Write exactly ${perIntent} distinct questions on that angle, in ${m.language}.`,
       );
       onUsage?.(res.usage, res.replayed);
       return { intent, texts: parseQuestions(res.text) };
