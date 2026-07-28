@@ -142,3 +142,49 @@ F3, F4, F5, F7 are built and stay.
 - Citation detection must move from "our page vs 2 competitors" to "which domains appear
   in the answer", which means parsing cited sources rather than numbered slots.
 - Everything stays replayable offline from recordings for the demo.
+
+---
+
+## The mechanism: from "we lose this query" to "we win it"
+
+The map produces lost queries. Each one is routed to exactly one of two actions, and both
+end with the same query being re-measured on the same engine.
+
+### Route 1 · a page of ours exists but loses
+
+1. Pick our best candidate page for that query (best factor+topic match).
+2. Autopsy the winner's page with the same nine factors.
+3. Diff the two. The gap is the work order, e.g. winner carries 12 figures and a named MD,
+   ours carries 0 and is unsigned.
+4. The fix plan writes the specific edits that close *that* gap, not a generic checklist:
+   the question becomes an H2 verbatim, the first sentence becomes the answer, the hedges
+   get slots for figures the client supplies, the quote slot names a real person.
+5. Apply, re-run that exact query, record cited / paraphrased / absent.
+
+### Route 2 · no page of ours answers the question
+
+No amount of editing fixes an absent page. The question becomes a brief for the pipeline:
+grounded on the local winning term, drafted answer-first around that single question,
+scored by the same engine before anyone reads it, gated on a named human approval, and
+shipped as a CMS payload. Then the new page is tested on the query that motivated it.
+
+### What actually improves, and what we refuse to promise
+
+The number that moves is **the count of queries where the brand is cited**, measured on the
+same engine, with the same competing sources, before and after. Not our internal 0-100,
+which is only a predictor.
+
+Hard limit, stated in the README and out loud in the walkthrough: this is a controlled
+comparison, not a promise about production ChatGPT. Live citation also depends on the
+engine's own index and retrieval, which nobody outside OpenAI controls. What the tool proves
+is that, given the page as a candidate source, the engine now prefers it over the
+competitors it previously preferred. That is the honest claim, and it is still the strongest
+claim anyone in this space can make.
+
+### The lever the tool cannot pull
+
+Off-site authority. If the autopsy shows the winner is cited because they are referenced
+across the web and the client is not, that is a real finding and an unfixable one inside a
+CMS. It is reported as a human action item with the evidence, never silently folded into a
+score. Roughly one lost query in four lands here, and saying so is what keeps the other
+three credible.
