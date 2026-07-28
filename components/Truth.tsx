@@ -11,6 +11,8 @@ import type { Run } from "../lib/types";
 export function TruthPanel({ run, busy, onLoad }: { run: Run; busy: string | null; onLoad: () => void }) {
   const t = run.truth;
   const live = t?.mode === "live";
+  // read the real gate rather than asserting a number: a page that fails it scores 0
+  const gateScore = run.audit?.factors.find((f) => f.key === "crawlability")?.score;
   const blind = live ? (t?.bots.filter((b) => b.thisPath === 0) ?? []) : [];
 
   return (
@@ -120,8 +122,8 @@ export function TruthPanel({ run, busy, onLoad }: { run: Run; busy: string | nul
           {blind.length > 0 && (
             <p className="lede" style={{ marginTop: 26, maxWidth: "70ch" }}>
               {blind.map((b) => b.bot).join(" and ")} crawl the domain but have never fetched this URL. The
-              on-page gate scored 100 and it was right. It was also incomplete, which is exactly why this panel
-              exists.
+              on-page gate scored {gateScore ?? "n/a"} and it was right about what it measures. It was also
+              incomplete, which is exactly why this panel exists.
             </p>
           )}
         </div>

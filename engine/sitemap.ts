@@ -18,7 +18,17 @@ export interface SitemapReport {
   /** Where the URLs came from, in the order tried. */
   source: string;
   declaredInRobots: boolean;
+  /** The URLs actually kept, capped at MAX_ENTRIES. */
   entries: SitemapEntry[];
+  /**
+   * URLs seen before any cap. Reported apart from `entries.length`, because a count
+   * that saturates at our own constant is our limit wearing the costume of a
+   * measurement, and the client can disprove it by counting their own file.
+   */
+  discovered: number;
+  /** True when discovery stopped early, so no total can be claimed at all. */
+  truncated: boolean;
+  childSitemaps: { total: number; read: number };
   attempts: { url: string; outcome: string }[];
 }
 
@@ -95,6 +105,9 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
         source: candidate,
         declaredInRobots: declared.includes(candidate),
         entries: parsed.entries.slice(0, MAX_ENTRIES),
+        discovered: parsed.entries.length,
+        truncated: parsed.entries.length > MAX_ENTRIES,
+        childSitemaps: { total: 0, read: 0 },
         attempts,
       };
     }
@@ -102,6 +115,8 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
     // one level of index expansion, bounded: a large site indexes hundreds of children
     attempts.push({ url: candidate, outcome: `index of ${parsed.entries.length} sitemaps` });
     const entries: SitemapEntry[] = [];
+    let discovered = 0;
+    let childrenRead = 0;
     for (const child of parsed.entries.slice(0, MAX_INDEX_CHILDREN)) {
       const childGot = await fetchXml(child.loc);
       if ("error" in childGot) {
@@ -110,6 +125,8 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
       }
       const childParsed = parseSitemapXml(childGot.xml);
       attempts.push({ url: child.loc, outcome: `${childParsed.entries.length} URLs` });
+      childrenRead++;
+      discovered += childParsed.entries.length;
       entries.push(...childParsed.entries);
       if (entries.length >= MAX_ENTRIES) break;
     }
@@ -123,9 +140,13 @@ export async function discoverSitemap(siteUrl: string, robotsBody = ""): Promise
       source: candidate,
       declaredInRobots: declared.includes(candidate),
       entries: entries.slice(0, MAX_ENTRIES),
+      discovered,
+      // an index whose children were not all read has no knowable total at all
+      truncated: entries.length > MAX_ENTRIES || childrenRead < parsed.entries.length,
+      childSitemaps: { total: parsed.entries.length, read: childrenRead },
       attempts,
     };
   }
 
-  return { source: "", declaredInRobots: false, entries: [], attempts };
+  return { source: "", declaredInRobots: false, entries: [], discovered: 0, truncated: false, childSitemaps: { total: 0, read: 0 }, attempts };
 }

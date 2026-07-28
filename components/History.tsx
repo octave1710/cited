@@ -78,20 +78,42 @@ export function DeltaPanel({ delta, noBaselineReason }: { delta: MapDelta | null
     ) : null;
   }
 
+  const churn = delta.won.length + delta.lost.length;
   const moved = delta.won.length - delta.lost.length;
+  const q = (n: number) => `${n} question${n === 1 ? "" : "s"}`;
+
+  // a net of zero over six questions changing hands is not "nothing moved", and a
+  // comparison with no shared questions is not a comparison at all
+  const headline =
+    delta.comparable === 0
+      ? "The re-run asked different questions, so there is nothing to compare."
+      : churn === 0
+        ? "Nothing changed hands since the last run."
+        : moved === 0
+          ? `${q(churn)} changed hands and you ended level.`
+          : moved > 0
+            ? `You gained ${q(moved)} since the last run.`
+            : `You lost ${q(-moved)} since the last run.`;
+
   return (
     <section style={{ paddingTop: 100 }}>
-      <h2 className="h1" style={{ fontSize: "clamp(32px,2.5vw,44px)", maxWidth: "24ch" }}>
-        {moved === 0
-          ? "Nothing moved since the last run."
-          : moved > 0
-            ? `You gained ${moved} question${moved > 1 ? "s" : ""} since the last run.`
-            : `You lost ${-moved} question${moved < -1 ? "s" : ""} since the last run.`}
-      </h2>
+      <h2 className="h1" style={{ fontSize: "clamp(32px,2.5vw,44px)", maxWidth: "24ch" }}>{headline}</h2>
       <p className="lede" style={{ marginTop: 18, maxWidth: "64ch" }}>
-        {delta.before.owned} to {delta.after.owned} questions naming you, {delta.daysBetween} day
-        {delta.daysBetween === 1 ? "" : "s"} apart, counted only on the {delta.comparable} questions both runs asked.
-        {delta.newQuestions > 0 && ` ${delta.newQuestions} question${delta.newQuestions > 1 ? "s were" : " was"} new this run and is not counted here.`}
+        {delta.comparable === 0 ? (
+          <>
+            Neither run asked a question the other did, across {delta.before.questions} and{" "}
+            {delta.after.questions} questions {delta.daysBetween} day{delta.daysBetween === 1 ? "" : "s"} apart. Nothing
+            below is a measurement of change.
+          </>
+        ) : (
+          <>
+            {delta.before.ownedComparable} to {delta.after.ownedComparable} questions naming you,{" "}
+            {delta.daysBetween} day{delta.daysBetween === 1 ? "" : "s"} apart, counted only on the {q(delta.comparable)}{" "}
+            both runs asked.
+            {delta.newQuestions > 0 &&
+              ` ${q(delta.newQuestions)} ${delta.newQuestions === 1 ? "was" : "were"} new this run and ${delta.newQuestions === 1 ? "is" : "are"} not counted here.`}
+          </>
+        )}
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(360px,1fr))", gap: 56, marginTop: 36 }}>

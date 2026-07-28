@@ -73,14 +73,24 @@ export function listMaps(limit = 40): MapSummary[] {
   });
 }
 
-/** The previous map for the same category, brand and market. The baseline for a delta. */
+/**
+ * The previous map for the same category, brand and market. The baseline for a delta.
+ *
+ * Filtered in SQL over every row. Taking the newest 20 by topic and then filtering in
+ * JS meant a real baseline sitting at row 21 was reported as "this is the first run",
+ * which reads as a missing history rather than as a paging limit.
+ */
 export function previousMapFor(map: CitationMap): CitationMap | null {
-  const rows = conn()
-    .prepare(`SELECT payload FROM maps WHERE topic = ? AND id != ? AND created_at <= ? ORDER BY created_at DESC LIMIT 20`)
-    .all(map.topic, map.id, map.createdAt) as { payload: string }[];
-  for (const r of rows) {
-    const candidate = JSON.parse(r.payload) as CitationMap;
-    if (candidate.brandDomain === map.brandDomain && candidate.market === map.market) return candidate;
-  }
-  return null;
+  const row = conn()
+    .prepare(
+      `SELECT payload FROM maps
+       WHERE topic = ?
+         AND id != ?
+         AND created_at <= ?
+         AND json_extract(payload, '$.brandDomain') = ?
+         AND json_extract(payload, '$.market') = ?
+       ORDER BY created_at DESC LIMIT 1`,
+    )
+    .get(map.topic, map.id, map.createdAt, map.brandDomain, map.market) as { payload: string } | undefined;
+  return row ? (JSON.parse(row.payload) as CitationMap) : null;
 }

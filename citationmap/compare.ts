@@ -28,8 +28,13 @@ export interface DomainMove {
 }
 
 export interface MapDelta {
-  before: { id: string; createdAt: string; owned: number; questions: number };
-  after: { id: string; createdAt: string; owned: number; questions: number };
+  /**
+   * `owned` is the whole-map count. `ownedComparable` counts only the questions both
+   * runs asked, which is the only number the won and lost lists are computed from, so
+   * it is the one the panel quotes.
+   */
+  before: { id: string; createdAt: string; owned: number; ownedComparable: number; questions: number };
+  after: { id: string; createdAt: string; owned: number; ownedComparable: number; questions: number };
   /** Questions that exist in both runs. Everything below is counted on these only. */
   comparable: number;
   won: QuestionMove[];
@@ -54,11 +59,15 @@ export function compareMaps(before: CitationMap, after: CitationMap): MapDelta {
   const lost: QuestionMove[] = [];
   const otherMoves: QuestionMove[] = [];
   let comparable = 0;
+  let ownedBeforeComparable = 0;
+  let ownedAfterComparable = 0;
 
   for (const [key, a] of afterByText) {
     const b = beforeByText.get(key);
     if (!b) continue;
     comparable++;
+    if (b.bucket === "owned") ownedBeforeComparable++;
+    if (a.bucket === "owned") ownedAfterComparable++;
     if (b.bucket === a.bucket && b.owner === a.owner) continue;
     const move: QuestionMove = {
       id: a.id,
@@ -88,14 +97,15 @@ export function compareMaps(before: CitationMap, after: CitationMap): MapDelta {
         isBrand: (a ?? b)!.isBrand,
       };
     })
-    .filter((d) => d.delta !== 0 || d.toWins > 0)
+    // a domain that did not move has no place under a heading that says who moved
+    .filter((d) => d.delta !== 0)
     .sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta) || y.toWins - x.toWins);
 
   const ms = new Date(after.createdAt).getTime() - new Date(before.createdAt).getTime();
 
   return {
-    before: { id: before.id, createdAt: before.createdAt, owned: before.counts.owned, questions: before.questions.length },
-    after: { id: after.id, createdAt: after.createdAt, owned: after.counts.owned, questions: after.questions.length },
+    before: { id: before.id, createdAt: before.createdAt, owned: before.counts.owned, ownedComparable: ownedBeforeComparable, questions: before.questions.length },
+    after: { id: after.id, createdAt: after.createdAt, owned: after.counts.owned, ownedComparable: ownedAfterComparable, questions: after.questions.length },
     comparable,
     won,
     lost,

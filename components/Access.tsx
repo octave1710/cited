@@ -108,7 +108,15 @@ export function AccessPanel({ access, patch, url }: { access: AccessEvent[]; pat
 interface LlmsResult {
   origin: string;
   siteName: string;
-  sitemap: { source: string; declaredInRobots: boolean; total: number; attempts: { url: string; outcome: string }[] };
+  sitemap: {
+    source: string;
+    declaredInRobots: boolean;
+    discovered: number;
+    read: number;
+    truncated: boolean;
+    childSitemaps: { total: number; read: number };
+    attempts: { url: string; outcome: string }[];
+  };
   pages: { listed: number; undescribed: number; unreadable: number; sampled: number };
   llmsTxt: string;
   robotsDiff: string | null;
@@ -185,8 +193,13 @@ function FilesForTheWebroot({ url }: { url: string }) {
         <>
           <div style={{ display: "flex", gap: 40, marginTop: 26, flexWrap: "wrap" }}>
             {[
+              // never a bare number that could be our own cap: `truncated` says whether
+              // the count is the site's or ours, and the label carries the plus sign
               [String(data.pages.listed), "pages listed, deduplicated"],
-              [String(data.sitemap.total), "URLs found in the sitemap"],
+              [
+                data.sitemap.truncated ? `${data.sitemap.read}+` : String(data.sitemap.discovered),
+                data.sitemap.truncated ? "URLs read, the file holds more" : "URLs in the sitemap",
+              ],
               [String(data.pages.undescribed), "with no description published"],
               [String(data.pages.unreadable), "that would not load"],
             ].map(([n, label]) => (
@@ -200,7 +213,9 @@ function FilesForTheWebroot({ url }: { url: string }) {
           <p className="m-sm meta" style={{ marginTop: 18, textTransform: "none", letterSpacing: 0.2, lineHeight: 1.7 }}>
             Sitemap {data.sitemap.source || "not found"}
             {data.sitemap.source && (data.sitemap.declaredInRobots ? ", declared in robots.txt" : ", not declared in robots.txt")}.
-            Sampled {data.pages.sampled} pages evenly across it.
+            {data.sitemap.childSitemaps.total > 0 &&
+              ` Read ${data.sitemap.childSitemaps.read} of its ${data.sitemap.childSitemaps.total} child sitemaps.`}{" "}
+            Sampled {data.pages.sampled} pages evenly across what was read.
           </p>
 
           <p style={{ fontSize: 16, marginTop: 18, maxWidth: "70ch" }}>

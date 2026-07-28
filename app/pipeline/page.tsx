@@ -1,12 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { TopBar } from "../../components/Chrome";
 import { NODES, type PipelineRun } from "../../pipeline/nodes";
 
+/**
+ * useSearchParams opts a client component out of static prerendering unless it sits
+ * under a Suspense boundary, and the build fails outright without one.
+ */
 export default function PipelinePage() {
+  return (
+    <Suspense fallback={null}>
+      <PipelineScreen />
+    </Suspense>
+  );
+}
+
+function PipelineScreen() {
   const [run, setRun] = useState<PipelineRun | null>(null);
   const [topic, setTopic] = useState("vitamin c serum");
+  /**
+   * The map's "Brief a page" button has always sent ?brief=<the question>. This page
+   * never read it, so the user landed on the demo category and the question they
+   * clicked was lost. It seeds the topic and stays on screen as the reason for the run.
+   */
+  const params = useSearchParams();
+  const brief = params.get("brief")?.trim() ?? "";
+  useEffect(() => {
+    if (brief) setTopic(brief);
+  }, [brief]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
@@ -55,6 +78,16 @@ export default function PipelinePage() {
   return (
     <div style={{ minHeight: "100vh" }}>
       <TopBar engineMode="mock" profoundMode="mock" />
+
+      {brief && (
+        <div
+          className="gut"
+          style={{ borderBottom: "1px solid var(--rule)", paddingTop: 14, paddingBottom: 14, display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}
+        >
+          <span className="m" style={{ color: "var(--red)" }}>BRIEFED FROM THE MAP</span>
+          <span style={{ fontSize: 16.5 }}>{brief}</span>
+        </div>
+      )}
 
       <div className="gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", borderBottom: "1px solid var(--rule)" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>

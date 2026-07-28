@@ -88,6 +88,20 @@ export async function POST(req: Request) {
       addLlmsTxt: pages.length > 0,
     });
 
+    // an empty llms.txt is not an artefact, it is a failure wearing a download button
+    if (llms.listed === 0) {
+      return Response.json(
+        {
+          error:
+            sitemap.entries.length === 0
+              ? `No sitemap could be read for ${origin}. The attempts are listed below.`
+              : `Read ${targets.length} pages from the sitemap and none carried a usable title.`,
+          sitemap: { source: sitemap.source, attempts: sitemap.attempts },
+        },
+        { status: 422 },
+      );
+    }
+
     return Response.json({
       origin,
       siteName,
@@ -95,7 +109,13 @@ export async function POST(req: Request) {
       sitemap: {
         source: sitemap.source,
         declaredInRobots: sitemap.declaredInRobots,
-        total: sitemap.entries.length,
+        // `discovered` is what was seen, `truncated` says whether that is the whole file.
+        // The old `total` was entries.length AFTER the 400 cap, so it saturated at our own
+        // constant and was printed as if it were the site's page count.
+        discovered: sitemap.discovered,
+        read: sitemap.entries.length,
+        truncated: sitemap.truncated,
+        childSitemaps: sitemap.childSitemaps,
         attempts: sitemap.attempts,
       },
       pages: { listed: llms.listed, undescribed: llms.undescribed, unreadable: failed, sampled: targets.length },

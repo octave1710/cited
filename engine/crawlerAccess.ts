@@ -1,3 +1,4 @@
+import { IngestError, safeFetch } from "./ingest";
 /**
  * Can the answer-engine crawlers even reach this page?
  *
@@ -83,25 +84,33 @@ export function parseRobots(text: string): Group[] {
   return groups;
 }
 
-/** Standard matching: longest matching rule wins, Allow wins a tie. */
-function decide(groups: Group[], ua: string, path: string): { allowed: boolean; rule: string; group: string } {
+/**
+ * Standard matching: longest matching rule wins, Allow wins a tie.
+ *
+ * RFC 9309 says every group naming the same user-agent is merged. Taking only the first
+ * meant our own emitted patch changed nothing: appending `User-agent: GPTBot / Allow: /`
+ * to a file that already disallowed GPTBot left the earlier group deciding, so the tool
+ * handed over a fix and then reported that the fix had no effect.
+ */
+export function decide(groups: Group[], ua: string, path: string): { allowed: boolean; rule: string; group: string } {
   const lower = ua.toLowerCase();
-  const specific = groups.find((g) => g.agents.includes(lower));
-  const wildcard = groups.find((g) => g.agents.includes("*"));
-  const group = specific ?? wildcard;
-  if (!group) return { allowed: true, rule: "no matching group, so nothing restricts it", group: "none" };
+  const specific = groups.filter((g) => g.agents.includes(lower));
+  const wildcard = groups.filter((g) => g.agents.includes("*"));
+  const matching = specific.length ? specific : wildcard;
+  if (!matching.length) return { allowed: true, rule: "no matching group, so nothing restricts it", group: "none" };
+  const rules = matching.flatMap((g) => g.rules);
 
   let best: { allow: boolean; path: string } | null = null;
-  for (const r of group.rules) {
+  for (const r of rules) {
     if (r.path === "") continue; // "Disallow:" with no value means allow everything
     if (matches(r.path, path) && (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.allow))) {
       best = r;
     }
   }
 
-  const groupName = specific ? ua : "*";
+  const groupName = specific.length ? ua : "*";
   if (!best) {
-    const blanket = group.rules.some((r) => r.path === "" );
+    const blanket = rules.some((r) => r.path === "");
     return {
       allowed: true,
       rule: blanket ? "Disallow: (empty, which allows everything)" : "no rule matches this path",
@@ -161,15 +170,14 @@ export async function checkCrawlerAccess(pageUrl: string): Promise<AccessReport>
     return emptyReport("", 0, "the audited target is not a URL, so there is no robots.txt to read");
   }
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
+  // safeFetch, not a raw fetch: this had its own fetch with the default redirect:follow,
+  // so it was a second, unguarded door into the same SSRF the ingest path had just closed
   let res: Response;
   try {
-    res = await fetch(robotsUrl, { signal: controller.signal, headers: { "user-agent": "CITEDBot/0.1" } });
-  } catch {
-    return emptyReport(robotsUrl, 0, `could not fetch ${robotsUrl}`);
-  } finally {
-    clearTimeout(timer);
+    res = await safeFetch(robotsUrl, "text/plain,*/*");
+  } catch (e) {
+    const why = e instanceof IngestError ? e.message : `could not fetch ${robotsUrl}`;
+    return emptyReport(robotsUrl, 0, why);
   }
 
   if (res.status === 404) {

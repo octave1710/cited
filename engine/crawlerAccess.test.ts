@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matches, parseRobots } from "./crawlerAccess";
+import { decide, matches, parseRobots } from "./crawlerAccess";
 
 const ROBOTS = `
 # comment line
@@ -104,5 +104,40 @@ describe("matches", () => {
     expect(matches(evil, path)).toBe(true);
     expect(matches(evil + "$", path + "b")).toBe(false);
     expect(Date.now() - t0).toBeLessThan(50);
+  });
+});
+
+describe("decide merges every group naming the same crawler", () => {
+  it("lets a later Allow override an earlier Disallow, which is what our own patch emits", () => {
+    const before = `User-agent: GPTBot
+Disallow: /
+`;
+    expect(decide(parseRobots(before), "GPTBot", "/guide").allowed).toBe(false);
+
+    // exactly what buildRobotsDiff appends
+    const after = before + `\nUser-agent: GPTBot\nAllow: /\n`;
+    const verdict = decide(parseRobots(after), "GPTBot", "/guide");
+    expect(verdict.allowed).toBe(true);
+    expect(verdict.rule).toBe("Allow: /");
+  });
+
+  it("still prefers a specific group over the wildcard", () => {
+    const robots = `User-agent: *
+Allow: /
+User-agent: GPTBot
+Disallow: /private
+`;
+    expect(decide(parseRobots(robots), "GPTBot", "/private/x").allowed).toBe(false);
+    expect(decide(parseRobots(robots), "SomeOtherBot", "/private/x").allowed).toBe(true);
+  });
+
+  it("keeps longest-match precedence across merged groups", () => {
+    const robots = `User-agent: GPTBot
+Disallow: /
+User-agent: GPTBot
+Allow: /public
+`;
+    expect(decide(parseRobots(robots), "GPTBot", "/public/a").allowed).toBe(true);
+    expect(decide(parseRobots(robots), "GPTBot", "/private").allowed).toBe(false);
   });
 });

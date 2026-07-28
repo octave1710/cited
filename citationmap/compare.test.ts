@@ -117,3 +117,58 @@ describe("compareMaps", () => {
     expect(d.domains[1]).toMatchObject({ domain: "big.com", delta: -10 });
   });
 });
+
+describe("delta counts that the panel quotes", () => {
+  const owned = (t: string) => q(t, { bucket: "owned", brandRank: 1, owner: "us.com" });
+  const lostQ = (t: string) => q(t, { bucket: "lost", owner: "big.com", domains: ["big.com"] });
+
+  it("counts owned only on the questions both runs asked", () => {
+    const before = m("a", "2026-01-01T00:00:00.000Z", [owned("kept"), owned("dropped"), owned("also dropped")]);
+    const after = m("b", "2026-01-08T00:00:00.000Z", [owned("kept"), lostQ("brand new")]);
+
+    const d = compareMaps(before, after);
+    // whole-map counts stay available, but the shared-set counts are what the panel shows
+    expect(d.before.owned).toBe(3);
+    expect(d.before.ownedComparable).toBe(1);
+    expect(d.after.ownedComparable).toBe(1);
+    expect(d.comparable).toBe(1);
+  });
+
+  it("reports gross churn even when the net is zero", () => {
+    const before = m("a", "2026-01-01T00:00:00.000Z", [owned("a"), owned("b"), lostQ("c"), lostQ("d")]);
+    const after = m("b", "2026-01-02T00:00:00.000Z", [lostQ("a"), lostQ("b"), owned("c"), owned("d")]);
+
+    const d = compareMaps(before, after);
+    expect(d.won).toHaveLength(2);
+    expect(d.lost).toHaveLength(2);
+    // a headline computed from won minus lost would say nothing moved
+    expect(d.won.length - d.lost.length).toBe(0);
+    expect(d.won.length + d.lost.length).toBe(4);
+  });
+
+  it("lists only domains that actually moved", () => {
+    const before = m("a", "2026-01-01T00:00:00.000Z", [], {
+      domains: [
+        { domain: "still.com", wins: 5, appearances: 5, isBrand: false },
+        { domain: "mover.com", wins: 1, appearances: 1, isBrand: false },
+      ],
+    });
+    const after = m("b", "2026-01-02T00:00:00.000Z", [], {
+      domains: [
+        { domain: "still.com", wins: 5, appearances: 5, isBrand: false },
+        { domain: "mover.com", wins: 4, appearances: 4, isBrand: false },
+      ],
+    });
+    expect(compareMaps(before, after).domains.map((d) => d.domain)).toEqual(["mover.com"]);
+  });
+
+  it("reports zero comparable when the two runs share no wording", () => {
+    const d = compareMaps(
+      m("a", "2026-01-01T00:00:00.000Z", [owned("alpha")]),
+      m("b", "2026-01-02T00:00:00.000Z", [owned("beta")]),
+    );
+    expect(d.comparable).toBe(0);
+    expect(d.won).toHaveLength(0);
+    expect(d.lost).toHaveLength(0);
+  });
+});

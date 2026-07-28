@@ -457,7 +457,9 @@ function Legend({ map, done, total }: { map: CitationMap | null; done: number; t
           ["var(--red)", "You are quoted", map ? map.counts.owned : null],
           [RANK_INK[0], "One site owns it", map ? map.counts.lost : null],
           [RANK_INK[2], "Split between sites", map ? map.counts.contested : null],
-          [RANK_INK[4], "Only reference sites", map ? map.counts.reference : null],
+          // the grid paints a reference-only cell at its owner's rank, so the key uses
+          // the same ramp position rather than inventing a swatch nothing draws
+          [RANK_INK[0], "Only reference sites", map ? map.counts.reference : null],
           ["transparent", "No site named at all", map ? map.counts.open : null],
         ].map(([c, label, n]) => (
           <div key={label as string} style={{ display: "flex", alignItems: "center", gap: 14, padding: "9px 0", borderTop: "1px solid var(--rule-soft)" }}>
