@@ -89,9 +89,24 @@ export function DeltaPanel({ delta, noBaselineReason }: { delta: MapDelta | null
     ) : null;
   }
 
-  // a comparison with no shared questions and no movement has produced no information
-  if (delta.comparable === 0 && delta.won.length === 0 && delta.lost.length === 0 && delta.domains.length === 0) {
-    return null;
+  /**
+   * A comparison is only worth showing when the two runs actually asked the same
+   * questions. The generator rewords freely between runs, so an overlap of 10 out of 159
+   * is not a measurement of change, it is two different maps side by side. Showing
+   * "nothing changed hands" over a domain list reading +121 was the visible symptom.
+   */
+  const overlap = delta.comparable / Math.max(1, Math.min(delta.before.questions, delta.after.questions));
+  if (delta.comparable === 0 || overlap < 0.5) {
+    return (
+      <div className="card" style={{ padding: "16px 20px", marginTop: 44 }}>
+        <span className="m" style={{ color: "var(--meta)" }}>NOT COMPARABLE</span>
+        <p style={{ fontSize: 15.5, lineHeight: 1.55, marginTop: 8, maxWidth: "76ch" }}>
+          The two runs only share {delta.comparable} of their questions, so there is nothing honest to compare. The
+          generator rewords between runs; a change report needs the same questions on both sides, and this pair does
+          not have them.
+        </p>
+      </div>
+    );
   }
 
   const churn = delta.won.length + delta.lost.length;
@@ -113,6 +128,9 @@ export function DeltaPanel({ delta, noBaselineReason }: { delta: MapDelta | null
 
   return (
     <section style={{ paddingTop: 100 }}>
+      <div className="m" style={{ color: "var(--meta)", marginBottom: 10 }}>
+        THIS RUN AGAINST THE PREVIOUS ONE ON THE SAME CATEGORY
+      </div>
       <h2 className="h1" style={{ fontSize: "clamp(32px,2.5vw,44px)", maxWidth: "24ch" }}>{headline}</h2>
       <p className="lede" style={{ marginTop: 18, maxWidth: "64ch" }}>
         {delta.comparable === 0 ? (

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import type { Autopsy, FactorDiff, PageSide } from "../autopsy/run";
+import type { Autopsy, BriefLine, FactorDiff, PageSide } from "../autopsy/run";
 import { Favicon } from "./Territory";
 
 /** Factor names are written for the ledger. A headline needs the first clause only. */
@@ -68,7 +68,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
     <div style={{ paddingBottom: 140 }}>
       <div className="rule-b gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", position: "sticky", top: "var(--bar-h)", zIndex: 40 }}>
         <form onSubmit={(e) => { e.preventDefault(); if (!busy) run(); }} className="bar">
-          <input className="field" style={{ flex: "1 1 380px" }} value={ourUrl} onChange={(e) => setOurUrl(e.target.value)} placeholder="Your page URL" aria-label="Your page URL" />
+          <input className="field" style={{ flex: "1 1 380px" }} value={ourUrl} onChange={(e) => setOurUrl(e.target.value)} placeholder="Your page URL (optional)" aria-label="Your page URL, optional" />
           <input className="field" style={{ width: 210 }} value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="competitor.com" aria-label="Competitor domain" />
           <input className="field" style={{ flex: "1 1 320px" }} value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="The question they win" aria-label="The question they win" />
           <button className="btn btn--primary" type="submit" disabled={busy}>{busy ? "Reading both pages…" : "Run the autopsy"}</button>
@@ -102,9 +102,11 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                 <h1 className="h1" style={{ maxWidth: "20ch" }}>
                   {!data.theirs
                     ? `${data.domain} will not let us read it.`
-                    : top
-                      ? `They win on ${shortName(top.name).toLowerCase()}.`
-                      : "Your page already matches theirs on every factor."}
+                    : !data.ours
+                      ? "Here is the page you have to beat."
+                      : top
+                        ? `They win on ${shortName(top.name).toLowerCase()}.`
+                        : "Your page already matches theirs on every factor."}
                 </h1>
                 <p className="lede" style={{ marginTop: 22, maxWidth: "58ch" }}>
                   {!data.theirs ? (
@@ -112,6 +114,12 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                       Their server refused our fetch{data.blockedUs ? ` (${data.blockedUs})` : ""}. A site can win
                       citations while staying closed to everyone except the engines it allows. Paste the page above and
                       the same nine factors run on it.
+                    </>
+                  ) : !data.ours ? (
+                    <>
+                      You have no page on this question yet, so there is nothing to diff. What follows is what the
+                      winning page actually carries, measured, which is the bar a new page has to clear. Paste your own
+                      URL above at any time and it becomes a side-by-side instead.
                     </>
                   ) : top ? (
                     `They sit at ${top.theirs} out of 100 on it and you sit at ${top.ours}, on a factor carrying ${Math.round((top.weight ?? 0) * 100)}% of the score. ${top.theirReasoning}`
@@ -123,7 +131,9 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
               <Sides data={data} />
             </div>
 
-            {data.theirs && (
+            {data.theirs && data.brief && <Brief lines={data.brief} domain={data.domain} />}
+
+            {data.theirs && data.diffs.length > 0 && (
               <div ref={barsRef} style={{ marginTop: 40 }}>
                 <div
                   style={{ display: "grid", gridTemplateColumns: "minmax(200px,260px) 74px minmax(0,1fr) 120px", gap: 18, alignItems: "end", paddingBottom: 8 }}
@@ -162,7 +172,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
 
 function AutopsyEmpty() {
   const steps = [
-    ["Your page URL", "the page of yours that should be winning this question"],
+    ["Your page URL", "optional. Without it you get the specification for the page to write"],
     ["Their domain", "arrives filled in when you come from a seat on the map"],
     ["The question", "the exact wording the engine was asked"],
   ];
@@ -245,7 +255,17 @@ function Sides({ data }: { data: Autopsy }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       {side("THE PAGE BEING QUOTED", data.theirs, "var(--d3)")}
-      {side("YOUR PAGE", data.ours, "var(--brand)")}
+      {data.ours ? (
+        side("YOUR PAGE", data.ours, "var(--brand)")
+      ) : (
+        <div className="card" style={{ padding: "14px 16px", borderTop: "2px solid var(--s3)" }}>
+          <div className="m" style={{ color: "var(--meta)" }}>YOUR PAGE</div>
+          <div style={{ fontSize: 15, fontWeight: 600, marginTop: 10 }}>You do not have one yet</div>
+          <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "var(--meta)", marginTop: 8 }}>
+            Nothing to diff, so the winning page is read on its own as the bar to clear.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -399,6 +419,85 @@ function Attempts({ data }: { data: Autopsy }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/**
+ * The winning page read as a specification.
+ *
+ * When the brand has no page on a question, a diff is impossible and a checklist would
+ * be somebody's opinion. This is neither: every line is what the page that IS being
+ * quoted actually carries, measured by the same nine factors, with the exact strings
+ * pulled off it. That is a bar to clear, and it can be checked by opening their page.
+ */
+function Brief({ lines, domain }: { lines: BriefLine[]; domain: string }) {
+  const strong = lines.filter((l) => l.theirs >= 60);
+  const weak = lines.filter((l) => l.theirs < 60);
+
+  return (
+    <div style={{ marginTop: 40 }}>
+      <div style={{ display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+        <h2 className="h2">What a page has to carry to take this.</h2>
+        <span className="m" style={{ color: "var(--meta)" }}>MEASURED ON {domain.toUpperCase()}</span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 16, marginTop: 22 }}>
+        <Column
+          title="Match these"
+          help="What the winning page does well. A new page that misses these starts behind."
+          accent="var(--d2)"
+          lines={strong}
+        />
+        <Column
+          title="Beat these"
+          help="Where the winning page is weak. This is where a new page overtakes it cheaply."
+          accent="var(--brand)"
+          lines={weak}
+        />
+      </div>
+    </div>
+  );
+}
+
+function Column({ title, help, accent, lines }: { title: string; help: string; accent: string; lines: BriefLine[] }) {
+  return (
+    <div>
+      <div className="m" style={{ color: accent }}>{title} · {lines.length}</div>
+      <p style={{ fontSize: 14, lineHeight: 1.5, color: "var(--meta)", marginTop: 6, marginBottom: 12 }}>{help}</p>
+      {lines.length === 0 && (
+        <p style={{ fontSize: 15, color: "var(--meta)" }}>Nothing in this column on this page.</p>
+      )}
+      {lines.map((l) => (
+        <div key={l.key} className="card" style={{ padding: "13px 15px", marginBottom: 8 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+            <span style={{ fontSize: 15, fontWeight: 600, flex: 1 }}>{l.name}</span>
+            <span className="num" style={{ fontSize: 15, fontWeight: 700, color: accent }}>{l.theirs}</span>
+            <span className="m-sm" style={{ color: "var(--meta)" }}>
+              {l.weight === null ? "GATE" : `${Math.round(l.weight * 100)}%`}
+            </span>
+          </div>
+          {l.evidence.length > 0 && (
+            <div style={{ marginTop: 9, display: "flex", flexDirection: "column", gap: 6 }}>
+              {l.evidence.slice(0, 3).map((e, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: 11.5,
+                    lineHeight: 1.55,
+                    color: "var(--ink)",
+                    borderLeft: `2px solid ${accent}`,
+                    paddingLeft: 10,
+                  }}
+                >
+                  {e}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

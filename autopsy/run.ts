@@ -31,10 +31,17 @@ export interface FactorDiff {
 export interface Autopsy {
   question?: string;
   domain: string;
-  ours: PageSide;
+  /**
+   * Absent when the brand has no page on this question yet, which is the normal case
+   * for a question the map says nobody of theirs answers. The screen then reads the
+   * winning page on its own and states what a page would have to carry to displace it.
+   */
+  ours?: PageSide;
   /** Absent when their page could not be fetched. The attempts say why. */
   theirs?: PageSide;
   diffs: FactorDiff[];
+  /** Set instead of `diffs` when there is no page of ours: the bar to clear. */
+  brief?: BriefLine[];
   /** Every URL tried on the way to a winning page, with what happened. */
   attempts: { url: string; outcome: string }[];
   /**
@@ -146,18 +153,55 @@ export function diff(ours: AuditResult, theirs: AuditResult): FactorDiff[] {
     .sort((a, b) => b.impact - a.impact);
 }
 
+export interface BriefLine {
+  key: string;
+  name: string;
+  weight: number | null;
+  /** What the winning page scores on this factor. */
+  theirs: number;
+  /** The strings pulled off their page, which is the standard to match. */
+  evidence: string[];
+  requirement: string;
+}
+
+/**
+ * The winning page read as a specification. Every line is what THEY actually carry,
+ * measured, so it is a bar to clear rather than a checklist somebody wrote.
+ */
+export function briefFrom(theirs: PageSide): BriefLine[] {
+  const cfg = new Map(FACTORS.map((f) => [f.key, f]));
+  return theirs.audit.factors
+    .map((f) => {
+      const c = cfg.get(f.key);
+      return {
+        key: f.key,
+        name: f.name.replace(/\s*\(.*\)$/, ""),
+        weight: c ? c.weight : null,
+        theirs: f.score,
+        evidence: f.evidence,
+        requirement: f.reasoning,
+      };
+    })
+    .sort((a, b) => b.theirs * (b.weight ?? 0.1) - a.theirs * (a.weight ?? 0.1));
+}
+
 export async function runAutopsy(
   llm: LLMClient,
-  input: { domain: string; question?: string; ourUrl: string; theirUrl?: string },
+  input: { domain: string; question?: string; ourUrl?: string; theirUrl?: string },
 ): Promise<Autopsy> {
-  const ourFetched = await fetchPage(normaliseUrl(input.ourUrl).toString());
-  const ourParsed = parse(ourFetched.html, ourFetched.finalUrl);
-  const ours: PageSide = {
-    url: ourFetched.finalUrl,
-    title: ourParsed.title,
-    words: ourParsed.wordCount,
-    audit: audit(ourParsed),
-  };
+  // no page of ours is a legitimate state, not an error: you cannot diff against a page
+  // that does not exist, but you can still read the one that is winning
+  let ours: PageSide | undefined;
+  if (input.ourUrl?.trim()) {
+    const ourFetched = await fetchPage(normaliseUrl(input.ourUrl).toString());
+    const ourParsed = parse(ourFetched.html, ourFetched.finalUrl);
+    ours = {
+      url: ourFetched.finalUrl,
+      title: ourParsed.title,
+      words: ourParsed.wordCount,
+      audit: audit(ourParsed),
+    };
+  }
 
   let theirs: PageSide | undefined;
   let attempts: { url: string; outcome: string }[] = [];
@@ -182,7 +226,9 @@ export async function runAutopsy(
     domain: input.domain,
     ours,
     theirs,
-    diffs: theirs ? diff(ours.audit, theirs.audit) : [],
+    diffs: theirs && ours ? diff(ours.audit, theirs.audit) : [],
+    // with no page of ours, the winner's own factor scores become the bar to clear
+    brief: theirs && !ours ? briefFrom(theirs) : undefined,
     attempts,
     blockedUs: !theirs && blocked ? blocked.outcome : undefined,
   };

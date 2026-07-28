@@ -14,14 +14,15 @@ export async function POST(req: Request) {
 
   const ourUrl = (body.ourUrl ?? "").trim();
   const domain = (body.domain ?? "").trim().toLowerCase().replace(/^www\./, "");
-  if (!ourUrl) return Response.json({ error: "Paste your own page URL. There is nothing to compare against otherwise." }, { status: 400 });
+  // our page is optional: a question the brand does not answer yet has no page to diff,
+  // and reading the winner alone still produces the specification for the one to write
   if (!domain && !body.theirUrl) return Response.json({ error: "Name the competitor domain, or paste their page URL." }, { status: 400 });
 
   try {
     const autopsy = await runAutopsy(getLLM({ cache: true, record: true, json: true }), {
       domain,
       question: (body.question ?? "").trim() || undefined,
-      ourUrl,
+      ourUrl: ourUrl || undefined,
       theirUrl: (body.theirUrl ?? "").trim() || undefined,
     });
     return Response.json({ autopsy });

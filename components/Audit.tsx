@@ -19,6 +19,14 @@ const MEASURES: Record<string, string> = {
   schemaValidity: "Valid JSON-LD. Generated for hygiene, weighted at 1%, measured causal effect is zero.",
 };
 
+/** What the one-word grade actually asserts, so it is never a bare label. */
+const GRADE_MEANS: Record<string, string> = {
+  invisible: "Invisible: under 35, so an engine has no reason to quote this page over the ones already winning.",
+  "at-risk": "At risk: 35 to 54, quotable in principle but beaten by any page that carries figures and a named source.",
+  likely: "Likely: 55 to 74, in the running. The remaining gap is usually one or two heavy factors.",
+  cited: "Cited: 75 and over, carrying what engines lift.",
+};
+
 const HEADLINE: Record<string, string> = {
   invisible: "Answer engines skip this page.",
   "at-risk": "This page is barely quotable.",
@@ -68,14 +76,14 @@ function ScoreBudget({
             WHERE THE 100 POINTS WENT
           </div>
 
-          <div ref={barRef} style={{ display: "flex", gap: 2, height: 74 }}>
+          <div ref={barRef} style={{ display: "flex", gap: 2, height: 60 }}>
             {weighted.map((f, i) => {
               const colour = SEGMENT[i % SEGMENT.length];
               const earned = Math.max(0, Math.min(100, f.score)) / 100;
               return (
                 <div
                   key={f.key}
-                  title={`${f.name}: ${f.score}/100 of a ${Math.round((f.weight ?? 0) * 100)}% weight`}
+                  title={`${f.name}: earned ${f.score} of 100 on a weight of ${Math.round((f.weight ?? 0) * 100)}%`}
                   style={{ flex: `${(f.weight ?? 0) * 100} 0 0`, position: "relative", background: "var(--s2)", minWidth: 4 }}
                 >
                   <div
@@ -87,14 +95,21 @@ function ScoreBudget({
             })}
           </div>
 
-          <div style={{ display: "flex", gap: 2, marginTop: 6 }}>
+          {/* the bar was unreadable without this: a coloured block with a bare percentage
+              under it names nothing, so every segment gets its factor and its two numbers */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(178px,1fr))", gap: 2, marginTop: 10 }}>
             {weighted.map((f, i) => (
-              <div key={f.key} style={{ flex: `${(f.weight ?? 0) * 100} 0 0`, minWidth: 4, overflow: "hidden" }}>
-                <span
-                  className="num"
-                  style={{ fontSize: 11, color: f.score === 0 ? "var(--brand)" : "var(--meta)", whiteSpace: "nowrap" }}
-                >
-                  {Math.round((f.weight ?? 0) * 100)}%
+              <div key={f.key} style={{ display: "flex", gap: 9, alignItems: "baseline", padding: "7px 0" }}>
+                <span style={{ width: 10, height: 10, flex: "none", background: SEGMENT[i % SEGMENT.length], marginTop: 4 }} />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, lineHeight: 1.25 }}>
+                    {f.name.replace(/\s*[&/(].*$/, "")}
+                  </span>
+                  <span className="num" style={{ fontSize: 11.5, color: f.score === 0 ? "var(--brand)" : "var(--meta)" }}>
+                    {f.score === 0
+                      ? `0 of ${Math.round((f.weight ?? 0) * 100)} points`
+                      : `${Math.round(((f.weight ?? 0) * 100 * f.score) / 100)} of ${Math.round((f.weight ?? 0) * 100)} points`}
+                  </span>
                 </span>
               </div>
             ))}
@@ -119,18 +134,10 @@ function ScoreBudget({
               {summary.overall}
             </span>
             <span className="num" style={{ fontSize: 13, color: "var(--meta)" }}>/100</span>
-            <span
-              className="m-sm"
-              style={{
-                marginLeft: "auto",
-                color: summary.overall < 40 ? "var(--brand)" : "var(--d2)",
-                border: `1px solid ${summary.overall < 40 ? "var(--brand)" : "var(--d2)"}`,
-                padding: "5px 9px",
-              }}
-            >
-              {summary.grade}
-            </span>
           </div>
+          <p style={{ fontSize: 13.5, lineHeight: 1.5, marginTop: 8, color: summary.overall < 40 ? "var(--brand)" : "var(--ink)" }}>
+            {GRADE_MEANS[summary.grade] ?? summary.grade}
+          </p>
           <button className="btn btn--primary" style={{ marginTop: 16, width: "100%" }} onClick={onFixes} disabled={busy !== null}>
             {busy === "fixes" ? "Writing the rewrites…" : hasFixes ? "Fix plan ready" : "Write the fix plan"}
           </button>
