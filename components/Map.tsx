@@ -468,7 +468,7 @@ function Picked({ result, brandDomain, onClose }: { result: QuestionResult; bran
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {winner ? (
-            <a className="btn btn--primary" href={`/?autopsy=${encodeURIComponent(winner)}&q=${encodeURIComponent(result.text)}`}>
+            <a className="btn btn--primary" href={`/autopsy?domain=${encodeURIComponent(winner)}&q=${encodeURIComponent(result.text)}`}>
               Autopsy {winner}
             </a>
           ) : (
@@ -504,7 +504,7 @@ function Owners({ map }: { map: CitationMap }) {
             </span>
             <span style={{ fontFamily: "var(--mono)", fontSize: 15, flex: "none" }}>{d.wins}</span>
             {!d.isBrand && (
-              <a className="btn btn--sm" href={`/?autopsy=${encodeURIComponent(d.domain)}`} style={{ flex: "none" }}>Autopsy</a>
+              <a className="btn btn--sm" href={`/autopsy?domain=${encodeURIComponent(d.domain)}`} style={{ flex: "none" }}>Autopsy</a>
             )}
           </div>
           <span style={{ display: "block", height: 5, background: "var(--rule-soft)", marginTop: 9 }}>
@@ -543,7 +543,7 @@ function Queue({ map }: { map: CitationMap }) {
           title="A competitor owns it"
           sub="A page already wins this. Autopsy it against yours before writing anything."
           rows={lost}
-          action={(q) => ({ label: `Autopsy ${q.owner}`, href: `/?autopsy=${encodeURIComponent(q.owner ?? "")}&q=${encodeURIComponent(q.text)}` })}
+          action={(q) => ({ label: `Autopsy ${q.owner}`, href: `/autopsy?domain=${encodeURIComponent(q.owner ?? "")}&q=${encodeURIComponent(q.text)}` })}
         />
       </div>
     </section>

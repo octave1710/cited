@@ -7,6 +7,7 @@ import { DEMO_PAGES } from "../engine/ingest";
 /** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
 const ROUTES = [
   { href: "/map", label: "MAP" },
+  { href: "/autopsy", label: "AUTOPSY" },
   { href: "/", label: "AUDIT" },
   { href: "/pipeline", label: "PIPELINE" },
 ];

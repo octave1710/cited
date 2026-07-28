@@ -903,5 +903,15 @@
     "answer": "{\"answer\": \"Some of the best-selling vitamin C serums in the UK include The Ordinary Vitamin C Suspension 23% + HA Spheres 2% priced around £5.50, and SkinCeuticals C E Ferulic priced approximately £150. Prices may vary based on retailers and promotions.\", \"sources\": [\"cultbeauty.co.uk\", \"lookfantastic.com\", \"boots.com\", \"feelunique.com\", \"johnlewis.com\"]}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-28T14:58:17.259Z"
+  },
+  "68c290d2816bced86b3586489c03f09d3d1bee5a": {
+    "answer": "{\"urls\":[\"https://www.healthline.com/health/beauty-skin/vitamin-c-serum-benefits\",\"https://www.healthline.com/health/beauty-skin/vitamin-c-serum\",\"https://www.healthline.com/health/beauty-skin/vitamin-c-for-skin\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T15:16:20.997Z"
+  },
+  "afccc36969f5a9f8fb6354a3e22626375ef4ca93": {
+    "answer": "{\"urls\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T15:17:58.744Z"
   }
 }
