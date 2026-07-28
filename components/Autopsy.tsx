@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import type { Autopsy, BriefLine, FactorDiff, PageSide } from "../autopsy/run";
+import type { Autopsy, BriefLine, PageSide } from "../autopsy/run";
 import { Favicon } from "./Territory";
+import { FacingBands } from "./Facing";
 
 /** Factor names are written for the ledger. A headline needs the first clause only. */
 const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
@@ -37,7 +38,6 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   const [data, setData] = useState<Autopsy | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState<string | null>(null);
   const barsRef = useRef<HTMLDivElement>(null);
 
   // overrides so an example can run on its own values without waiting for a re-render
@@ -45,7 +45,6 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
     setBusy(true);
     setError(null);
     setData(null);
-    setOpen(null);
     try {
       const res = await fetch("/api/autopsy", {
         method: "POST",
@@ -238,31 +237,12 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
             {data.theirs && data.brief && <Brief lines={data.brief} domain={data.domain} />}
 
             {data.theirs && data.diffs.length > 0 && (
-              <div ref={barsRef} style={{ marginTop: 40 }}>
-                <div
-                  style={{ display: "grid", gridTemplateColumns: "minmax(200px,260px) 74px minmax(0,1fr) 120px", gap: 18, alignItems: "end", paddingBottom: 8 }}
-                >
-                  <span className="m" style={{ color: "var(--meta)" }}>FACTOR, HEAVIEST GAP FIRST</span>
-                  <span className="m" style={{ color: "var(--meta)" }}>GAP</span>
-                  <span style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span className="m" style={{ color: "var(--meta)" }}>0</span>
-                    <span style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                      <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <span style={{ width: 10, height: 10, background: "var(--brand)" }} />
-                        <span className="m-sm" style={{ color: "var(--meta)" }}>YOU</span>
-                      </span>
-                      <span style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <span style={{ width: 10, height: 10, background: "var(--d3)" }} />
-                        <span className="m-sm" style={{ color: "var(--meta)" }}>THEM</span>
-                      </span>
-                    </span>
-                    <span className="m" style={{ color: "var(--meta)" }}>100</span>
-                  </span>
-                  <span />
-                </div>
-                {data.diffs.map((d) => (
-                  <Row key={d.key} d={d} open={open === d.key} onToggle={() => setOpen(open === d.key ? null : d.key)} />
-                ))}
+              <div ref={barsRef} style={{ marginTop: 44 }}>
+                <FacingBands
+                  diffs={data.diffs}
+                  ourLabel="YOUR PAGE"
+                  theirLabel={data.domain ? data.domain.toUpperCase() : "THEIR PAGE"}
+                />
               </div>
             )}
 
@@ -390,118 +370,6 @@ const hostOf = (url: string) => {
  * 60-point one; a single axis is the form for comparing two paired values, and the row
  * with the longest segment is literally the work order.
  */
-function Row({ d, open, onToggle }: { d: FactorDiff; open: boolean; onToggle: () => void }) {
-  const behind = d.theirs > d.ours;
-  const lo = Math.min(d.ours, d.theirs);
-  const hi = Math.max(d.ours, d.theirs);
-
-  return (
-    <div style={{ borderTop: "1px solid var(--line)" }}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        style={{ width: "100%", background: "transparent", border: "none", padding: "13px 0", cursor: "pointer", textAlign: "left", color: "var(--ink)" }}
-      >
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(200px,260px) 74px minmax(0,1fr) 120px", gap: 18, alignItems: "center" }}>
-          <span>
-            <span style={{ display: "block", fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{d.name}</span>
-            <span className="m-sm" style={{ color: "var(--meta)" }}>
-              {d.weight === null ? "BINARY GATE" : `${Math.round(d.weight * 100)}% OF SCORE`}
-            </span>
-          </span>
-
-          <span
-            className="num"
-            style={{ fontSize: 14, fontWeight: 700, color: behind ? "var(--brand)" : d.ours === d.theirs ? "var(--meta)" : "var(--d2)" }}
-          >
-            {behind ? `-${d.theirs - d.ours}` : d.ours === d.theirs ? "level" : `+${d.ours - d.theirs}`}
-          </span>
-
-          {/* the axis. One scale, two dots, one connecting segment. */}
-          <span style={{ position: "relative", height: 26, display: "block" }}>
-            <span style={{ position: "absolute", left: 0, right: 0, top: 12, height: 2, background: "var(--s2)" }} />
-            <span
-              data-bar
-              style={{
-                position: "absolute",
-                left: `${lo}%`,
-                width: `${hi - lo}%`,
-                top: 11,
-                height: 4,
-                background: behind ? "var(--brand)" : "var(--d2)",
-                transformOrigin: behind ? "right center" : "left center",
-              }}
-            />
-            {d.ours === d.theirs ? (
-              /* equal scores put both dots on the same pixel and the second paints over the
-                 first, so a tie read as "only your page is on this axis". One marker, split. */
-              <span
-                title={`Both pages: ${d.ours}`}
-                style={{
-                  position: "absolute",
-                  left: `${d.ours}%`,
-                  top: 6,
-                  width: 16,
-                  height: 14,
-                  marginLeft: -8,
-                  background: "linear-gradient(90deg, var(--brand) 0 50%, var(--d3) 50% 100%)",
-                  boxShadow: "0 0 0 2px var(--void)",
-                }}
-              />
-            ) : (
-              <>
-                <Dot at={d.theirs} colour="var(--d3)" title={`Their page: ${d.theirs}`} />
-                <Dot at={d.ours} colour="var(--brand)" title={`Your page: ${d.ours}`} ring />
-              </>
-            )}
-          </span>
-
-          <span style={{ display: "flex", gap: 14, justifyContent: "flex-end", alignItems: "baseline" }}>
-            <span className="num" style={{ fontSize: 15, fontWeight: 700, color: "var(--brand)" }}>{d.ours}</span>
-            <span className="num" style={{ fontSize: 15, fontWeight: 700, color: "var(--d3)" }}>{d.theirs}</span>
-          </span>
-        </div>
-      </button>
-
-      {open && (
-        <div style={{ padding: "2px 0 22px" }}>
-          <p style={{ fontSize: 15, lineHeight: 1.55, maxWidth: "82ch", color: "var(--meta)" }}>
-            {d.theirReasoning || d.ourReasoning}
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 26, marginTop: 18 }}>
-            <Evidence label="PULLED OFF YOUR PAGE" colour="var(--brand)" items={d.ourEvidence} />
-            <Evidence label="PULLED OFF THEIRS" colour="var(--d3)" items={d.theirEvidence} />
-          </div>
-          <p className="m-sm" style={{ color: "var(--meta)", marginTop: 16, textTransform: "none", letterSpacing: 0.2, lineHeight: 1.6 }}>
-            Weight source: {d.source}
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Dot({ at, colour, title, ring }: { at: number; colour: string; title: string; ring?: boolean }) {
-  return (
-    <span
-      title={title}
-      style={{
-        position: "absolute",
-        left: `${at}%`,
-        top: 6,
-        width: 14,
-        height: 14,
-        marginLeft: -7,
-        background: colour,
-        // a 2px ring in the ground colour keeps the two dots readable when they overlap
-        boxShadow: ring ? "0 0 0 2px var(--void)" : "0 0 0 2px var(--void)",
-        borderRadius: 0,
-      }}
-    />
-  );
-}
-
 /** The receipt: the exact strings the scorer pulled off each page, never a paraphrase. */
 function Evidence({ label, colour, items }: { label: string; colour: string; items: string[] }) {
   return (

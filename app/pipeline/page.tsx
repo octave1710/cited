@@ -3,8 +3,14 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { TopBar } from "../../components/Chrome";
-import { NODES, type PipelineRun } from "../../pipeline/nodes";
-import { Rail } from "../../components/Rail";
+import { NODES, type MarketPlan, type PipelineRun } from "../../pipeline/nodes";
+import { Rail, type RailLane } from "../../components/Rail";
+import { Entity, Label, Num, Panel, Section, Verdict } from "../../components/da";
+
+/** The markets this run asks for. Sent to the API and drawn as lanes before it answers. */
+const MARKETS = ["UK", "SE", "DK"];
+/** Mirrors MIN_SCORE in pipeline/run.ts, which is server-only and cannot be imported here. */
+const SCORE_FLOOR = 55;
 
 /**
  * useSearchParams opts a client component out of static prerendering unless it sits
@@ -42,7 +48,7 @@ function PipelineScreen() {
       const res = await fetch("/api/pipeline", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ topic, markets: ["UK", "SE", "DK"] }),
+        body: JSON.stringify({ topic, markets: MARKETS }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -74,26 +80,46 @@ function PipelineScreen() {
     }
   }
 
-  const approved = new Set(run?.decisions.map((d) => d.market) ?? []);
+  const approvers = new Map((run?.decisions ?? []).map((d) => [d.market, d.approvedBy]));
+  const markets = run?.markets ?? MARKETS;
+  const pending = markets.filter((m) => !approvers.has(m));
+
+  // one lane per market, carrying the name the API stored rather than a boolean
+  const lanes: RailLane[] = markets.map((m) => {
+    const plan = run?.plans.find((p) => p.market === m);
+    return { market: m, term: plan?.term, score: plan?.score, approvedBy: approvers.get(m) };
+  });
+
+  const railNodes = NODES.map((n) => ({
+    id: n.id,
+    label: n.label,
+    what: n.what,
+    state: run ? run.nodes[n.id].state : ("queued" as const),
+    note: run?.nodes[n.id].note,
+    error: run?.nodes[n.id].error,
+  }));
+
+  const failed = run ? NODES.find((n) => run.nodes[n.id].state === "failed") : undefined;
+  const headline = !run
+    ? "Seven nodes, and node six is a wall."
+    : failed
+      ? "The run refused to guess, so it stopped where the data ran out."
+      : run.output
+        ? "Every market carries a name. The pages are written, and still not published."
+        : pending.length === markets.length
+          ? "Nothing here can publish. No market carries a name yet."
+          : pending.length === 1
+            ? `${pending[0]} still carries no name, so nothing in it can publish.`
+            : `${pending.join(" and ")} carry no names, so those lanes stay shut.`;
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      <TopBar />
+      <TopBar runId={run?.id} />
 
-      {brief && (
-        <div
-          className="gut"
-          style={{ borderBottom: "1px solid var(--rule)", paddingTop: 14, paddingBottom: 14, display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}
-        >
-          <span className="m" style={{ color: "var(--red)" }}>BRIEFED FROM THE MAP</span>
-          <span style={{ fontSize: 16.5 }}>{brief}</span>
-        </div>
-      )}
-
-      <div className="gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", borderBottom: "1px solid var(--rule)" }}>
+      <div className="gut rule-b" style={{ paddingTop: 22, paddingBottom: 20, background: "var(--s1)" }}>
         <div className="bar shell">
           <input className="field" style={{ flex: "1 1 420px" }} value={topic} onChange={(e) => setTopic(e.target.value)} aria-label="Topic" />
-          <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase" }}>UK · SE · DK</span>
+          <Label>{MARKETS.join(" · ")}</Label>
           <button className="btn btn--primary" onClick={start} disabled={busy !== null}>
             {busy === "run" ? "Running…" : "Run the pipeline"}
           </button>
@@ -101,157 +127,264 @@ function PipelineScreen() {
         </div>
       </div>
 
-      {error && (
-        <div className="gut" style={{ background: "rgba(255,59,59,.08)", borderBottom: "1px solid var(--red)", paddingTop: 16, paddingBottom: 16, display: "flex", gap: 16 }}>
-          <span className="m" style={{ color: "var(--red)" }}>BLOCKED</span>
-          <span style={{ fontSize: 16, fontWeight: 500 }}>{error}</span>
+      {brief && (
+        <div className="gut" style={{ borderBottom: "1px solid var(--line)", paddingTop: 14, paddingBottom: 14, display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+          <Label tone="brand">BRIEFED FROM THE MAP</Label>
+          <span style={{ fontSize: 16.5 }}>{brief}</span>
         </div>
       )}
 
-      <div className="gut shell" style={{ paddingBottom: 120 }}>
-        <div className="sec" style={{ paddingTop: 52 }}>
-          <div className="kicker" style={{ color: "var(--meta)" }}>PART B · MULTI-MARKET CONTENT ENGINE</div>
-          <h1 className="h1" style={{ maxWidth: "22ch", marginTop: 24 }}>
-            Seven nodes, and one of them is a wall.
-          </h1>
-          <p className="lede" style={{ maxWidth: "64ch", marginTop: 22 }}>
-            The pipeline grounds every market on the term that actually wins there, drafts, scores itself with the
-            same nine factors as the audit, then stops. Publishing is impossible without a named human decision per
-            market, and that refusal lives in the domain logic, not in this screen.
-          </p>
+      {/* the refusal is the product, so the API's own words stay on screen while you scroll */}
+      {error && (
+        <div
+          className="gut"
+          style={{
+            background: "rgba(255,92,61,.09)",
+            borderBottom: "1px solid var(--brand)",
+            paddingTop: 16,
+            paddingBottom: 16,
+            display: "flex",
+            gap: 16,
+            alignItems: "baseline",
+            flexWrap: "wrap",
+            position: "sticky",
+            top: "var(--bar-h)",
+            zIndex: 45,
+          }}
+        >
+          <Label tone="brand">REFUSED BY THE API</Label>
+          <span style={{ fontSize: 16.5, fontWeight: 500 }}>{error}</span>
+        </div>
+      )}
+
+      <div className="gut shell" style={{ paddingBottom: 140 }}>
+        <div style={{ paddingTop: 48 }}>
+          <Verdict
+            meta={`PART B · MULTI-MARKET CONTENT ENGINE · ${NODES.length} NODES · ${markets.length} MARKETS${run ? ` · RUN ${run.id.toUpperCase()}` : " · NOTHING RUN YET"}`}
+            headline={headline}
+            lede={
+              <>
+                Grounding, brief, draft, score, adaptation. Then <code style={{ fontFamily: "var(--mono)", fontSize: 15 }}>publish()</code> throws
+                unless every market carries a named human decision, and the route answers <Num size={15}>409</Num>. That refusal lives in the
+                domain logic, not on this screen.
+              </>
+            }
+          />
         </div>
 
-        {!run && (
-          <div className="sec">
-            {/* the seven nodes waiting, so the shape of the run is legible before it starts */}
-            <Rail
-              nodes={NODES.map((n) => ({ id: n.id, label: n.label, what: n.what, state: "queued" as const }))}
-            />
-          </div>
+        {/* the device */}
+        <Section>
+          <Rail nodes={railNodes} lanes={lanes} wallId="gate" scoreFloor={SCORE_FLOOR} />
+        </Section>
+
+        {run && run.plans.length > 0 && !run.output && (
+          <Section>
+            <div style={{ marginBottom: 20 }}>
+              <Label>THE GATE · ONE NAMED DECISION PER MARKET</Label>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 2 }}>
+              {run.plans.map((p) => (
+                <MarketGate
+                  key={p.market}
+                  plan={p}
+                  approver={approvers.get(p.market)}
+                  name={names[p.market] ?? ""}
+                  busy={busy !== null}
+                  onName={(v) => setNames({ ...names, [p.market]: v })}
+                  onSign={(approvedBy) => act("approve", { market: p.market, approvedBy })}
+                />
+              ))}
+            </div>
+          </Section>
         )}
 
-        {run && (
-          <>
-            <div className="sec">
-              <Rail
-                nodes={NODES.map((n) => ({
-                  id: n.id,
-                  label: n.label,
-                  what: n.what,
-                  state: run.nodes[n.id].state,
-                  note: run.nodes[n.id].note,
-                  error: run.nodes[n.id].error,
-                }))}
-              />
-            </div>
-
-            {run.nodes.gate.state !== "done" && run.plans.length > 0 && (
-              <div className="sec">
-                <h2 className="h2" style={{ color: "var(--red)" }}>Human approval required</h2>
-                <p className="lede" style={{ maxWidth: "60ch", marginTop: 14, marginBottom: 26 }}>
-                  One decision per market, each carrying a name. Try the publish endpoint without them and it returns
-                  409.
-                </p>
-
-                {run.plans.map((p) => (
-                  <div key={p.market} style={{ borderTop: "1px solid var(--rule)", padding: "24px 0" }}>
-                    <div style={{ display: "flex", gap: 22, alignItems: "baseline", flexWrap: "wrap" }}>
-                      <span className="h2" style={{ fontSize: 34 }}>{p.market}</span>
-                      <span style={{ fontFamily: "var(--mono)", fontSize: 13 }}>{p.term}</span>
-                      <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--meta)" }}>
-                        {p.monthlyVolume.toLocaleString("en-US")}/mo · draft scores {p.score}/100
-                      </span>
-                      {approved.has(p.market) && (
-                        <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 1.2, textTransform: "uppercase", color: "var(--go)", border: "1px solid var(--go)", padding: "5px 9px" }}>
-                          approved
-                        </span>
-                      )}
-                    </div>
-
-                    <p style={{ fontSize: 16, fontWeight: 500, marginTop: 12, maxWidth: "80ch" }}>{p.groundingNote}</p>
-
-                    {p.flags.length > 0 && (
-                      <div style={{ marginTop: 14 }}>
-                        {p.flags.map((f, j) => (
-                          <div key={j} style={{ borderLeft: "2px solid var(--amber)", paddingLeft: 14, marginTop: 9, fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.7 }}>
-                            <span style={{ color: "var(--amber)" }}>needs human eyes</span> · {f.why}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {!approved.has(p.market) && (
-                      <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
-                        <input
-                          className="field"
-                          style={{ width: 280 }}
-                          placeholder="Who approves this market?"
-                          value={names[p.market] ?? ""}
-                          onChange={(e) => setNames({ ...names, [p.market]: e.target.value })}
-                          aria-label={`Approver for ${p.market}`}
-                        />
-                        <button
-                          className="btn btn--primary"
-                          disabled={busy !== null || !(names[p.market] ?? "").trim()}
-                          onClick={() => act("approve", { market: p.market, approvedBy: names[p.market] })}
-                        >
-                          Approve {p.market}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                <div style={{ display: "flex", gap: 12, marginTop: 28, alignItems: "center", flexWrap: "wrap" }}>
-                  <button className="btn" onClick={() => act("publish")} disabled={busy !== null}>
-                    Try to publish without approving
-                  </button>
-                  <span style={{ fontSize: 15, fontWeight: 500 }}>
-                    This is the demo of the refusal. It should fail while any market is pending.
-                  </span>
+        {run && !run.output && run.plans.length > 0 && (
+          <Section>
+            <Panel accent="var(--brand)" style={{ padding: "26px 28px" }}>
+              <div style={{ display: "flex", gap: 30, alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ flex: "1 1 440px" }}>
+                  <Entity size={30} style={{ display: "block" }}>Try to publish with the names missing.</Entity>
+                  <p style={{ fontSize: 16.5, lineHeight: 1.55, marginTop: 12, maxWidth: "62ch" }}>
+                    This hits the same endpoint a CMS would. It fails while any market is unsigned, and it fails in the
+                    domain logic rather than behind a disabled button.
+                  </p>
                 </div>
+                <button className="btn" onClick={() => act("publish")} disabled={busy !== null}>
+                  {busy === "publish" ? "Calling…" : "Attempt the publish"}
+                </button>
               </div>
-            )}
+            </Panel>
+          </Section>
+        )}
 
-            {run.output && (
-              <div className="sec">
-                <h2 className="h2" style={{ color: "var(--go)" }}>CMS output, ready but not published</h2>
-                {run.output.map((o) => (
-                  <div key={o.market} style={{ borderTop: "1px solid var(--rule)", padding: "22px 0" }}>
-                    <div style={{ display: "flex", gap: 18, alignItems: "baseline", flexWrap: "wrap" }}>
-                      <span className="h2" style={{ fontSize: 28 }}>{o.market}</span>
-                      <span style={{ fontFamily: "var(--mono)", fontSize: 12.5 }}>approved by {o.metadata.approvedBy}</span>
-                      <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--amber)" }}>{o.metadata.status}</span>
-                    </div>
-                    <pre style={{ background: "#030303", border: "1px solid var(--rule)", padding: 16, marginTop: 14, fontFamily: "var(--mono)", fontSize: 12, lineHeight: 1.7, overflow: "auto", maxHeight: 210 }}>
-                      {o.markdown}
-                    </pre>
-                    <div style={{ fontFamily: "var(--mono)", fontSize: 12, lineHeight: 1.8, marginTop: 10 }}>
-                      {o.hreflang.map((h, j) => (
-                        <div key={j}>{h}</div>
-                      ))}
-                    </div>
+        {run?.output && (
+          <Section>
+            <div style={{ marginBottom: 20 }}>
+              <Label tone="d2">CMS OUTPUT · WRITTEN, HANDED OVER, NEVER PUSHED</Label>
+            </div>
+            {run.output.map((o) => (
+              <Panel key={o.market} accent="var(--d2)" style={{ marginBottom: 2, padding: "22px 24px" }}>
+                <div style={{ display: "flex", gap: 20, alignItems: "baseline", flexWrap: "wrap" }}>
+                  <Entity size={30}>{o.market}</Entity>
+                  <span style={{ fontSize: 16.5 }}>{o.metadata.approvedBy}</span>
+                  <Label tone="d2">SIGNED OFF</Label>
+                  <Label tone="d1">{o.metadata.status.toUpperCase()}</Label>
+                </div>
+                <pre
+                  style={{
+                    background: "var(--void)",
+                    borderLeft: "2px solid var(--d2)",
+                    padding: "12px 16px",
+                    marginTop: 16,
+                    fontFamily: "var(--mono)",
+                    fontSize: 12.5,
+                    lineHeight: 1.7,
+                    overflow: "auto",
+                    maxHeight: 220,
+                  }}
+                >
+                  {o.markdown}
+                </pre>
+                <div style={{ marginTop: 14 }}>
+                  <Label>HREFLANG PROPOSED, NEVER DEPLOYED</Label>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: 12, lineHeight: 1.9, marginTop: 6, color: "var(--ink)", overflowX: "auto" }}>
+                    {o.hreflang.map((h, j) => (
+                      <div key={j} style={{ whiteSpace: "nowrap" }}>{h}</div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              </Panel>
+            ))}
+          </Section>
+        )}
 
-            <div className="sec">
-              <h2 className="h2">Decision trace</h2>
-              <p className="lede" style={{ maxWidth: "62ch", marginTop: 14, marginBottom: 20 }}>
-                Every recommendation the pipeline made, and the row it came from.
-              </p>
+        {run && run.trace.length > 0 && (
+          <Section>
+            <div style={{ marginBottom: 6 }}>
+              <Label>DECISION TRACE · EVERY CLAIM AND THE ROW IT CAME FROM</Label>
+            </div>
+            <div style={{ marginTop: 18, borderTop: "1px solid var(--line-strong)" }}>
               {run.trace.map((t, i) => (
-                <div key={i} style={{ borderTop: "1px solid var(--rule-soft)", padding: "13px 0", display: "grid", gridTemplateColumns: "110px minmax(0,1fr) minmax(0,1fr)", gap: 24 }}>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: 11, letterSpacing: 1.1, textTransform: "uppercase", color: "var(--meta)" }}>{t.step}</span>
-                  <span style={{ fontSize: 15.5, fontWeight: 500 }}>{t.claim}</span>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.7 }}>{t.source}</span>
+                <div
+                  key={i}
+                  style={{
+                    borderBottom: "1px solid var(--line)",
+                    padding: "14px 0",
+                    display: "grid",
+                    gridTemplateColumns: "132px minmax(0,1fr) minmax(0,1fr)",
+                    gap: 24,
+                    alignItems: "baseline",
+                  }}
+                >
+                  <Label>{t.step.toUpperCase()}</Label>
+                  <span style={{ fontSize: 16.5, lineHeight: 1.45 }}>{t.claim}</span>
+                  <span style={{ fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.7, color: "var(--ink)" }}>{t.source}</span>
                 </div>
               ))}
             </div>
-          </>
+          </Section>
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * One market's gate. The evidence the decision rests on, then the only control that
+ * opens the lane. The unsigned button is kept on purpose: it demonstrates that an
+ * anonymous approval is refused by the API rather than by this form.
+ */
+function MarketGate({
+  plan,
+  approver,
+  name,
+  busy,
+  onName,
+  onSign,
+}: {
+  plan: MarketPlan;
+  approver?: string;
+  name: string;
+  busy: boolean;
+  onName: (v: string) => void;
+  onSign: (approvedBy: string) => void;
+}) {
+  const signed = (approver ?? "").trim().length > 0;
+  return (
+    <Panel accent={signed ? "var(--d2)" : "var(--brand)"} style={{ padding: "20px 22px" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "baseline", justifyContent: "space-between" }}>
+        <Entity size={32}>{plan.market}</Entity>
+        <Label tone={signed ? "d2" : "brand"}>{signed ? "LANE OPEN" : "LANE HELD SHUT"}</Label>
+      </div>
+
+      <p style={{ fontSize: 16.5, lineHeight: 1.35, marginTop: 10 }}>{plan.term}</p>
+
+      <div style={{ display: "flex", gap: 28, marginTop: 18, flexWrap: "wrap" }}>
+        <span>
+          <span style={{ display: "block" }}>
+            <Num size={15}>{plan.monthlyVolume.toLocaleString("en-US")}</Num>
+          </span>
+          <span style={{ display: "block", marginTop: 5 }}>
+            <Label>SEARCHES A MONTH</Label>
+          </span>
+        </span>
+        <span>
+          <span style={{ display: "block" }}>
+            <Num size={15} tone={plan.score >= SCORE_FLOOR ? "d2" : "brand"}>{plan.score}/100</Num>
+          </span>
+          <span style={{ display: "block", marginTop: 5 }}>
+            <Label>DRAFT SCORE · {SCORE_FLOOR} IS THE FLOOR</Label>
+          </span>
+        </span>
+      </div>
+
+      <p style={{ fontSize: 16, lineHeight: 1.5, marginTop: 18 }}>{plan.groundingNote}</p>
+
+      {plan.flags.length > 0 ? (
+        <div style={{ marginTop: 16 }}>
+          {plan.flags.slice(0, 3).map((f, j) => (
+            <div key={j} style={{ borderLeft: "2px solid var(--d1)", paddingLeft: 13, marginTop: 10 }}>
+              <span style={{ display: "block" }}>
+                <Label tone="d1">NEEDS HUMAN EYES</Label>
+              </span>
+              <span style={{ display: "block", fontSize: 16, lineHeight: 1.45, marginTop: 4 }}>{f.why}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ marginTop: 16 }}>
+          <Label tone="d2">NO LINE IN THIS MARKET WAS FLAGGED</Label>
+        </div>
+      )}
+
+      {signed ? (
+        <div style={{ marginTop: 20, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
+          <Label tone="d2">SIGNED BY</Label>
+          <Entity size={21} style={{ display: "block", marginTop: 5 }}>{approver}</Entity>
+        </div>
+      ) : (
+        <div style={{ marginTop: 20, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
+          <input
+            className="field"
+            style={{ width: "100%" }}
+            placeholder="Who approves this market?"
+            value={name}
+            onChange={(e) => onName(e.target.value)}
+            aria-label={`Approver for ${plan.market}`}
+          />
+          <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+            <button className="btn btn--primary" disabled={busy || !name.trim()} onClick={() => onSign(name)}>
+              Sign {plan.market}
+            </button>
+            <button className="btn btn--ghost btn--sm" disabled={busy} onClick={() => onSign("")}>
+              Send it unsigned
+            </button>
+          </div>
+          <p style={{ marginTop: 12 }}>
+            <Label tone="brand">AN UNSIGNED APPROVAL IS REJECTED · HTTP 400</Label>
+          </p>
+        </div>
+      )}
+    </Panel>
   );
 }
