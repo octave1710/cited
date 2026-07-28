@@ -4663,5 +4663,15 @@
     "answer": "{\"urls\":[\"https://www.medicalnewstoday.com/articles/324202\",\"https://www.medicalnewstoday.com/articles/323456\",\"https://www.medicalnewstoday.com/articles/323789\"]}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-28T20:47:36.616Z"
+  },
+  "9896ff655c8454822e26bf24e23ecd1ff31930b7": {
+    "answer": "{\"urls\": [\"https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/expert-answers/vitamin-c-and-skin/faq-20058012\", \"https://www.mayoclinic.org/healthy-lifestyle/skin-health/in-depth/vitamin-c/art-20045780\", \"https://www.mayoclinic.org/healthy-lifestyle/skin-health/expert-answers/vitamin-c-serum/faq-20057880\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T21:14:18.967Z"
+  },
+  "6bf224b9bb82f52d1a64f7651c0944e5bb615675": {
+    "answer": "{\"urls\": [\"https://www.bmj.com/content/376/n1340\", \"https://www.bmj.com/content/376/n1341\", \"https://www.bmj.com/content/376/n1342\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-28T21:14:36.810Z"
   }
 }

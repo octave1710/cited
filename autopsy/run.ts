@@ -6,7 +6,7 @@ import { FACTORS, GATE_FACTOR } from "../engine/weights.config";
 import type { AuditResult, FactorResult } from "../engine/types";
 import { scanSitemap } from "../engine/sitemap";
 import { checkCrawlerAccess } from "../engine/crawlerAccess";
-import { rankSitemapCandidates } from "./resolve";
+import { keywords, rankSitemapCandidates } from "./resolve";
 
 export interface PageSide {
   url: string;
@@ -87,6 +87,21 @@ export function parseUrls(raw: string, domain: string): string[] {
 const MIN_WORDS = 200;
 
 /**
+ * Does this page even claim to be about the question? Read off the address and the
+ * title only, both of which the publisher wrote, never off the body, where a passing
+ * mention of a word proves nothing.
+ */
+export function onTopic(question: string, url: string, title: string): boolean {
+  const specific = keywords(question)
+    .filter((k) => k.specific && !k.word.includes("-"))
+    .map((k) => k.word);
+  if (!specific.length) return true; // nothing discriminating to test against
+
+  const hay = `${url.toLowerCase()} ${title.toLowerCase()}`;
+  return specific.some((w) => hay.includes(w));
+}
+
+/**
  * Resolves the competitor's actual page, then proves it by fetching it. A URL the
  * model invented is caught here rather than carried into the comparison: every
  * attempt is reported with its outcome, and a total failure is returned as a
@@ -123,13 +138,17 @@ export async function resolveCompetitorPage(
     attempts.push({ url: `https://${domain}/sitemap.xml`, outcome: (e as Error).message });
   }
 
+  /** Only a URL the sitemap actually published is trusted without a topic check. */
+  let fromSitemap = candidates.length > 0;
+
   if (!candidates.length) {
     const res = await llm.call(RESOLVE_SYSTEM, `Website: ${domain}\nQuestion: ${question}`);
     candidates = parseUrls(res.text, domain);
+    fromSitemap = false;
     attempts.push({
       url: `(engine suggestion for ${domain})`,
       outcome: candidates.length
-        ? `${candidates.length} URL(s) suggested; each is fetched before it is trusted`
+        ? `${candidates.length} URL(s) suggested; each is fetched and checked against the question`
         : "the engine named no URL it could stand behind",
     });
   }
@@ -142,6 +161,20 @@ export async function resolveCompetitorPage(
       const parsed = parse(fetched.html, fetched.finalUrl);
       if (parsed.wordCount < MIN_WORDS) {
         attempts.push({ url, outcome: `fetched, but only ${parsed.wordCount} words, too thin to compare` });
+        continue;
+      }
+      /**
+       * A URL the model invented can still resolve to a real page on the wrong subject.
+       * Asked for mayoclinic.org on "Is vitamin C good for skin?" it produced a type 1
+       * diabetes expert-answers page, which loaded fine and would have been presented as
+       * "the page beating you" with total confidence. A page whose own title and address
+       * carry none of the question's specific words is not that page.
+       */
+      if (!fromSitemap && !onTopic(question, fetched.finalUrl, parsed.title)) {
+        attempts.push({
+          url,
+          outcome: `fetched, but "${(parsed.title || "untitled").slice(0, 54)}" is not about this question, so it was refused`,
+        });
         continue;
       }
       attempts.push({ url, outcome: `HTTP ${fetched.status}, ${parsed.wordCount.toLocaleString("en-US")} words` });

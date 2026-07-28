@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       send({ type: "step", id: "ingest", state: "running" });
       const t0 = performance.now();
       let html = "";
+      let route: "crawler" | "browser" | undefined;
       try {
         if (body.demoId) {
           const demo = DEMO_PAGES.find((d) => d.id === body.demoId);
@@ -74,11 +75,16 @@ export async function POST(req: Request) {
           const tf = performance.now();
           const page = await fetchPage(run.url);
           html = page.html;
+          route = page.route;
           send({
             type: "check",
             group: "ingest",
             name: "Fetch over the network",
-            what: `HTTP ${page.status} · ${page.bytes.toLocaleString("en-US")} bytes from ${new URL(page.finalUrl).hostname}`,
+            what:
+              `HTTP ${page.status} · ${page.bytes.toLocaleString("en-US")} bytes from ${new URL(page.finalUrl).hostname}` +
+              (route === "browser"
+                ? " · refused our crawler, read in a browser instead"
+                : " · read as a self-identifying crawler"),
             ms: +(performance.now() - tf).toFixed(1),
           });
         }
@@ -107,6 +113,7 @@ export async function POST(req: Request) {
         bytes: html.length,
         fetchedAt: new Date().toISOString(),
         source: body.demoId ? "demo" : "live",
+        route,
         title: page.title,
         words: page.wordCount,
         sections: page.sections.length,

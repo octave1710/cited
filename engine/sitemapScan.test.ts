@@ -19,6 +19,20 @@ vi.mock("./ingest", async () => {
   };
 });
 
+/**
+ * The browser fallback is stubbed out, not exercised. Left real, a 404 in this fixture
+ * launches Chrome and fetches the actual ex.com, which is a live network call inside a
+ * unit test and made two of these pass for the wrong reason.
+ */
+vi.mock("./render", () => ({
+  renderText: async () => {
+    throw new Error("browser route disabled in tests");
+  },
+  renderPage: async () => {
+    throw new Error("browser route disabled in tests");
+  },
+}));
+
 const { scanSitemap } = await import("./sitemap");
 
 const index = (...locs: string[]) =>

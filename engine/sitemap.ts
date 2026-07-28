@@ -64,12 +64,23 @@ export function sitemapsFromRobots(robots: string): string[] {
 async function fetchXml(url: string): Promise<{ xml: string } | { error: string }> {
   try {
     const res = await safeFetch(url, "application/xml,text/xml,*/*");
-    if (!res.ok) return { error: `HTTP ${res.status}` };
+    if (!res.ok) throw new IngestError(`HTTP ${res.status}`, "http_error");
     const xml = await res.text();
     if (!xml.trim()) return { error: "HTTP 200 with an empty body" };
     return { xml };
   } catch (e) {
-    return { error: e instanceof IngestError ? e.message : (e as Error).message };
+    /**
+     * Sitemaps sit behind the same wall as the articles. mayoclinic.org refuses its own
+     * robots.txt and every sitemap to a crawler and serves both to a browser, so the
+     * whole domain was unresolvable until this second route existed.
+     */
+    try {
+      const { renderText } = await import("./render");
+      const got = await renderText(url);
+      return got.text.trim() ? { xml: got.text } : { error: "HTTP 200 with an empty body" };
+    } catch {
+      return { error: e instanceof IngestError ? e.message : (e as Error).message };
+    }
   }
 }
 

@@ -21,6 +21,8 @@ export interface IngestSummary {
   bytes: number;
   fetchedAt: string;
   source: "live" | "demo";
+  /** "browser" means the site refused our self-identifying crawler and was rendered instead. */
+  route?: "crawler" | "browser";
   title: string;
   words: number;
   sections: number;

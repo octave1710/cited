@@ -19,6 +19,13 @@ export interface FetchedPage {
   bytes: number;
   fetchedAt: string;
   source: "live" | "demo";
+  /**
+   * Which route produced this text. "crawler" is a plain fetch identifying itself as
+   * CITEDBot; "browser" means that was refused and the page was rendered in Chrome.
+   * Carried through to the screen, because a page that serves people and refuses
+   * automated readers is a finding about its answer-engine visibility, not a detail.
+   */
+  route?: "crawler" | "browser";
 }
 
 export class IngestError extends Error {
@@ -185,7 +192,11 @@ export async function safeFetch(input: string, accept: string): Promise<Response
   throw new IngestError("Too many redirects.", "network");
 }
 
-export async function fetchPage(input: string): Promise<FetchedPage> {
+/**
+ * The honest crawler first. It identifies itself, follows redirects by hand and
+ * revalidates every hop. Errors that a browser cannot fix are thrown as they are.
+ */
+async function fetchAsCrawler(input: string): Promise<FetchedPage> {
   const url = normaliseUrl(input);
   const res = await safeFetch(input, "text/html,application/xhtml+xml");
 
@@ -209,7 +220,35 @@ export async function fetchPage(input: string): Promise<FetchedPage> {
     bytes: html.length,
     fetchedAt: new Date().toISOString(),
     source: "live",
+    route: "crawler",
   };
+}
+
+/** Failures a browser can plausibly get past. A refused host never becomes one. */
+const BROWSER_CAN_HELP = new Set(["http_error", "timeout", "network"]);
+
+export async function fetchPage(input: string, opts: { allowBrowser?: boolean } = {}): Promise<FetchedPage> {
+  try {
+    return await fetchAsCrawler(input);
+  } catch (e) {
+    const code = e instanceof IngestError ? e.code : "network";
+    // never route around the SSRF guard, an unusable URL, or a non-HTML response
+    if (opts.allowBrowser === false || !BROWSER_CAN_HELP.has(code)) throw e;
+
+    try {
+      const { renderPage } = await import("./render");
+      return await renderPage(input);
+    } catch (browserError) {
+      /**
+       * Both routes failed. The crawler's message is the one that describes the site's
+       * behaviour, so it stays the headline, with the browser's outcome appended rather
+       * than replacing it.
+       */
+      const first = (e as Error).message;
+      const second = (browserError as Error).message;
+      throw new IngestError(first === second ? first : `${first} Rendering it in a browser also failed: ${second}`, code as IngestError["code"]);
+    }
+  }
 }
 
 // DEMO_PAGES lives in its own import-free module so client components can read it

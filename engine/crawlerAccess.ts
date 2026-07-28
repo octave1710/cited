@@ -172,12 +172,36 @@ export async function checkCrawlerAccess(pageUrl: string): Promise<AccessReport>
 
   // safeFetch, not a raw fetch: this had its own fetch with the default redirect:follow,
   // so it was a second, unguarded door into the same SSRF the ingest path had just closed
+  /**
+   * Some sites refuse their own robots.txt to anything that is not a browser window.
+   * mayoclinic.org answers 403 to a crawler and 200 to Chrome, and what that file says
+   * is the whole point of this check, so a refusal is retried in a browser.
+   *
+   * A 403 arrives as a resolved Response, not as a thrown error, so the retry has to
+   * cover both. It did not, and the domain stayed unreadable.
+   */
   let res: Response;
+  const inBrowser = async (why: string): Promise<Response | null> => {
+    try {
+      const { renderText } = await import("./render");
+      const got = await renderText(robotsUrl);
+      return new Response(got.text, { status: got.status });
+    } catch {
+      void why;
+      return null;
+    }
+  };
+
   try {
     res = await safeFetch(robotsUrl, "text/plain,*/*");
+    if (!res.ok && res.status !== 404) {
+      res = (await inBrowser(`HTTP ${res.status}`)) ?? res;
+    }
   } catch (e) {
     const why = e instanceof IngestError ? e.message : `could not fetch ${robotsUrl}`;
-    return emptyReport(robotsUrl, 0, why);
+    const rendered = await inBrowser(why);
+    if (!rendered) return emptyReport(robotsUrl, 0, why);
+    res = rendered;
   }
 
   if (res.status === 404) {
