@@ -19,14 +19,38 @@ Four screens at http://localhost:3000
 
 | Route | What it does |
 |---|---|
-| `/map` | Generates 120 to 160 real buyer questions for a category, asks a live engine each one, records which domains it names. |
+| `/map` | Generates 120 to 160 real buyer questions for a category, asks a live engine each one, records which domains it names, and routes each question at the weakest site holding a seat in that answer. |
 | `/autopsy` | Runs the same nine factors on the page that is being quoted and on yours, ordered by weighted gap. |
-| `/` | Audits any public URL: crawler access, nine factors with the extracts, fix plan, JSON-LD, apply and re-test. |
+| `/` | Audits any public URL: crawler access with the deciding line quoted, nine factors with the extracts, fix plan, the fact sheet, JSON-LD, llms.txt and a robots.txt diff, apply and re-test. |
 | `/pipeline` | Seven-node multi-market content run with a gate that structurally blocks on a named human approval. |
 
 ```bash
-npm run verify   # typecheck + 70 tests + production build
+npm run verify   # typecheck + 144 tests + production build
 ```
+
+---
+
+## What you leave with
+
+Files, from `GET /api/bundle?map=<id>&run=<id>` or the download buttons on each screen.
+
+| File | What it is | How you check it without us |
+|---|---|---|
+| `seats.csv` | Every question you do not hold, easiest first, each routed at the site holding the weakest seat in that answer with its record across the whole map | Retype the question into ChatGPT and read the source list |
+| `citation-map.csv` | Every question, who was cited, in what order | Same |
+| `unclaimed-questions.csv` | Questions no commercial page holds, split between "nothing named" and "reference sites only" | Same |
+| `llms.txt` | Built from your live sitemap, every title and description lifted verbatim from your own pages | `curl your-site.com/llms.txt` after upload; Ctrl-F any line on the page it points to |
+| `robots.txt.diff` | A unified diff that adds only what is missing | `patch --dry-run` and let your own tool accept or reject it |
+| `corrected.html` | Your page with the structural fixes applied | Diff it |
+| `fix-plan.csv` | Every rewrite ranked, with the refusals marked | Read it |
+| `facts-needed.csv` | One row per rewrite blocked on a fact only you can supply, quoting the sentence on your page it would replace | Fill the `your_answer` column, upload it back, re-run |
+| `schema.jsonld` | Structured data built from the page's own content | Paste into validator.schema.org |
+
+The seat routing is the difference between a report and a plan. On the measured map,
+8 questions have no commercial page to beat, which is a thin story. **147 of the 158
+carry a site that wins nothing anywhere on the map**: `verywellhealth.com` is named in
+125 answers and chosen first in none, `cosmopolitan.com` in 100 and none. Beating the
+domain that owns 118 questions is a year. Taking the seat next to it is a page.
 
 ---
 
@@ -86,17 +110,35 @@ that failed.
 
 ---
 
-## Two things the build found
+## What the build found
 
 **The sites that win citations often block the crawler you would use to study them.**
 `healthline.com` owns 118 of the 158 questions mapped on vitamin C serum in the UK, and
-answers our fetch with HTTP 500. The autopsy reports that as a finding with the full
-attempt log, then runs on the page anyway if you paste the URL.
+its article URLs answer our fetch with HTTP 500, redirects followed. The autopsy reports
+that as a finding with the full attempt log, then runs on the page anyway if you paste
+the URL. `medicalnewstoday.com` blocks four of the eight named AI crawlers in its own
+robots.txt, which the audit screen quotes line by line.
 
 **An engine will not name a URL it is unsure of.** Asked for exact article URLs on a
 domain, `gpt-4o-mini` returns an empty list more often than not. Automatic resolution is
 a convenience that sometimes works, never a guarantee, and every attempt is shown with
 what happened to it.
+
+**Two adversarial audits, thirty-six confirmed defects.** Every finding was checked by an
+independent verifier whose job was to refute it, and each surviving one is closed with a
+test that fails if it returns. The three worst are worth naming because they are the
+shapes this kind of tool fails in:
+
+- The SSRF guard tested the hostname as text, so `[::ffff:127.0.0.1]`, `2130706433` and a
+  302 to `169.254.169.254` all walked past it. It now parses addresses, resolves DNS, and
+  follows redirects by hand, revalidating every hop.
+- The robots.txt diff was rejected by `patch` on every real file, because splitting a
+  newline-terminated body left a phantom line that inflated the hunk header. The tests
+  were green because they asserted on the text rather than on applicability. They now
+  shell out to GNU patch.
+- "URLs found in the sitemap" printed our own 400-entry cap as if it were a measurement.
+  motion.dev really has 651. Any number that saturates at a constant in our own source is
+  our limit wearing the costume of a fact, and the screen now says "400+ read".
 
 ---
 
