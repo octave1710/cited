@@ -59,6 +59,9 @@ describe("runLab", () => {
         seen.push(user.split("\n")[2]); // first source's excerpt line
         return "Answer [1].";
       },
+      async call(s: string, user: string) {
+        return { text: await stub.answer(s, user), replayed: true };
+      },
     };
     const run = await runLab(doc("t"), [doc("a"), doc("b")], fanout("x"), stub);
     // [1] is a different doc depending on rotation: target cited only when rotation puts it first

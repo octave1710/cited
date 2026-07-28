@@ -1,7 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { DEMO_PAGES } from "../engine/ingest";
+
+/** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
+const ROUTES = [
+  { href: "/map", label: "MAP" },
+  { href: "/", label: "AUDIT" },
+  { href: "/pipeline", label: "PIPELINE" },
+];
+
+function Nav() {
+  const path = usePathname();
+  return (
+    <nav style={{ display: "flex", gap: 18 }}>
+      {ROUTES.map((r) => {
+        const on = path === r.href;
+        return (
+          <a
+            key={r.href}
+            href={r.href}
+            className="m-sm"
+            style={{
+              color: on ? "var(--ink)" : "var(--meta)",
+              textDecoration: "none",
+              borderBottom: on ? "1px solid var(--red)" : "1px solid transparent",
+              paddingBottom: 2,
+            }}
+          >
+            {r.label}
+          </a>
+        );
+      })}
+    </nav>
+  );
+}
 
 export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; engineMode: string; profoundMode: string }) {
   const [clock, setClock] = useState("");
@@ -29,6 +63,7 @@ export function TopBar({ runId, engineMode, profoundMode }: { runId?: string; en
       <span className="m" style={{ color: "var(--ink)" }}>
         <span style={{ color: "var(--red)" }}>■</span> CITED
       </span>
+      <Nav />
       <span className="m-sm meta">ENGINE {engineMode.toUpperCase()}</span>
       <span className="m-sm meta">PROFOUND {profoundMode.toUpperCase()}</span>
       <span className="m-sm meta">WEIGHTS LOCKED</span>

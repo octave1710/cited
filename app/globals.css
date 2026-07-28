@@ -183,3 +183,44 @@ body {
 .h2 { font-family: var(--display); font-weight: 700; font-style: italic; text-transform: uppercase;
       letter-spacing: -0.02em; line-height: 1; font-size: 28px; }
 .lede { font-family: var(--body); font-size: 18px; font-weight: 500; line-height: 1.55; color: var(--ink); }
+
+/* ---------- citation map: the territory ----------
+   Fixed column count, because auto-fill inside an auto track collapses to the
+   narrowest thing that fits and the map stops reading as one block. */
+
+.map-layout {
+  display: grid;
+  grid-template-columns: 768px minmax(320px, 1fr);
+  gap: 96px;
+  align-items: start;
+}
+.map-grid { display: grid; grid-template-columns: repeat(16, 42px); gap: 6px; width: 768px; }
+
+@media (max-width: 1500px) {
+  .map-layout { grid-template-columns: 528px minmax(300px, 1fr); gap: 56px; }
+  .map-grid { grid-template-columns: repeat(11, 42px); width: 528px; }
+}
+@media (max-width: 1080px) {
+  .map-layout { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .map-grid { grid-template-columns: repeat(auto-fill, 42px); width: 100%; }
+}
+
+.cell {
+  width: 42px; height: 42px; padding: 0;
+  border: 1px solid var(--rule-soft);
+  background: transparent;
+  transition: background 220ms cubic-bezier(0.215, 0.61, 0.355, 1), border-color 220ms ease;
+}
+.cell[data-done="1"] { cursor: pointer; }
+.cell[data-done="1"]:hover { border-color: var(--ink); }
+.cell[data-sel="1"] { border-color: var(--red); outline: 1px solid var(--red); outline-offset: 2px; }
+
+/* the waiting grid: a slow diagonal breath, so the instrument reads as powered on */
+.ghost { border-color: #171717; }
+@media (prefers-reduced-motion: no-preference) {
+  .ghost { animation: breathe 3.6s ease-in-out infinite both; }
+  @keyframes breathe {
+    0%, 100% { border-color: #141414; }
+    50% { border-color: #2c2c2c; }
+  }
+}
