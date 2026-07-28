@@ -2,9 +2,16 @@
 
 import type { Run } from "../lib/types";
 
+/**
+ * Numbers only when they are about the user's own domain. With PROFOUND_MODE=mock the
+ * adapter answers with recorded fixtures for any domain, and this panel used to print
+ * them under the heading "this is observed behaviour", which is the single most
+ * believable lie the product could tell. Fixtures are now stated, never rendered.
+ */
 export function TruthPanel({ run, busy, onLoad }: { run: Run; busy: string | null; onLoad: () => void }) {
   const t = run.truth;
-  const blind = t?.bots.filter((b) => b.thisPath === 0) ?? [];
+  const live = t?.mode === "live";
+  const blind = live ? (t?.bots.filter((b) => b.thisPath === 0) ?? []) : [];
 
   return (
     <div style={{ paddingBottom: 120 }}>
@@ -13,18 +20,43 @@ export function TruthPanel({ run, busy, onLoad }: { run: Run; busy: string | nul
           STEP 7 · WHAT THE CRAWLERS ACTUALLY DID
         </div>
         <h1 className="h1" style={{ maxWidth: "20ch", marginTop: 24 }}>
-          Our score is a model. This is observed behaviour.
+          {live ? "Our score is a model. This is observed behaviour." : "This panel has no data to show."}
         </h1>
         <p className="lede" style={{ maxWidth: "62ch", marginTop: 22 }}>
-          Profound reports which answer-engine crawler touched which path. It is the one signal the on-page score
-          cannot produce, and it is where a 100 on crawlability can still mean nobody came.
+          {live ? (
+            <>
+              Profound reports which answer-engine crawler touched which path. It is the one signal the on-page score
+              cannot produce, and it is where a 100 on crawlability can still mean nobody came.
+            </>
+          ) : (
+            <>
+              Profound authenticates but this account has rights to no useful domain, so no bot-crawl figure here would
+              be about your site. Recorded fixture numbers are not shown as if they were, and the crawler ruling on the
+              audit screen answers the same question from your own robots.txt instead.
+            </>
+          )}
         </p>
         <button className="btn btn--primary" style={{ marginTop: 28 }} onClick={onLoad} disabled={busy !== null}>
-          {busy === "truth" ? "Asking Profound…" : t ? "Refresh from Profound" : "Load production truth"}
+          {busy === "truth" ? "Asking Profound…" : t ? "Try Profound again" : "Try Profound"}
         </button>
       </div>
 
-      {t && (
+      {t && !live && (
+        <div className="sec">
+          <div style={{ border: "1px solid var(--amber)", padding: "16px 20px", display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+            <span className="m" style={{ color: "var(--amber)" }}>NOTHING MEASURED</span>
+            <span style={{ fontSize: 16, fontWeight: 500 }}>
+              {t.degradedReason ?? "Profound returned no data this account is entitled to."}
+            </span>
+          </div>
+          <p className="lede" style={{ marginTop: 24, maxWidth: "64ch" }}>
+            The recorded fixtures behind this integration describe another domain. Rendering them here would put a
+            number on screen that is not about your site, so the table stays empty on purpose.
+          </p>
+        </div>
+      )}
+
+      {t && live && (
         <div className="sec">
           <div
             style={{

@@ -28,6 +28,13 @@ export interface ApplyResult {
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+/**
+ * The fix plan quotes the original sentence for display, so `before` arrives wrapped in
+ * quotation marks that are not in the page. Anything matching against the real HTML has
+ * to strip them first, and exporting it keeps the fact sheet and the applier agreeing.
+ */
+export const unquote = (s: string) => /^"(.*)"$/s.exec(s)?.[1] ?? s;
+
 function replaceHeading(html: string, from: string, to: string): { html: string; ok: boolean } {
   const re = new RegExp(`(<h[1-6][^>]*>)\\s*${esc(from)}\\s*(</h[1-6]>)`, "i");
   if (!re.test(html)) return { html, ok: false };
@@ -98,7 +105,7 @@ export function applyFixes(
 
     // ---- figures: only from supplied, sourced sentences
     if (fix.factorKey === "factualSpecificity") {
-      const original = /^"(.*)"$/s.exec(fix.before)?.[1] ?? fix.before;
+      const original = unquote(fix.before);
       const match = supplied.claims?.find((c) => original.includes(c.find) || c.find.includes(original.slice(0, 40)));
       if (!match) {
         skipped.push({ title: fix.title, why: "needs a sourced figure; the slot stays empty until supplied" });

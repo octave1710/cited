@@ -17,8 +17,14 @@ export const maxDuration = 120;
 
 const COMPETITORS = ["fixtures/pages/competitor-1.html", "fixtures/pages/competitor-2.html"];
 
-/** Facts the client supplied. Never generated here: read from disk, keyed by demo page. */
-function suppliedFor(demoId?: string): SuppliedFacts {
+/**
+ * Facts the client supplied. The run's own sheet wins; the bundled demo file is only a
+ * fallback for the bundled demo pages. Keying solely on demoId meant that on any real
+ * client URL demoId was undefined, so every substantive fix was refused forever.
+ */
+function suppliedFor(run: { demoId?: string; supplied?: SuppliedFacts }): SuppliedFacts {
+  if (run.supplied && Object.keys(run.supplied).length) return run.supplied;
+  const demoId = run.demoId;
   if (!demoId) return {};
   try {
     const all = JSON.parse(readFileSync(join(process.cwd(), "fixtures/supplied-facts.json"), "utf8")) as Record<
@@ -49,7 +55,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     const before = run.audit ?? audit(page);
     const fixes = run.fixes ?? generateFixes(page, before);
 
-    const supplied = suppliedFor(run.demoId);
+    const supplied = suppliedFor(run);
     const result = applyFixes(run.html, page, fixes, supplied);
     run.fixedHtml = result.html;
 

@@ -1,4 +1,5 @@
 import type { AuditResult, Fix } from "../engine/index";
+import type { SuppliedFacts } from "../engine/apply";
 import type { LabRun } from "../querylab/types";
 import type { AccessReport } from "../engine/crawlerAccess";
 
@@ -52,6 +53,8 @@ export interface Run {
   /** Raw HTML kept server-side so the re-test can apply the fixes to it. */
   html?: string;
   fixedHtml?: string;
+  /** Facts the client supplied through the fact sheet. Never generated. */
+  supplied?: SuppliedFacts;
   /** What the re-test actually changed, and what it refused to change. */
   applied?: { title: string; how: string }[];
   skipped?: { title: string; why: string }[];

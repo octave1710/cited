@@ -1,8 +1,10 @@
 import { csv, zip, type ZipEntry } from "./zip";
+import { buildFactRequests, factSheetRows, FACT_SHEET_HEADER } from "../engine/factRequest";
 import { needsSuppliedFact } from "../engine/fixes";
 import type { Run } from "./types";
 import type { CitationMap } from "../citationmap/types";
 import { BUCKET_LABEL } from "../citationmap/types";
+import { deriveSignals } from "../citationmap/signals";
 
 /**
  * The bundle is the point of the tool: the client leaves with files they can ship,
@@ -52,6 +54,29 @@ export function buildBundle(input: { run?: Run | null; map?: CitationMap | null 
       ]),
       `${unclaimed.length} questions no commercial page holds: ${map.counts.open} where the engine named nothing, ${map.counts.reference} where it named only reference sites.`,
     );
+
+    // the work order: every question routed at the weakest site holding a seat in it,
+    // with that site's record across the whole map so the routing is auditable
+    const signals = deriveSignals(map);
+    add(
+      "seats.csv",
+      csv([
+        ["question", "intent", "difficulty", "attack_this_domain", "its_slot_in_the_answer", "its_wins_across_the_map", "its_appearances_across_the_map", "category_owner", "owner_wins", "why"],
+        ...signals.entryPoints.map((e) => [
+          e.text,
+          e.intent,
+          e.difficulty,
+          e.weakest?.domain ?? "",
+          e.weakest?.slot ?? "",
+          e.weakest ? e.weakest.winsAcross : "",
+          e.weakest ? e.weakest.appearancesAcross : "",
+          e.incumbent ?? "",
+          e.incumbent ? e.incumbentWinsAcross : "",
+          e.reason,
+        ]),
+      ]),
+      `${signals.entryPoints.length} questions you do not hold, easiest first. ${signals.softChairQuestions} of them are held by a site that wins nothing anywhere on this map.`,
+    );
   }
 
   if (run?.fixedHtml) {
@@ -89,6 +114,17 @@ export function buildBundle(input: { run?: Run | null; map?: CitationMap | null 
       ]),
       `${run.fixes.length} rewrites, ranked by impact times ease. Rows marked yes are left blank on purpose.`,
     );
+
+    // the ceiling on every run is a fact nobody was asked for. This asks, in one sheet,
+    // quoting the sentence on their own page that each answer would replace.
+    const requests = buildFactRequests(run.fixes);
+    if (requests.length) {
+      add(
+        "facts-needed.csv",
+        csv([[...FACT_SHEET_HEADER], ...factSheetRows(requests)]),
+        `${requests.length} rewrites are waiting on a fact only you can supply. Fill the your_answer column and upload it back; the page and the re-test run again from it.`,
+      );
+    }
   }
 
   // conditional lines are dropped by identity, so the blank lines that carry the

@@ -153,3 +153,84 @@ describe("deriveSignals", () => {
     expect(s.intents).toEqual([]);
   });
 });
+
+describe("weakest occupant routing", () => {
+  it("points at the site that wins nothing, not at the one that owns the category", () => {
+    const s = deriveSignals(
+      build(
+        [q({ id: "t", domains: ["big.com", "mid.com", "ghost.com"], owner: "big.com", bucket: "lost" })],
+        [
+          { domain: "big.com", wins: 40, appearances: 45, isBrand: false },
+          { domain: "mid.com", wins: 4, appearances: 20, isBrand: false },
+          { domain: "ghost.com", wins: 0, appearances: 30, isBrand: false },
+        ],
+      ),
+    );
+    const e = s.entryPoints[0];
+    expect(e.occupants.map((o) => o.domain)).toEqual(["big.com", "mid.com", "ghost.com"]);
+    expect(e.occupants[2]).toMatchObject({ slot: 3, winsAcross: 0, appearancesAcross: 30 });
+    expect(e.weakest!.domain).toBe("ghost.com");
+    expect(e.incumbent).toBe("big.com");
+    expect(e.reason).toContain("ghost.com holds slot 3");
+    expect(s.softChairQuestions).toBe(1);
+  });
+
+  it("never routes at a reference site, only at commercial occupants", () => {
+    const s = deriveSignals(
+      build([q({ domains: ["en.wikipedia.org", "shop.com"], owner: "en.wikipedia.org" })], [
+        { domain: "shop.com", wins: 1, appearances: 1, isBrand: false },
+      ]),
+    );
+    expect(s.entryPoints[0].occupants.map((o) => o.domain)).toEqual(["shop.com"]);
+    expect(s.entryPoints[0].weakest!.domain).toBe("shop.com");
+    // slot is the position in the engine's own list, so the encyclopedia still counts as slot 1
+    expect(s.entryPoints[0].occupants[0].slot).toBe(2);
+  });
+
+  it("leaves weakest null when the engine named nothing commercial", () => {
+    const s = deriveSignals(build([q({ id: "none" })], []));
+    expect(s.entryPoints[0].weakest).toBeNull();
+    expect(s.softChairQuestions).toBe(0);
+  });
+});
+
+describe("reason strings never name something that does not exist", () => {
+  it("handles a reference site cited first with commercial sites behind it", () => {
+    const s = deriveSignals(
+      build(
+        [q({ id: "mix", domains: ["nhs.uk", "shop.com", "other.com"], owner: "nhs.uk", bucket: "contested" })],
+        [
+          { domain: "shop.com", wins: 0, appearances: 3, isBrand: false },
+          { domain: "other.com", wins: 0, appearances: 2, isBrand: false },
+        ],
+      ),
+    );
+    const r = s.entryPoints[0].reason;
+    expect(r).not.toContain("null");
+    expect(r).not.toContain("undefined");
+    expect(r).toContain("reference source first");
+  });
+
+  it("never prints null or undefined on any question of a mixed map", () => {
+    const s = deriveSignals(
+      build(
+        [
+          q({ id: "a" }),
+          q({ id: "b", domains: ["en.wikipedia.org"], owner: "en.wikipedia.org" }),
+          q({ id: "c", domains: ["nhs.uk", "x.com"], owner: "nhs.uk" }),
+          q({ id: "d", domains: ["big.com", "x.com"], owner: "big.com", bucket: "lost" }),
+          q({ id: "e", domains: ["small.com"], owner: "small.com", bucket: "contested" }),
+        ],
+        [
+          { domain: "big.com", wins: 30, appearances: 30, isBrand: false },
+          { domain: "x.com", wins: 0, appearances: 2, isBrand: false },
+          { domain: "small.com", wins: 1, appearances: 1, isBrand: false },
+        ],
+      ),
+    );
+    for (const e of s.entryPoints) {
+      expect(e.reason, e.id).not.toMatch(/\bnull\b|\bundefined\b|\bNaN\b/);
+      expect(e.reason.length, e.id).toBeGreaterThan(20);
+    }
+  });
+});

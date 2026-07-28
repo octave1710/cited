@@ -8,6 +8,9 @@ import { animate } from "motion";
 gsap.registerPlugin(Flip);
 import type { CitationMap, MapCost, MapQuestion, QuestionResult } from "../citationmap/types";
 import { INTENTS } from "../citationmap/questions";
+import { deriveSignals, type Difficulty, type EntryPoint, type MapSignals } from "../citationmap/signals";
+import { DeltaPanel, History } from "./History";
+import type { MapDelta } from "../citationmap/compare";
 
 /* ------------------------------------------------------------------ *
  * Ownership is encoded on one ink ramp by rank, because the app owns
@@ -54,6 +57,7 @@ export function MapScreen() {
   const [phase, setPhase] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [picked, setPicked] = useState<QuestionResult | null>(null);
+  const [delta, setDelta] = useState<{ delta: MapDelta | null; noBaselineReason?: string } | null>(null);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const flipState = useRef<Flip.FlipState | null>(null);
@@ -94,6 +98,7 @@ export function MapScreen() {
     setQuestions([]);
     setCost(null);
     setSettled(false);
+    setDelta(null);
     flipState.current = null;
     setPhase("Decomposing the category into buyer questions");
 
@@ -134,6 +139,12 @@ export function MapScreen() {
             setCost(ev.map.cost);
             setSettled(true);
             setPhase("");
+            // the baseline is whatever previous run covered the same category, brand
+            // and market. Absent, the panel says so rather than showing a zero.
+            fetch(`/api/map?id=${encodeURIComponent(ev.map.id)}&delta=1`)
+              .then((r) => r.json())
+              .then((d) => setDelta({ delta: d.delta ?? null, noBaselineReason: d.noBaselineReason }))
+              .catch(() => setDelta(null));
           }
           if (ev.type === "error") throw new Error(ev.error);
         }
@@ -159,6 +170,37 @@ export function MapScreen() {
     Flip.from(state, { duration: 0.9, ease: "expo.inOut", stagger: { amount: 0.35, from: "start" } });
   }, [settled]);
 
+  const openStored = useCallback(async (id: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/map?id=${encodeURIComponent(id)}&delta=1`);
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error ?? `Request failed (${res.status}).`);
+      const m: CitationMap = d.map;
+      setTopic(m.topic);
+      setBrand(m.brand);
+      setDomain(m.brandDomain);
+      setMarket(m.market);
+      setQuestions(m.questions);
+      setCells(Object.fromEntries(m.questions.map((q) => [q.id, { phase: "done" as const, result: q }])));
+      setMap(m);
+      setCost(m.cost);
+      setEngine({ label: m.engine, mode: "stored" });
+      setSettled(true);
+      setPicked(null);
+      flipState.current = null;
+      setDelta({ delta: d.delta ?? null, noBaselineReason: d.noBaselineReason });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  /** Pure derivation over the finished map, so it costs nothing and needs no round trip. */
+  const signals = useMemo(() => (map ? deriveSignals(map) : null), [map]);
+
   const done = Object.values(cells).filter((c) => c.phase === "done").length;
   const total = questions.length;
 
@@ -170,6 +212,7 @@ export function MapScreen() {
         domain={domain} setDomain={setDomain}
         market={market} setMarket={setMarket}
         onRun={run} busy={busy}
+        currentId={map?.id} onOpen={openStored}
       />
 
       {error && (
@@ -199,11 +242,19 @@ export function MapScreen() {
               </div>
             </div>
 
-            {picked && <Picked result={picked} brandDomain={map?.brandDomain ?? domain} onClose={() => setPicked(null)} />}
+            {picked && (
+              <Picked
+                result={picked}
+                brandDomain={map?.brandDomain ?? domain}
+                entry={signals?.entryPoints.find((e) => e.id === picked.id)}
+                onClose={() => setPicked(null)}
+              />
+            )}
           </>
         )}
 
-        {map && <Queue map={map} />}
+        {map && signals && <Queue map={map} signals={signals} />}
+        {map && delta && <DeltaPanel delta={delta.delta} noBaselineReason={delta.noBaselineReason} />}
       </div>
     </div>
   );
@@ -217,6 +268,7 @@ function MapBar(p: {
   domain: string; setDomain: (v: string) => void;
   market: string; setMarket: (v: string) => void;
   onRun: () => void; busy: boolean;
+  currentId?: string; onOpen: (id: string) => void;
 }) {
   return (
     <div className="rule-b gut" style={{ paddingTop: 24, paddingBottom: 22, background: "var(--band)", position: "sticky", top: "var(--bar-h)", zIndex: 40 }}>
@@ -229,6 +281,9 @@ function MapBar(p: {
         </select>
         <button className="btn btn--primary" type="submit" disabled={p.busy}>{p.busy ? "Mapping…" : "Map the category"}</button>
       </form>
+      <div style={{ marginTop: 14 }}>
+        <History currentId={p.currentId} onOpen={p.onOpen} />
+      </div>
     </div>
   );
 }
@@ -291,8 +346,8 @@ function Verdict({ map, topic, done, total, phase }: { map: CitationMap | null; 
         )}
       </h1>
       <p className="lede" style={{ marginTop: 22, maxWidth: "62ch" }}>
-        {yours ? `You are quoted on ${yours.appearances}.` : "You are never quoted."} On {map.counts.open} of
-        them the engine names no site at all, and those are the cheapest to take.
+        {yours ? `You are quoted on ${yours.appearances}.` : "You are never quoted."} On{" "}
+        {map.counts.open + map.counts.reference} of them no commercial page is cited at all.
       </p>
     </div>
   );
@@ -402,7 +457,8 @@ function Legend({ map, done, total }: { map: CitationMap | null; done: number; t
           ["var(--red)", "You are quoted", map ? map.counts.owned : null],
           [RANK_INK[0], "One site owns it", map ? map.counts.lost : null],
           [RANK_INK[2], "Split between sites", map ? map.counts.contested : null],
-          ["transparent", "Nobody is quoted", map ? map.counts.open : null],
+          [RANK_INK[4], "Only reference sites", map ? map.counts.reference : null],
+          ["transparent", "No site named at all", map ? map.counts.open : null],
         ].map(([c, label, n]) => (
           <div key={label as string} style={{ display: "flex", alignItems: "center", gap: 14, padding: "9px 0", borderTop: "1px solid var(--rule-soft)" }}>
             <span style={{ width: 16, height: 16, background: c as string, border: c === "transparent" ? "1px solid var(--ink)" : "none", flex: "none" }} />
@@ -456,8 +512,14 @@ function Cost({ cost, engine }: { cost: MapCost | null; engine: { label: string;
 
 /* --------------------------- picked question -------------------------- */
 
-function Picked({ result, brandDomain, onClose }: { result: QuestionResult; brandDomain: string; onClose: () => void }) {
-  const winner = result.domains.find((d) => d !== brandDomain) ?? null;
+function Picked({ result, brandDomain, entry, onClose }: {
+  result: QuestionResult;
+  brandDomain: string;
+  entry?: EntryPoint;
+  onClose: () => void;
+}) {
+  // route at the softest chair when the map knows one, never at the category owner
+  const winner = entry?.weakest?.domain ?? result.domains.find((d) => d !== brandDomain) ?? null;
   return (
     <div style={{ borderTop: "1px solid var(--red)", background: "var(--band)", padding: "28px 30px", marginTop: 44 }}>
       <div style={{ display: "flex", gap: 30, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -465,9 +527,10 @@ function Picked({ result, brandDomain, onClose }: { result: QuestionResult; bran
           <div className="m" style={{ color: "var(--red)" }}>SELECTED QUESTION · {result.intent.toUpperCase()}</div>
           <div style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.3, marginTop: 12 }}>{sentence(result.text)}</div>
           <p className="lede" style={{ marginTop: 14, maxWidth: "58ch", fontSize: 17 }}>
-            {result.domains.length === 0
-              ? "The engine answered without naming a single source. There is no page to beat here, only a page to write."
-              : `The engine credits ${result.domains[0]}${result.brandRank > 0 ? `, and you at position ${result.brandRank}` : ", and never you"}.`}
+            {entry?.reason ??
+              (result.domains.length === 0
+                ? "The engine answered without naming a single source. There is no page to beat here, only a page to write."
+                : `The engine credits ${result.domains[0]}${result.brandRank > 0 ? `, and you at position ${result.brandRank}` : ", and never you"}.`)}
           </p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -528,64 +591,79 @@ function Owners({ map }: { map: CitationMap }) {
 
 /* ------------------------------- the queue ------------------------------- */
 
-function Queue({ map }: { map: CitationMap }) {
-  const open = map.questions.filter((q) => q.bucket === "open").slice(0, 6);
-  const lost = map.questions.filter((q) => q.bucket === "lost").slice(0, 6);
+/**
+ * The work order, sorted easiest first, routed at the weakest occupant rather than at
+ * the site that owns the category. Displacing the domain that wins 118 of 158 is a
+ * year; displacing the one that wins nothing anywhere is a page.
+ */
+function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
+  const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
+  const rows = signals.entryPoints.filter((e) => difficulty === "all" || e.difficulty === difficulty).slice(0, 12);
+  const counts = signals.entryPoints.reduce<Record<string, number>>((a, e) => ({ ...a, [e.difficulty]: (a[e.difficulty] ?? 0) + 1 }), {});
+
   return (
     <section style={{ paddingTop: 140 }}>
-      <h2 className="h1" style={{ fontSize: "clamp(34px,2.6vw,46px)", maxWidth: "22ch" }}>What to do on Monday.</h2>
-      <p className="lede" style={{ marginTop: 18, maxWidth: "62ch" }}>
-        Two routes, and every question lands in exactly one. Nothing here is a recommendation
-        without a button attached to it.
+      <h2 className="h1" style={{ fontSize: "clamp(34px,2.6vw,46px)", maxWidth: "24ch" }}>
+        {signals.softChairQuestions} of these answers have a seat you can take.
+      </h2>
+      <p className="lede" style={{ marginTop: 18, maxWidth: "64ch" }}>
+        An answer names up to five sites. Beating the one that owns the category is a year of work.
+        Taking the seat held by a site that wins nothing anywhere is a page.
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(420px,1fr))", gap: 64, marginTop: 44 }}>
-        <Route
-          title="Nobody is cited"
-          sub="No page to beat. Write one, and the pipeline grounds it on the local winning term."
-          rows={open}
-          action={(q) => ({ label: "Brief a page", href: `/pipeline?brief=${encodeURIComponent(q.text)}` })}
-        />
-        <Route
-          title="A competitor owns it"
-          sub="A page already wins this. Autopsy it against yours before writing anything."
-          rows={lost}
-          action={(q) => ({ label: `Autopsy ${q.owner}`, href: `/autopsy?domain=${encodeURIComponent(q.owner ?? "")}&q=${encodeURIComponent(q.text)}` })}
-        />
+      <div style={{ display: "flex", gap: 8, marginTop: 30, flexWrap: "wrap" }}>
+        {([
+          ["all", `All ${signals.entryPoints.length}`],
+          ["open", `Nobody cited · ${counts.open ?? 0}`],
+          ["contested", `Split · ${counts.contested ?? 0}`],
+          ["monopoly", `One site owns it · ${counts.monopoly ?? 0}`],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            className={`btn btn--sm ${difficulty === key ? "btn--primary" : "btn--ghost"}`}
+            onClick={() => setDifficulty(key as Difficulty | "all")}
+          >
+            {label}
+          </button>
+        ))}
       </div>
-    </section>
-  );
-}
 
-function Route({ title, sub, rows, action }: {
-  title: string; sub: string; rows: QuestionResult[];
-  action: (q: QuestionResult) => { label: string; href: string };
-}) {
-  return (
-    <div>
-      <div className="h2">{title}</div>
-      <p style={{ fontSize: 16, lineHeight: 1.6, marginTop: 10, maxWidth: "48ch" }}>{sub}</p>
-      <div style={{ marginTop: 24, borderTop: "1px solid var(--rule)" }}>
+      <div style={{ marginTop: 30, borderTop: "1px solid var(--rule)" }}>
         {rows.length === 0 && <p style={{ fontSize: 16, padding: "18px 0" }}>Nothing in this route on this map.</p>}
-        {rows.map((q) => {
-          const a = action(q);
-          return (
-            <div key={q.id} style={{ display: "flex", gap: 18, alignItems: "center", padding: "16px 0", borderBottom: "1px solid var(--rule-soft)" }}>
-              {/* same swatch the grid uses, so a row traces back to its cell */}
+        {rows.map((e, i) => (
+          <div key={e.id} style={{ padding: "18px 0", borderBottom: "1px solid var(--rule-soft)" }}>
+            <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
               <span
                 style={{
                   width: 14, height: 14, flex: "none",
-                  background: q.bucket === "open" ? "transparent" : RANK_INK[0],
-                  border: q.bucket === "open" ? "1px solid var(--ink)" : "none",
+                  background: e.difficulty === "open" ? "transparent" : RANK_INK[e.difficulty === "monopoly" ? 0 : 2],
+                  border: e.difficulty === "open" ? "1px solid var(--ink)" : "none",
                 }}
               />
-              <span style={{ fontSize: 16.5, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{sentence(q.text)}</span>
-              <a className="btn btn--sm" href={a.href} style={{ flex: "none" }}>{a.label}</a>
+              <span style={{ fontSize: 16.5, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{sentence(e.text)}</span>
+              {e.weakest ? (
+                <a
+                  className="btn btn--sm"
+                  href={`/autopsy?domain=${encodeURIComponent(e.weakest.domain)}&q=${encodeURIComponent(e.text)}`}
+                  style={{ flex: "none" }}
+                >
+                  Autopsy {e.weakest.domain}
+                </a>
+              ) : (
+                <a className="btn btn--sm" href={`/pipeline?brief=${encodeURIComponent(e.text)}`} style={{ flex: "none" }}>
+                  Brief a page
+                </a>
+              )}
             </div>
-          );
-        })}
+            {/* consecutive questions in the same situation share one wording, so the
+                reason prints once per run instead of eight identical lines */}
+            {e.reason !== rows[i - 1]?.reason && (
+              <p style={{ fontSize: 15, lineHeight: 1.6, marginTop: 8, paddingLeft: 32, maxWidth: "82ch" }}>{e.reason}</p>
+            )}
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 }
 

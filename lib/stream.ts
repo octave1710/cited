@@ -42,12 +42,35 @@ export interface SummaryEvent {
   checks: number;
 }
 
+/** One AI crawler ruled on against the target's own robots.txt. */
+export interface AccessEvent {
+  type: "access";
+  ua: string;
+  operator: string;
+  feeds: string;
+  allowed: boolean;
+  /** The exact line from their file that decided it. */
+  rule: string;
+  group: string;
+  robotsUrl: string;
+}
+
+/** A ready-to-paste file, emitted only when something is actually blocked. */
+export interface PatchEvent {
+  type: "patch";
+  kind: string;
+  filename: string;
+  content: string;
+}
+
 export type StreamEvent =
   | { type: "run"; id: string; brand: string; market: string }
   | CheckEvent
   | FactorEvent
   | StepEvent
   | SummaryEvent
+  | AccessEvent
+  | PatchEvent
   | { type: "done"; run: Run }
   | { type: "error"; error: string };
 

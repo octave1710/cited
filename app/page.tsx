@@ -7,7 +7,8 @@ import { AuditPanel } from "../components/Audit";
 import { FixesPanel } from "../components/Fixes";
 import { LabPanel } from "../components/Lab";
 import { TruthPanel } from "../components/Truth";
-import { readStream, type FactorEvent, type SummaryEvent, type TraceEvent } from "../lib/stream";
+import { AccessPanel } from "../components/Access";
+import { readStream, type AccessEvent, type FactorEvent, type PatchEvent, type SummaryEvent, type TraceEvent } from "../lib/stream";
 import type { Run, StepId } from "../lib/types";
 
 export default function Page() {
@@ -15,6 +16,8 @@ export default function Page() {
   const [trace, setTrace] = useState<TraceEvent[]>([]);
   const [factors, setFactors] = useState<FactorEvent[]>([]);
   const [summary, setSummary] = useState<SummaryEvent | null>(null);
+  const [access, setAccess] = useState<AccessEvent[]>([]);
+  const [patch, setPatch] = useState<PatchEvent | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [active, setActive] = useState<StepId>("score");
@@ -27,6 +30,8 @@ export default function Page() {
     setTrace([]);
     setFactors([]);
     setSummary(null);
+    setAccess([]);
+    setPatch(null);
     setActive("score");
     setTarget({ url: input.url || "", mode: input.demoId ? "demo" : "live" });
 
@@ -48,6 +53,8 @@ export default function Page() {
         if (ev.type === "check" || ev.type === "factor") setTrace((prev) => [...prev, ev]);
         if (ev.type === "factor") setFactors((prev) => [...prev, ev]);
         if (ev.type === "summary") setSummary(ev);
+        if (ev.type === "access") setAccess((prev) => [...prev, ev]);
+        if (ev.type === "patch") setPatch(ev);
         if (ev.type === "step") {
           setRun((prev) =>
             prev
@@ -141,16 +148,21 @@ export default function Page() {
           )}
           {!showTruth && !showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
           {!showTruth && !showLab && !showFixes && (trace.length > 0 || run) && (
-            <AuditPanel
-              url={target.url || run?.url || ""}
-              mode={target.mode}
-              trace={trace}
-              factors={factors}
-              summary={summary}
-              busy={busy}
-              hasFixes={Boolean(run?.fixes)}
-              onFixes={() => step("fixes")}
-            />
+            <>
+              <AuditPanel
+                url={target.url || run?.url || ""}
+                mode={target.mode}
+                trace={trace}
+                factors={factors}
+                summary={summary}
+                busy={busy}
+                hasFixes={Boolean(run?.fixes)}
+                onFixes={() => step("fixes")}
+              />
+              {/* the crawler ruling was streamed and dropped on the floor until now,
+                  which meant the single most checkable finding never reached the screen */}
+              <AccessPanel access={access} patch={patch} url={run?.url || target.url} />
+            </>
           )}
         </main>
       </div>

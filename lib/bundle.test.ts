@@ -52,7 +52,7 @@ const map = (over: Partial<CitationMap> = {}): CitationMap => ({
 describe("buildBundle", () => {
   it("ships only what a run actually produced", () => {
     const { entries } = buildBundle({ map: map() });
-    expect(entries.map((e) => e.name)).toEqual(["README.txt", "citation-map.csv", "unclaimed-questions.csv"]);
+    expect(entries.map((e) => e.name)).toEqual(["README.txt", "citation-map.csv", "unclaimed-questions.csv", "seats.csv"]);
     // no corrected.html, no schema, no robots patch: none of those were generated
   });
 

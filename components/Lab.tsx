@@ -1,6 +1,7 @@
 "use client";
 
 import type { Run } from "../lib/types";
+import { BundleBox } from "./Fixes";
 
 const STATUS: Record<string, { label: string; color: string }> = {
   cited: { label: "cited", color: "var(--go)" },
@@ -136,6 +137,11 @@ export function LabPanel({
           </div>
         </div>
       )}
+
+      {/* the re-test is where corrected.html finally exists, so the handover belongs here too */}
+      <div className="sec">
+        <BundleBox run={run} />
+      </div>
     </div>
   );
 }
