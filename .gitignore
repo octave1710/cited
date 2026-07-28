@@ -9,3 +9,5 @@ next-env.d.ts
 dist/
 tsconfig.tsbuildinfo
 nul
+.probe/
+_probe_tmp.ts
