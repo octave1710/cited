@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { DEMO_PAGES } from "../engine/ingest";
+import { DEMO_PAGES } from "../engine/demoPages";
 
 /** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
 const ROUTES = [

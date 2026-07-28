@@ -69,19 +69,27 @@ export async function runCitationMap(llm: LLMClient, opts: MapOptions, events: M
     replayed: 0,
     inTokens: 0,
     outTokens: 0,
-    usd: 0,
-    rate: rate ? `${model} at $${rate.in}/1M in, $${rate.out}/1M out` : `${model}, published rate not on file`,
+    usd: rate ? 0 : null,
+    rate: rate
+      ? `${model} at $${rate.in}/1M in, $${rate.out}/1M out`
+      : `${model}: no published rate on file, so the spend is not computed here`,
   };
+  /** Set when a billed call came back without usage, so the total is a floor, not a total. */
+  let missingUsage = false;
   const charge = (usage: LLMUsage | undefined, replayed: boolean) => {
     if (replayed) {
       cost.replayed++;
       return;
     }
     cost.calls++;
-    if (!usage) return;
+    if (!usage) {
+      missingUsage = true;
+      cost.usd = null;
+      return;
+    }
     cost.inTokens += usage.in;
     cost.outTokens += usage.out;
-    if (rate) cost.usd = (cost.inTokens * rate.in + cost.outTokens * rate.out) / 1_000_000;
+    if (rate && !missingUsage) cost.usd = (cost.inTokens * rate.in + cost.outTokens * rate.out) / 1_000_000;
   };
 
   const brandDomain = toDomain(opts.brandDomain) ?? opts.brandDomain.toLowerCase();

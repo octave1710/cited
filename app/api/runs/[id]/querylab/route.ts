@@ -21,11 +21,24 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   if (!run.html) return NextResponse.json({ error: "This run has no stored page." }, { status: 409 });
 
   const body = (await req.json().catch(() => ({}))) as { topic?: string; queries?: string[] };
-  const topic = (body.topic ?? "").trim() || guessTopic(run.url);
+  const topic = (body.topic ?? "").trim().slice(0, 200) || guessTopic(run.url);
+
+  // one billed engine call per element, so the array is bounded at the boundary rather
+  // than trusted: an unbounded POST here is an unbounded bill
+  const MAX_QUERIES = 25;
+  const supplied = Array.isArray(body.queries)
+    ? body.queries.filter((q): q is string => typeof q === "string" && q.trim().length > 0).map((q) => q.slice(0, 300))
+    : [];
+  if (supplied.length > MAX_QUERIES) {
+    return NextResponse.json(
+      { error: `A lab run takes at most ${MAX_QUERIES} queries. You sent ${supplied.length}.` },
+      { status: 400 },
+    );
+  }
 
   markRunning(run, "querylab");
   try {
-    const queries = body.queries?.length ? userQueries(body.queries) : fanout(topic);
+    const queries = supplied.length ? userQueries(supplied) : fanout(topic);
     const target = toLabDoc("this page", parse(run.html, run.url));
     const competitors = COMPETITORS.map((f, i) =>
       toLabDoc(`competitor ${i + 1}`, parse(readFileSync(join(process.cwd(), f), "utf8"))),

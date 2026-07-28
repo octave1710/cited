@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseRobots } from "./crawlerAccess";
+import { matches, parseRobots } from "./crawlerAccess";
 
 const ROBOTS = `
 # comment line
@@ -39,5 +39,70 @@ describe("parseRobots", () => {
 
   it("ignores comments and blank lines", () => {
     expect(groups).toHaveLength(3);
+  });
+});
+
+describe("parseRobots group boundaries", () => {
+  it("does not merge two agents across a Crawl-delay line", () => {
+    const groups = parseRobots(`User-agent: GPTBot
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Disallow: /
+`);
+    const gpt = groups.find((g) => g.agents.includes("gptbot"))!;
+    const ahrefs = groups.find((g) => g.agents.includes("ahrefsbot"))!;
+    expect(gpt).not.toBe(ahrefs);
+    expect(gpt.agents).toEqual(["gptbot"]);
+    expect(gpt.rules).toEqual([]);
+    expect(ahrefs.rules).toEqual([{ allow: false, path: "/" }]);
+  });
+
+  it("does not merge two agents across a Sitemap line", () => {
+    const groups = parseRobots(`User-agent: GPTBot
+Sitemap: https://example.com/sitemap.xml
+User-agent: BadBot
+Disallow: /
+`);
+    expect(groups.find((g) => g.agents.includes("gptbot"))!.agents).toEqual(["gptbot"]);
+    expect(groups.find((g) => g.agents.includes("badbot"))!.rules).toEqual([{ allow: false, path: "/" }]);
+  });
+
+  it("still groups genuinely consecutive user-agent lines", () => {
+    const groups = parseRobots(`User-agent: A
+User-agent: B
+Disallow: /x
+`);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].agents).toEqual(["a", "b"]);
+  });
+});
+
+describe("matches", () => {
+  it("handles prefixes, wildcards and the end anchor", () => {
+    expect(matches("/admin", "/admin/users")).toBe(true);
+    expect(matches("/admin", "/public")).toBe(false);
+    expect(matches("/*.pdf$", "/docs/report.pdf")).toBe(true);
+    expect(matches("/*.pdf$", "/docs/report.pdf.html")).toBe(false);
+    expect(matches("/a/*/c", "/a/b/c")).toBe(true);
+    expect(matches("/a/*/c", "/a/b/d")).toBe(false);
+    expect(matches("/", "/anything")).toBe(true);
+    expect(matches("/x$", "/x")).toBe(true);
+    expect(matches("/x$", "/xy")).toBe(false);
+  });
+
+  it("does not let overlapping segments satisfy an anchored tail", () => {
+    // "/aa" then "$aa" cannot both be served by the same two characters
+    expect(matches("/aa*aa$", "/aa")).toBe(false);
+    expect(matches("/aa*aa$", "/aabaa")).toBe(true);
+  });
+
+  it("answers a pathological pattern in milliseconds instead of minutes", () => {
+    const evil = "/" + "a*".repeat(20);
+    const path = "/" + "a".repeat(60);
+    const t0 = Date.now();
+    expect(matches(evil, path)).toBe(true);
+    expect(matches(evil + "$", path + "b")).toBe(false);
+    expect(Date.now() - t0).toBeLessThan(50);
   });
 });

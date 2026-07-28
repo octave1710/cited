@@ -1,5 +1,6 @@
 import { getLLM } from "../../../../adapters/llm";
 import { runCitationMap } from "../../../../citationmap/run";
+import { toDomain } from "../../../../citationmap/classify";
 import { saveMap } from "../../../../lib/mapdb";
 
 export const runtime = "nodejs";
@@ -17,13 +18,21 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ error: "Malformed request body." }), { status: 400 });
   }
 
-  const topic = (body.topic ?? "").trim();
-  const brandDomain = (body.brandDomain ?? "").trim();
+  const topic = (body.topic ?? "").trim().slice(0, 200);
+  const rawDomain = (body.brandDomain ?? "").trim();
   if (!topic) return new Response(JSON.stringify({ error: "A topic is required to map a category." }), { status: 400 });
-  if (!brandDomain)
+  if (!rawDomain)
     return new Response(JSON.stringify({ error: "Your own domain is required, otherwise nothing can be scored as yours." }), {
       status: 400,
     });
+  // a brand NAME in the domain field can never equal a cited hostname, so every question
+  // would come back "you are never quoted" and the screen would be confidently wrong
+  const brandDomain = toDomain(rawDomain);
+  if (!brandDomain)
+    return new Response(
+      JSON.stringify({ error: `"${rawDomain}" is not a domain. Enter something like meridianskinlab.com.` }),
+      { status: 400 },
+    );
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({

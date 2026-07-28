@@ -6,3 +6,4 @@ export { FACTORS, GATE_FACTOR } from "./weights.config";
 export type * from "./types";
 export type { Fix } from "./fixes";
 export type { SchemaGenResult } from "./schemaGen";
+export { needsSuppliedFact } from "./fixes";

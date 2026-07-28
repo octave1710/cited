@@ -18,7 +18,9 @@ export function toDomain(raw: string): string | null {
     .replace(/^www\./, "")
     .split(/[/?#]/)[0]
     .replace(/[.,;:)\]]+$/, "");
-  if (!s || !s.includes(".") || s.includes(" ")) return null;
+  // a hostname is letters, digits, dots and hyphens. Anything else (a space, a CRLF that
+  // would forge a header, a brand name) is refused rather than lowercased into a domain.
+  if (!s || !s.includes(".") || !/^[a-z0-9.-]+$/.test(s) || s.startsWith(".") || s.endsWith(".")) return null;
   return s;
 }
 
@@ -42,13 +44,17 @@ export function rankDomains(results: QuestionResult[], brandDomain: string): Dom
 
 /**
  * owned     the brand appears in the source list
- * open      no commercial site is named at all
+ * open      the engine named nothing at all
+ * reference only encyclopedias, governments or academia were named, so no commercial
+ *           page holds it. Kept apart from `open` because saying "no site was named"
+ *           about an answer that named nhs.uk is a claim the user disproves in one retype.
  * lost      one domain owns it and owns at least OWNER_THRESHOLD questions across the map
  * contested cited, but by a site with no consolidated hold on the category
  */
 export function bucketOf(r: QuestionResult, consolidated: Set<string>): Bucket {
   if (r.brandRank > 0) return "owned";
-  if (r.domains.length === 0 || r.domains.every(isInstitutional)) return "open";
+  if (r.domains.length === 0) return "open";
+  if (r.domains.every(isInstitutional)) return "reference";
   return r.owner && consolidated.has(r.owner) ? "lost" : "contested";
 }
 
@@ -59,7 +65,7 @@ export function classify(results: QuestionResult[], brandDomain: string) {
     domains.filter((d) => !d.isBrand && d.wins >= OWNER_THRESHOLD).map((d) => d.domain),
   );
   const questions = results.map((r) => ({ ...r, bucket: bucketOf(r, consolidated) }));
-  const counts: Record<Bucket, number> = { owned: 0, lost: 0, contested: 0, open: 0 };
+  const counts: Record<Bucket, number> = { owned: 0, lost: 0, contested: 0, reference: 0, open: 0 };
   for (const q of questions) counts[q.bucket]++;
   return { questions, domains, counts };
 }

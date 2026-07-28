@@ -67,13 +67,17 @@ export function parseRobots(text: string): Group[] {
       lastWasAgent = true;
       continue;
     }
+    // ANY other directive ends the run of user-agent lines. Clearing the flag only on
+    // allow/disallow let a Crawl-delay or Sitemap line between two User-agent lines
+    // merge them into one group, so the next agent inherited rules that were never
+    // written for it and the tool reported crawlers as blocked that were not.
+    lastWasAgent = false;
     if (field === "allow" || field === "disallow") {
       if (!current) {
         current = { agents: ["*"], rules: [] };
         groups.push(current);
       }
       current.rules.push({ allow: field === "allow", path: value });
-      lastWasAgent = false;
     }
   }
   return groups;
@@ -107,20 +111,43 @@ function decide(groups: Group[], ua: string, path: string): { allowed: boolean; 
   return { allowed: best.allow, rule: `${best.allow ? "Allow" : "Disallow"}: ${best.path}`, group: groupName };
 }
 
-function matches(pattern: string, path: string): boolean {
-  if (pattern === "/") return true;
-  // support the * and $ wildcards robots.txt allows
-  if (pattern.includes("*") || pattern.endsWith("$")) {
-    const re = new RegExp(
-      "^" +
-        pattern
-          .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
-          .replace(/\*/g, ".*")
-          .replace(/\\\$$/, "$"),
-    );
-    return re.test(path);
+/**
+ * Greedy left-to-right scan over the literal segments between the wildcards.
+ *
+ * This used to compile a RegExp from the raw robots.txt value, turning every `*`
+ * into an unbounded `.*`. Chained `.*` against a non-matching path backtracks
+ * exponentially: a 12-star pattern measured at 69 seconds of blocked event loop on
+ * a file any third party controls. This version is O(pattern x path) and cannot
+ * backtrack, so a hostile robots.txt costs the same as a friendly one.
+ */
+export function matches(pattern: string, path: string): boolean {
+  if (pattern === "/" || pattern === "") return true;
+
+  const anchored = pattern.endsWith("$");
+  const body = anchored ? pattern.slice(0, -1) : pattern;
+  const segments = body.split("*");
+
+  // the text before the first wildcard must sit at the very start
+  const first = segments[0];
+  if (!path.startsWith(first)) return false;
+  let cursor = first.length;
+
+  for (let i = 1; i < segments.length; i++) {
+    const seg = segments[i];
+    if (seg === "") continue;
+    const isLast = i === segments.length - 1;
+    if (isLast && anchored) {
+      // the tail has to land exactly at the end, and cannot overlap what is consumed
+      if (!path.endsWith(seg) || path.length - seg.length < cursor) return false;
+      cursor = path.length;
+      continue;
+    }
+    const at = path.indexOf(seg, cursor);
+    if (at < 0) return false;
+    cursor = at + seg.length;
   }
-  return path.startsWith(pattern);
+
+  return anchored ? cursor === path.length : true;
 }
 
 export async function checkCrawlerAccess(pageUrl: string): Promise<AccessReport> {

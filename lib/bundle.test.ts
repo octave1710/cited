@@ -44,7 +44,7 @@ const map = (over: Partial<CitationMap> = {}): CitationMap => ({
     { id: "q2", text: "how do I store it?", intent: "usage", domains: [], bucket: "open", owner: null, brandRank: 0, replayed: true, ms: 1 },
   ],
   domains: [{ domain: "big.com", wins: 1, appearances: 1, isBrand: false }],
-  counts: { owned: 0, lost: 1, contested: 0, open: 1 },
+  counts: { owned: 0, lost: 1, contested: 0, reference: 0, open: 1 },
   cost: { calls: 2, replayed: 0, inTokens: 10, outTokens: 5, usd: 0.0001, rate: "test" },
   ...over,
 });

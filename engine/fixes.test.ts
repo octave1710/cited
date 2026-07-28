@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { needsSuppliedFact } from "./fixes";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "./parse";
@@ -84,5 +85,49 @@ describe("generateSchemas", () => {
     expect(howTo).toBeDefined();
     expect(howTo.name).toBe("How to apply serum");
     expect(howTo.step).toHaveLength(3);
+  });
+});
+
+describe("needsSuppliedFact", () => {
+  it("catches every slot shape the generator actually emits, colon included", () => {
+    for (const s of [
+      "Vitamin C brightens skin by [SOURCED STAT: metric, %, timeframe, study + year].",
+      "Results appear in [SOURCED STAT].",
+      'Add: "[NAMED SOURCE: person, credential, publication]".',
+      "[FIGURE] of users saw a change.",
+    ]) {
+      expect(needsSuppliedFact(s), s).toBe(true);
+    }
+  });
+
+  it("does not flag ordinary prose or a lowercase bracket", () => {
+    for (const s of [
+      "Move the question into the H2 verbatim.",
+      "Wrap the answer in a <p> tag.",
+      "See [the guide] for details.",
+      "",
+    ]) {
+      expect(needsSuppliedFact(s), s).toBe(false);
+    }
+  });
+
+  it("agrees with itself across the screen and the downloaded CSV", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { parse } = await import("./parse");
+    const { audit } = await import("./score");
+    const { buildBundle } = await import("../lib/bundle");
+
+    const html = readFileSync("fixtures/pages/medium.html", "utf8");
+    const page = parse(html, "https://example.com/x");
+    const fixes = generateFixes(page, audit(page));
+    const onScreen = fixes.filter((f) => needsSuppliedFact(f.after)).length;
+    expect(onScreen).toBeGreaterThan(0);
+
+    const { entries } = buildBundle({
+      run: { id: "r", createdAt: "", url: "", brand: "", market: "", steps: {} as never, fixes },
+    });
+    const csvRows = entries.find((e) => e.name === "fix-plan.csv")!.content.split("\r\n").slice(1);
+    const inFile = csvRows.filter((r) => r.endsWith(",yes")).length;
+    expect(inFile).toBe(onScreen);
   });
 });

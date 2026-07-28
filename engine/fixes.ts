@@ -15,6 +15,16 @@ export interface Fix {
   rationale: string;
 }
 
+/**
+ * One definition of "this rewrite is waiting on a fact only the client can supply".
+ *
+ * It lived in three places with three different patterns. `/\[[A-Z ]+\]/` in the CSV
+ * missed `[SOURCED STAT: metric, %, timeframe, study + year]` because of the colon, so
+ * the downloadable artefact said "no" on the very rows the screen was counting as "yes".
+ * The artefact is the copy the client keeps, so that is the one that has to be right.
+ */
+export const needsSuppliedFact = (after: string): boolean => /\[[A-Z][A-Z ]*(?:[:\]])/.test(after);
+
 const HEDGE_RE = /\b(may help|can help|could|might|many (users|people)|some people|is believed|over time|tend to)\b/i;
 // Container headings (FAQ, sources...) are not passages; rewriting them as questions is noise.
 const CONTAINER_RE = /faq|frequently asked|sources|references|conclusion|summary/i;

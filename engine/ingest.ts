@@ -7,6 +7,11 @@
  * URL the user typed would be fabricating provenance.
  */
 
+import { isIP } from "node:net";
+import { lookup } from "node:dns/promises";
+
+const dnsLookup = lookup;
+
 export interface FetchedPage {
   html: string;
   finalUrl: string;
@@ -39,19 +44,73 @@ const UA =
   "Mozilla/5.0 (compatible; CITEDBot/0.1; +https://github.com/octave1710) AppleWebKit/537.36 Chrome/126 Safari/537.36";
 
 /**
- * Loopback, link-local and RFC1918 targets are refused. These are prefix tests on
- * purpose: an anchored full-match pattern silently lets 127.0.0.1 through.
+ * Refuses an IP inside any range that is not a public internet destination.
+ * Works on the parsed address, not on the text, because the same loopback address
+ * can be written 127.0.0.1, 2130706433, 0x7f.1, [::ffff:127.0.0.1] or [::ffff:7f00:1].
  */
+export function isPrivateIp(ip: string): boolean {
+  const v = isIP(ip);
+  if (v === 4) {
+    const [a, b] = ip.split(".").map(Number);
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 169 && b === 254) return true; // link-local, incl. cloud metadata
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+    if (a === 192 && b === 0) return true; // 192.0.0.0/24 + test-net
+    if (a >= 224) return true; // multicast and reserved
+    return false;
+  }
+  if (v !== 6) return true; // not an IP at all: never treat it as safe here
+
+  const h = ip.toLowerCase();
+  // an IPv4-mapped address is an IPv4 destination wearing IPv6 syntax
+  const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(h);
+  if (mapped) return isPrivateIp(mapped[1]);
+  const mappedHex = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(h);
+  if (mappedHex) {
+    const n = (parseInt(mappedHex[1], 16) << 16) | parseInt(mappedHex[2], 16);
+    return isPrivateIp([(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join("."));
+  }
+  if (h === "::" || h === "::1") return true;
+  if (/^f[cd]/.test(h)) return true; // unique-local fc00::/7
+  if (/^fe[89ab]/.test(h)) return true; // link-local fe80::/10
+  return false;
+}
+
+/** Hostname-level refusal. Text only: the DNS check happens separately, at fetch time. */
 export function isPrivateHost(hostname: string): boolean {
   const h = hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (h === "localhost" || h === "::1" || h === "0.0.0.0") return true;
-  if (h.endsWith(".local") || h.endsWith(".internal") || h.endsWith(".localhost")) return true;
-  if (/^127\./.test(h) || /^10\./.test(h) || /^0\./.test(h) || /^169\.254\./.test(h)) return true;
-  if (/^192\.168\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
-  if (/^f[cd][0-9a-f]{2}:/.test(h)) return true; // unique-local IPv6
-  if (/^fe80:/.test(h)) return true; // link-local IPv6
+  if (!h) return true;
+  if (h === "localhost" || h.endsWith(".local") || h.endsWith(".internal") || h.endsWith(".localhost")) return true;
+  if (isIP(h)) return isPrivateIp(h);
+  // a bare integer or hex host is a legal IPv4 spelling that never survives isIP()
+  if (/^(0x[0-9a-f]+|\d+)$/.test(h)) return true;
   return false;
+}
+
+/**
+ * The only guard that cannot be spoofed by spelling: ask DNS where the name points
+ * and refuse if any answer is private. A name that resolves to 127.0.0.1 is refused
+ * however it is written.
+ */
+export async function assertPublicHost(hostname: string): Promise<void> {
+  const h = hostname.replace(/^\[|\]$/g, "");
+  if (isPrivateHost(h)) throw new IngestError("Private and loopback addresses are refused.", "blocked_host");
+  if (isIP(h)) return; // already validated above, no name to resolve
+
+  let addrs: { address: string }[];
+  try {
+    addrs = await dnsLookup(h, { all: true });
+  } catch {
+    throw new IngestError(`${hostname} does not resolve.`, "network");
+  }
+  if (!addrs.length) throw new IngestError(`${hostname} does not resolve.`, "network");
+  for (const a of addrs) {
+    if (isPrivateIp(a.address)) {
+      throw new IngestError(`${hostname} resolves to a private address (${a.address}) and was refused.`, "blocked_host");
+    }
+  }
 }
 
 export function normaliseUrl(input: string): URL {
@@ -77,29 +136,58 @@ export function normaliseUrl(input: string): URL {
   return url;
 }
 
+const MAX_HOPS = 5;
+
+/**
+ * Fetches with redirects followed by hand, revalidating the host on every hop.
+ * `redirect: "follow"` checks the first URL and then goes wherever it is sent, so a
+ * public URL answering 302 to http://169.254.169.254 walks straight past the guard.
+ */
+export async function safeFetch(input: string, accept: string): Promise<Response> {
+  let url = normaliseUrl(input);
+
+  for (let hop = 0; hop <= MAX_HOPS; hop++) {
+    await assertPublicHost(url.hostname);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        redirect: "manual",
+        signal: controller.signal,
+        headers: { "user-agent": UA, accept },
+      });
+    } catch (e) {
+      const aborted = (e as Error).name === "AbortError";
+      throw new IngestError(
+        aborted
+          ? `${url.hostname} did not answer within ${TIMEOUT_MS / 1000}s.`
+          : `Could not reach ${url.hostname}. Check the URL or your connection.`,
+        aborted ? "timeout" : "network",
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (res.status < 300 || res.status > 399) return res;
+
+    const location = res.headers.get("location");
+    if (!location) return res;
+    if (hop === MAX_HOPS) throw new IngestError(`${url.hostname} redirected more than ${MAX_HOPS} times.`, "network");
+    try {
+      url = normaliseUrl(new URL(location, url).toString());
+    } catch (e) {
+      if (e instanceof IngestError) throw e;
+      throw new IngestError(`${url.hostname} redirected to something that is not a usable URL.`, "network");
+    }
+  }
+  throw new IngestError("Too many redirects.", "network");
+}
+
 export async function fetchPage(input: string): Promise<FetchedPage> {
   const url = normaliseUrl(input);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-  let res: Response;
-  try {
-    res = await fetch(url, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: { "user-agent": UA, accept: "text/html,application/xhtml+xml" },
-    });
-  } catch (e) {
-    const aborted = (e as Error).name === "AbortError";
-    throw new IngestError(
-      aborted
-        ? `${url.hostname} did not answer within ${TIMEOUT_MS / 1000}s.`
-        : `Could not reach ${url.hostname}. Check the URL or your connection.`,
-      aborted ? "timeout" : "network",
-    );
-  } finally {
-    clearTimeout(timer);
-  }
+  const res = await safeFetch(input, "text/html,application/xhtml+xml");
 
   if (!res.ok) {
     throw new IngestError(`${url.hostname} answered HTTP ${res.status}.`, "http_error");
@@ -124,32 +212,5 @@ export async function fetchPage(input: string): Promise<FetchedPage> {
   };
 }
 
-/** Bundled pages so the demo runs with no network. Always labelled as demo in the UI. */
-export const DEMO_PAGES = [
-  {
-    id: "medium",
-    file: "fixtures/pages/medium.html",
-    label: "meridianskinlab.com/guides/vitamin-c-serum",
-    note: "ranks, never cited",
-  },
-  {
-    id: "medium-fixed",
-    file: "fixtures/pages/medium-fixed.html",
-    label: "meridianskinlab.com/guides/vitamin-c-serum (fixed)",
-    note: "same page after the fixes",
-  },
-  {
-    id: "good",
-    file: "fixtures/pages/good.html",
-    label: "meridianskinlab.com/does-vitamin-c-work",
-    note: "already citable",
-  },
-  {
-    id: "bad",
-    file: "fixtures/pages/bad.html",
-    label: "glowmax.com/serum",
-    note: "pure marketing copy",
-  },
-] as const;
-
-export type DemoId = (typeof DEMO_PAGES)[number]["id"];
+// DEMO_PAGES lives in its own import-free module so client components can read it
+export { DEMO_PAGES, type DemoId } from "./demoPages";

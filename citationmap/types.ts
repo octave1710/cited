@@ -1,5 +1,11 @@
-/** Where a question sits in the category, once the engine has answered it. */
-export type Bucket = "owned" | "lost" | "contested" | "open";
+/**
+ * Where a question sits in the category, once the engine has answered it.
+ *
+ * `open` and `reference` used to be one bucket, which made the screen say "the engine
+ * names no site at all" about questions where it had named nhs.uk and wikipedia. The
+ * user can disprove that in one retype, so they are counted apart and worded apart.
+ */
+export type Bucket = "owned" | "lost" | "contested" | "reference" | "open";
 
 export interface MapQuestion {
   id: string;
@@ -34,7 +40,11 @@ export interface MapCost {
   replayed: number;
   inTokens: number;
   outTokens: number;
-  usd: number;
+  /**
+   * null when the model has no published rate on file. Showing $0.0000 for a run that
+   * really was billed is a fabricated number, and the one place it would be believed.
+   */
+  usd: number | null;
   /** The published rate the usd figure was computed from, so the number is traceable. */
   rate: string;
 }
@@ -57,5 +67,6 @@ export const BUCKET_LABEL: Record<Bucket, string> = {
   owned: "You are cited",
   lost: "Owned by one competitor",
   contested: "Split between sites",
-  open: "Nobody is cited",
+  reference: "Only reference sites cited",
+  open: "No site cited at all",
 };

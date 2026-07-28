@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { parse, generateFixes, audit } from "../../../../../engine/index";
+import { needsSuppliedFact } from "../../../../../engine/fixes";
 import { getRun, saveRun } from "../../../../../lib/db";
 import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib/run-helpers";
 
@@ -17,7 +18,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     const result = run.audit ?? audit(page);
     run.audit = result;
     run.fixes = generateFixes(page, result);
-    const slots = run.fixes.filter((f) => /\[[A-Z]/.test(f.after)).length;
+    const slots = run.fixes.filter((f) => needsSuppliedFact(f.after)).length;
     markDone(
       run,
       "fixes",

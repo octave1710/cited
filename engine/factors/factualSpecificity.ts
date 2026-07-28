@@ -13,8 +13,10 @@ export function factualSpecificity(page: ParsedPage): FactorResult {
   // ponytail: linear ramp, 2.5 quantified facts per 100 words = full marks
   const score = Math.round(Math.min(100, (per100 / 2.5) * 100));
 
+  // .test() on a /g/ regex is stateful: lastIndex survives between calls, so a filter
+  // silently skipped short paragraphs that did contain a figure. .match() resets it.
   const samples = paras
-    .filter((p) => FACT_RE.test(p))
+    .filter((p) => p.match(FACT_RE) !== null)
     .slice(0, 3)
     .map((p) => `"${p.length > 140 ? p.slice(0, 140) + "..." : p}"`);
 

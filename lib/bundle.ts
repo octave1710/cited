@@ -1,4 +1,5 @@
 import { csv, zip, type ZipEntry } from "./zip";
+import { needsSuppliedFact } from "../engine/fixes";
 import type { Run } from "./types";
 import type { CitationMap } from "../citationmap/types";
 import { BUCKET_LABEL } from "../citationmap/types";
@@ -35,13 +36,21 @@ export function buildBundle(input: { run?: Run | null; map?: CitationMap | null 
       `${map.questions.length} questions on "${map.topic}". Retype any of them into ChatGPT to check the row.`,
     );
 
+    // "no site named" and "only reference sites named" are both unclaimed by any
+    // commercial page, and the column says which, because they are not the same claim
+    const unclaimed = map.questions.filter((q) => q.bucket === "open" || q.bucket === "reference");
     add(
       "unclaimed-questions.csv",
       csv([
-        ["question", "intent"],
-        ...map.questions.filter((q) => q.bucket === "open").map((q) => [q.text, q.intent]),
+        ["question", "intent", "what_the_engine_named", "cited_domains"],
+        ...unclaimed.map((q) => [
+          q.text,
+          q.intent,
+          q.bucket === "open" ? "nothing at all" : "reference sites only",
+          q.domains.join(" | "),
+        ]),
       ]),
-      `${map.counts.open} questions where the engine names no site. One brief each.`,
+      `${unclaimed.length} questions no commercial page holds: ${map.counts.open} where the engine named nothing, ${map.counts.reference} where it named only reference sites.`,
     );
   }
 
@@ -75,7 +84,7 @@ export function buildBundle(input: { run?: Run | null; map?: CitationMap | null 
             f.rationale,
             f.before,
             f.after,
-            /\[[A-Z ]+\]/.test(f.after) ? "yes" : "no",
+            needsSuppliedFact(f.after) ? "yes" : "no",
           ]),
       ]),
       `${run.fixes.length} rewrites, ranked by impact times ease. Rows marked yes are left blank on purpose.`,

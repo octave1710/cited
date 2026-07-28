@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { needsSuppliedFact } from "../engine/fixes";
 import type { Run } from "../lib/types";
 
 /** Bracketed slots are the facts CITED refuses to invent. Render them as visible holes. */
@@ -28,7 +29,7 @@ function withSlots(text: string) {
 
 export function FixesPanel({ run, busy, onSchema }: { run: Run; busy: string | null; onSchema: () => void }) {
   const fixes = run.fixes ?? [];
-  const needSlots = fixes.filter((f) => /\[[A-Z]/.test(f.after)).length;
+  const needSlots = fixes.filter((f) => needsSuppliedFact(f.after)).length;
 
   return (
     <div style={{ padding: "40px 0 72px" }} className="gut">

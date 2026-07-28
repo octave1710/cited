@@ -29,6 +29,15 @@ describe("toDomain", () => {
     expect(toDomain("a well known magazine")).toBeNull();
     expect(toDomain("")).toBeNull();
   });
+
+  it("rejects a brand name and a header-forging value rather than lowercasing them", () => {
+    // typed into the domain field, "Meridian Skin Lab" used to become a domain that can
+    // never match a cited host, so every question came back "you are never quoted"
+    expect(toDomain("Meridian Skin Lab")).toBeNull();
+    expect(toDomain("evil.com\r\nX-Injected: 1")).toBeNull();
+    expect(toDomain("site.com/../../etc")).toBe("site.com");
+    expect(toDomain(".leading.dot")).toBeNull();
+  });
 });
 
 describe("isInstitutional", () => {
@@ -77,9 +86,11 @@ describe("bucketOf", () => {
     expect(bucketOf(q({ domains: ["healthline.com", "us.com"], owner: "healthline.com", brandRank: 2 }), consolidated)).toBe("owned");
   });
 
-  it("is open when nothing is cited, or only institutional sources", () => {
+  it("separates naming nothing from naming only reference sites", () => {
+    // saying "no site was named" about an answer that named nhs.uk is a claim the
+    // user disproves in one retype, so the two are counted apart
     expect(bucketOf(q({}), consolidated)).toBe("open");
-    expect(bucketOf(q({ domains: ["en.wikipedia.org", "nih.gov"], owner: "en.wikipedia.org" }), consolidated)).toBe("open");
+    expect(bucketOf(q({ domains: ["en.wikipedia.org", "nih.gov"], owner: "en.wikipedia.org" }), consolidated)).toBe("reference");
   });
 
   it("separates a consolidated owner from a one-off winner", () => {
@@ -108,7 +119,7 @@ describe("classify", () => {
     const three = Array.from({ length: 3 }, () => q({ domains: ["big.com"], owner: "big.com" }));
     const one = q({ domains: ["small.com"], owner: "small.com" });
     const { counts } = classify([...three, one], "us.com");
-    expect(counts).toEqual({ owned: 0, lost: 3, contested: 1, open: 0 });
+    expect(counts).toEqual({ owned: 0, lost: 3, contested: 1, reference: 0, open: 0 });
   });
 });
 
@@ -148,6 +159,7 @@ describe("runCitationMap", () => {
     expect(map.brandDomain).toBe("us.com");
     expect(map.counts.owned).toBe(8);
     expect(map.counts.open).toBe(8);
+    expect(map.counts.reference).toBe(0);
     expect(map.counts.lost).toBe(24);
     expect(map.domains[0]).toMatchObject({ domain: "big.com", wins: 24 });
 

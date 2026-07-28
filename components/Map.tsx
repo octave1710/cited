@@ -428,7 +428,11 @@ function Cost({ cost, engine }: { cost: MapCost | null; engine: { label: string;
           <>
             <div>{cost.calls} live calls to the engine</div>
             <div>{(cost.inTokens + cost.outTokens).toLocaleString("en-US")} tokens billed</div>
-            <div style={{ color: "var(--red)", fontSize: 15 }}>${cost.usd.toFixed(4)}</div>
+            {cost.usd === null ? (
+              <div style={{ color: "var(--amber)", fontSize: 15 }}>spend not computed</div>
+            ) : (
+              <div style={{ color: "var(--red)", fontSize: 15 }}>${cost.usd.toFixed(4)}</div>
+            )}
           </>
         )}
         {cost && cost.calls === 0 && cost.replayed > 0 && (
