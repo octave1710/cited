@@ -10,6 +10,7 @@ import type { CitationMap, MapCost, MapQuestion, QuestionResult } from "../citat
 import { INTENTS } from "../citationmap/questions";
 import { deriveSignals, type Difficulty, type EntryPoint, type MapSignals } from "../citationmap/signals";
 import { DeltaPanel, History } from "./History";
+import { BRAND_COLOUR, Favicon, REST_COLOUR, TerritoryMap, toTerritories } from "./Territory";
 import type { MapDelta } from "../citationmap/compare";
 
 /* ------------------------------------------------------------------ *
@@ -229,19 +230,37 @@ export function MapScreen() {
 
         {(busy || total > 0) && (
           <>
-            <div className="map-layout" style={{ paddingTop: 54 }}>
-              <div>
-                <Verdict map={map} topic={topic} done={done} total={total} phase={phase} />
-                <div style={{ marginTop: 46 }}>
-                  <Territory gridRef={gridRef} questions={ordered} cells={cells} map={map} rankOf={rankOf} onPick={setPicked} picked={picked} settled={settled} />
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 40, minWidth: 320 }}>
-                <Legend map={map} done={done} total={total} />
-                {map && <Owners map={map} />}
-                <Cost cost={cost} engine={engine} />
-              </div>
+            <div style={{ paddingTop: 48 }}>
+              <Verdict map={map} topic={topic} done={done} total={total} phase={phase} />
             </div>
+
+            {/* the run itself stays a live grid: cells fill as answers land. Once the
+                map is complete it is replaced by area, which is the finding. */}
+            {!map && (
+              <div style={{ marginTop: 40 }}>
+                <RunGrid gridRef={gridRef} questions={ordered} cells={cells} map={map} rankOf={rankOf} onPick={setPicked} picked={picked} settled={settled} />
+              </div>
+            )}
+
+            {map && (
+              <>
+                {/* one row, both columns the same height, so there is no dead space under
+                    the map. The legend and the cost sit under it as a band rather than
+                    stacking the side column into something twice as tall. */}
+                <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 26, alignItems: "stretch", marginTop: 24, height: 430 }}>
+                  <TerritoryMap
+                    map={map}
+                    onPick={(d) => (window.location.href = `/autopsy?domain=${encodeURIComponent(d)}`)}
+                  />
+                  <Owners map={map} />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 26, marginTop: 22, alignItems: "start" }}>
+                  <Legend map={map} done={done} total={total} />
+                  <Cost cost={cost} engine={engine} />
+                </div>
+              </>
+            )}
 
             {picked && (
               <Picked
@@ -359,7 +378,7 @@ function Verdict({ map, topic, done, total, phase }: { map: CitationMap | null; 
 
 /* ---------------------------- the territory --------------------------- */
 
-function Territory({
+function RunGrid({
   gridRef, questions, cells, map, rankOf, onPick, picked, settled,
 }: {
   gridRef: React.RefObject<HTMLDivElement | null>;
@@ -441,41 +460,41 @@ function Tip({ r, x, y, brandDomain }: { r: QuestionResult; x: number; y: number
 
 function Legend({ map, done, total }: { map: CitationMap | null; done: number; total: number }) {
   const pct = total ? Math.round((done / total) * 100) : 0;
+  const rows: [string, string, string, number | null][] = [
+    ["var(--brand)", "You are quoted", "your domain appears in the engine's source list", map ? map.counts.owned : null],
+    ["var(--d1)", "One site owns it", "the first-cited site also wins a large share of the whole map", map ? map.counts.lost : null],
+    ["var(--d3)", "Split between sites", "several sites are cited and none of them owns the category", map ? map.counts.contested : null],
+    ["var(--d-rest)", "Only reference sites", "the engine named encyclopedias or government pages, no commercial page", map ? map.counts.reference : null],
+    ["transparent", "No site named at all", "the engine answered without citing anything", map ? map.counts.open : null],
+  ];
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 34 }}>
+    <div>
       {total > done && (
-        <div>
+        <div style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-            <span className="m">ANSWERED</span>
-            <span style={{ fontFamily: "var(--mono)", fontSize: 13 }}>{done} / {total}</span>
+            <span className="m" style={{ color: "var(--meta)" }}>ANSWERED</span>
+            <span className="num" style={{ fontSize: 13 }}>{done} / {total}</span>
           </div>
-          <div style={{ height: 2, background: "var(--rule)", marginTop: 10 }}>
-            <div style={{ height: 2, width: `${pct}%`, background: "var(--red)", transition: "width 240ms cubic-bezier(0.215,0.61,0.355,1)" }} />
+          <div style={{ height: 3, background: "var(--s2)", marginTop: 8 }}>
+            <div style={{ height: 3, width: `${pct}%`, background: "var(--brand)", transition: "width 240ms cubic-bezier(0.215,0.61,0.355,1)" }} />
           </div>
         </div>
       )}
 
-      <div>
-        <div className="m" style={{ marginBottom: 14 }}>HOW TO READ THE GRID</div>
-        {[
-          ["var(--red)", "You are quoted", map ? map.counts.owned : null],
-          [RANK_INK[0], "One site owns it", map ? map.counts.lost : null],
-          [RANK_INK[2], "Split between sites", map ? map.counts.contested : null],
-          // the grid paints a reference-only cell at its owner's rank, so the key uses
-          // the same ramp position rather than inventing a swatch nothing draws
-          [RANK_INK[0], "Only reference sites", map ? map.counts.reference : null],
-          ["transparent", "No site named at all", map ? map.counts.open : null],
-        ].map(([c, label, n]) => (
-          <div key={label as string} style={{ display: "flex", alignItems: "center", gap: 14, padding: "9px 0", borderTop: "1px solid var(--rule-soft)" }}>
-            <span style={{ width: 16, height: 16, background: c as string, border: c === "transparent" ? "1px solid var(--ink)" : "none", flex: "none" }} />
-            <span style={{ fontSize: 16 }}>{label as string}</span>
-            <span style={{ marginLeft: "auto", fontFamily: "var(--mono)", fontSize: 15 }}>
-              {n === null ? "—" : <Ticker value={n as number} />}
-            </span>
+      <div className="m" style={{ color: "var(--meta)", marginBottom: 10 }}>WHAT EACH QUESTION CAME BACK AS</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 2 }}>
+        {rows.map(([c, label, help, n]) => (
+          <div key={label} className="card" style={{ padding: "12px 14px", background: "var(--s1)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+              <span style={{ width: 12, height: 12, flex: "none", background: c, border: c === "transparent" ? "1px solid var(--ink)" : "none" }} />
+              <span style={{ fontSize: 14.5, fontWeight: 600, flex: 1 }}>{label}</span>
+              <span className="num" style={{ fontSize: 16, fontWeight: 700 }}>{n === null ? "—" : n}</span>
+            </div>
+            <p style={{ fontSize: 13, lineHeight: 1.5, color: "var(--meta)", marginTop: 7 }}>{help}</p>
           </div>
         ))}
       </div>
-
     </div>
   );
 }
@@ -561,40 +580,64 @@ function Picked({ result, brandDomain, entry, onClose }: {
  * the territory uses, so the block on the left and the name on the right are one read.
  * Every line carries the button that acts on it.
  */
+/**
+ * The order book. Same colours as the treemap, so a block on the left and a line on
+ * the right are read as one object. Two bars per row: how often the engine puts a
+ * domain first, and how often it names it at all. The gap between them is the whole
+ * "always in the room, never chosen" finding, visible without a sentence.
+ */
 function Owners({ map }: { map: CitationMap }) {
-  const top = map.domains.slice(0, 6);
-  const max = top[0]?.wins || 1;
-  const ink = (d: (typeof top)[number], i: number) => (d.isBrand ? "var(--red)" : RANK_INK[Math.min(i, RANK_INK.length - 1)]);
+  const territories = toTerritories(map);
+  const colourOf = new Map(territories.map((t) => [t.domain, t.colour]));
+  const top = map.domains.slice(0, 5);
+  const max = Math.max(...top.map((d) => d.appearances), 1);
+
   return (
-    <div>
-      <div className="m" style={{ marginBottom: 14 }}>WHO GETS QUOTED, RANKED</div>
-      {top.map((d, i) => (
-        <div key={d.domain} style={{ padding: "13px 0", borderTop: "1px solid var(--rule-soft)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {d.isBrand ? (
-              <span style={{ width: 18, height: 18, flex: "none", background: "var(--red)" }} />
-            ) : (
-              <Favicon domain={d.domain} />
-            )}
-            <span style={{ fontSize: 17, fontWeight: 600, color: d.isBrand ? "var(--red)" : "var(--ink)", flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {d.domain}{d.isBrand ? " (you)" : ""}
-            </span>
-            <span style={{ fontFamily: "var(--mono)", fontSize: 15, flex: "none" }}>{d.wins}</span>
-            {!d.isBrand && (
-              <a className="btn btn--sm" href={`/autopsy?domain=${encodeURIComponent(d.domain)}`} style={{ flex: "none" }}>Autopsy</a>
-            )}
+    <div className="card" style={{ padding: "16px 18px", minHeight: 0, overflow: "hidden" }}>
+      <div className="m" style={{ marginBottom: 16, color: "var(--meta)" }}>WHO THE ENGINE QUOTES</div>
+
+      {top.map((d) => {
+        const colour = d.isBrand ? BRAND_COLOUR : (colourOf.get(d.domain) ?? REST_COLOUR);
+        return (
+          <div key={d.domain} style={{ padding: "9px 0", borderTop: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Favicon domain={d.domain} size={20} />
+              <span
+                style={{
+                  fontSize: 15.5,
+                  fontWeight: 600,
+                  color: d.isBrand ? "var(--brand)" : "var(--ink)",
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {d.domain}
+                {d.isBrand && <span style={{ color: "var(--meta)", fontWeight: 400 }}> · you</span>}
+              </span>
+              <span className="num" style={{ fontSize: 15, fontWeight: 700, color: colour }}>{d.wins}</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 8 }}>
+              <span style={{ display: "block", height: 7, background: "var(--s2)" }}>
+                <span style={{ display: "block", height: 7, width: `${(d.wins / max) * 100}%`, background: colour }} />
+              </span>
+              <span style={{ display: "block", height: 3, background: "var(--s2)" }}>
+                <span
+                  style={{ display: "block", height: 3, width: `${(d.appearances / max) * 100}%`, background: colour, opacity: 0.4 }}
+                />
+              </span>
+            </div>
           </div>
-          <span style={{ display: "block", height: 5, background: "var(--rule-soft)", marginTop: 9 }}>
-            <span style={{ display: "block", height: 5, width: `${(d.wins / max) * 100}%`, background: ink(d, i) }} />
-          </span>
-        </div>
-      ))}
-      <p className="m-sm meta" style={{ marginTop: 12, textTransform: "none", letterSpacing: 0.2 }}>
-        Counted on questions where the domain is named first.
+        );
+      })}
+
+      <p style={{ fontSize: 12.5, lineHeight: 1.45, color: "var(--meta)", marginTop: 10 }}>
+        Thick bar: named first. Thin: named at all. The gap is a site the engine keeps in
+        the room and never chooses.
       </p>
-      <a className="btn btn--primary" href={`/api/bundle?map=${encodeURIComponent(map.id)}`} style={{ marginTop: 20 }} download>
-        Download the map as files
-      </a>
     </div>
   );
 }
@@ -656,44 +699,95 @@ function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
 
       <p style={{ fontSize: 15.5, lineHeight: 1.6, marginTop: 14, maxWidth: "88ch" }}>
         {difficulty === "all"
-          ? "Sorted easiest first. Every row names the site holding the weakest seat in that answer, with its record across the whole map."
+          ? "Sorted easiest first. The logos are the sites the engine actually named in that answer, in its order. The one ringed in orange is the seat worth taking."
           : difficulty === "open"
             ? "The engine named no commercial page on these. There is nothing to outrank, only a page to write."
             : difficulty === "contested"
               ? "Several sites are cited here and none of them owns the category, so the incumbent is beatable."
-              : "The site cited first also wins a large share of the whole map. The way in is the weaker site sitting beside it, named on each row."}
+              : "The site cited first also wins a large share of the whole map. The way in is the weaker site sitting beside it, ringed on each row."}
       </p>
+
+      {/* what each button does, because a row of verbs with no mechanism behind them is
+          the exact thing that makes a tool feel like a mock-up */}
+      <div
+        className="card"
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 20, padding: "16px 18px", marginTop: 18 }}
+      >
+        <div>
+          <div className="m" style={{ color: "var(--brand)", marginBottom: 6 }}>TAKE A SEAT</div>
+          <p style={{ fontSize: 14.5, lineHeight: 1.55 }}>
+            Fetches that site&apos;s page for this question and your page, runs the same nine factors on both, and
+            shows the gap with the exact text pulled off each one. You leave with the rewrites and a corrected HTML file.
+          </p>
+        </div>
+        <div>
+          <div className="m" style={{ color: "var(--brand)", marginBottom: 6 }}>WRITE THE PAGE</div>
+          <p style={{ fontSize: 14.5, lineHeight: 1.55 }}>
+            Sends the question to the multi-market pipeline, which grounds it on the term that wins in that market,
+            drafts answer-first, scores itself, and stops dead until a named human approves.
+          </p>
+        </div>
+        <div>
+          <div className="m" style={{ color: "var(--brand)", marginBottom: 6 }}>EXPORT TO CSV</div>
+          <p style={{ fontSize: 14.5, lineHeight: 1.55 }}>
+            All {signals.entryPoints.length} rows as a file: the question, every site named, which one holds the
+            weakest seat, and its record across the map. Retype any question into ChatGPT to check the row yourself.
+          </p>
+        </div>
+      </div>
 
       <div style={{ marginTop: 30, borderTop: "1px solid var(--rule)" }}>
         {rows.length === 0 && <p style={{ fontSize: 16, padding: "18px 0" }}>Nothing in this route on this map.</p>}
-        {rows.map((e, i) => (
-          <div key={e.id} style={{ padding: "18px 0", borderBottom: "1px solid var(--rule-soft)" }}>
-            <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-              {e.weakest ? (
-                <Favicon domain={e.weakest.domain} />
-              ) : (
-                <span style={{ width: 18, height: 18, flex: "none", border: "1px solid var(--ink)" }} />
-              )}
-              <span style={{ fontSize: 16.5, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{sentence(e.text)}</span>
+        {rows.map((e) => (
+          <div key={e.id} style={{ padding: "14px 0", borderBottom: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+              {/* who is actually in this answer, in the engine's own order. A grey square
+                  told the user nothing; five logos say who to beat before a word is read. */}
+              <span style={{ display: "flex", gap: 3, flex: "none", width: 118, alignItems: "center" }}>
+                {e.occupants.length === 0 && (
+                  <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--brand)", letterSpacing: 0.6 }}>
+                    NOBODY
+                  </span>
+                )}
+                {e.occupants.slice(0, 5).map((o) => (
+                  <span
+                    key={o.domain}
+                    title={`${o.domain} · slot ${o.slot} here · wins ${o.winsAcross} across the map`}
+                    style={{
+                      // the seat we are telling them to take is the only one at full strength
+                      opacity: o.domain === e.weakest?.domain ? 1 : 0.34,
+                      outline: o.domain === e.weakest?.domain ? "2px solid var(--brand)" : "none",
+                      outlineOffset: 1,
+                      display: "block",
+                    }}
+                  >
+                    <Favicon domain={o.domain} size={20} />
+                  </span>
+                ))}
+              </span>
+
+              <span style={{ fontSize: 15.5, lineHeight: 1.45, flex: 1, minWidth: 0 }}>{sentence(e.text)}</span>
+
               {e.weakest ? (
                 <a
                   className="btn btn--sm"
                   href={`/autopsy?domain=${encodeURIComponent(e.weakest.domain)}&q=${encodeURIComponent(e.text)}`}
                   style={{ flex: "none" }}
+                  title={`Fetch ${e.weakest.domain}'s page for this question, fetch yours, and score both on the same nine factors`}
                 >
-                  Autopsy {e.weakest.domain}
+                  Take {e.weakest.domain}&apos;s seat
                 </a>
               ) : (
-                <a className="btn btn--sm" href={`/pipeline?brief=${encodeURIComponent(e.text)}`} style={{ flex: "none" }}>
-                  Brief a page
+                <a
+                  className="btn btn--sm"
+                  href={`/pipeline?brief=${encodeURIComponent(e.text)}`}
+                  style={{ flex: "none" }}
+                  title="Send this question to the content pipeline, which drafts a page for it and blocks on a named human approval"
+                >
+                  Write the page
                 </a>
               )}
             </div>
-            {/* consecutive questions in the same situation share one wording, so the
-                reason prints once per run instead of eight identical lines */}
-            {e.reason !== rows[i - 1]?.reason && (
-              <p style={{ fontSize: 15, lineHeight: 1.6, marginTop: 8, paddingLeft: 32, maxWidth: "82ch" }}>{e.reason}</p>
-            )}
           </div>
         ))}
       </div>
@@ -707,39 +801,6 @@ function Queue({ map, signals }: { map: CitationMap; signals: MapSignals }) {
   );
 }
 
-/**
- * The site's own favicon, from Google's public S2 service. Sixteen grey squares told
- * the user nothing about who was in the room; a logo is recognised before it is read.
- * Falls back to the first letter when the service has nothing, so a row is never blank.
- */
-function Favicon({ domain, size = 18 }: { domain: string; size?: number }) {
-  const [failed, setFailed] = useState(false);
-  if (failed || !domain) {
-    return (
-      <span
-        aria-hidden
-        style={{
-          width: size, height: size, flex: "none", display: "inline-flex", alignItems: "center",
-          justifyContent: "center", border: "1px solid var(--rule)", fontFamily: "var(--mono)",
-          fontSize: size * 0.55, color: "var(--meta)", textTransform: "uppercase",
-        }}
-      >
-        {domain.replace(/^www\./, "")[0] ?? "?"}
-      </span>
-    );
-  }
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=64`}
-      alt=""
-      width={size}
-      height={size}
-      onError={() => setFailed(true)}
-      style={{ flex: "none", display: "block" }}
-    />
-  );
-}
 
 /** Count-up for a measured number. Motion, not a timer, so it lands on the real value. */
 export function Ticker({ value, className, style }: { value: number; className?: string; style?: React.CSSProperties }) {

@@ -1,23 +1,29 @@
 import type { Metadata } from "next";
-import { Barlow, Barlow_Condensed, IBM_Plex_Mono } from "next/font/google";
+import { Archivo, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Barlow_Condensed({
+/**
+ * v3 typography. The v2 system was Barlow Condensed 700 italic caps, which is narrow,
+ * slanted and shouted. Every axis is inverted here: a high-contrast roman serif at
+ * sentence case for display, a wide neutral grotesque for the interface, a mono with
+ * tabular figures for anything countable. Nothing is set in capitals.
+ */
+const display = Instrument_Serif({
   subsets: ["latin"],
-  weight: ["700"],
-  style: ["italic", "normal"],
+  weight: ["400"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
-const body = Barlow({
+const body = Archivo({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });
-const mono = IBM_Plex_Mono({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "700"],
   variable: "--font-mono",
   display: "swap",
 });

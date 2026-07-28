@@ -68,14 +68,30 @@ export function History({ currentId, onOpen }: { currentId?: string; onOpen: (id
   );
 }
 
+/**
+ * Only renders when there is something to report.
+ *
+ * It used to print "Nothing changed hands since the last run" under every first run,
+ * which is a headline about an event that did not happen, next to a comparison that was
+ * never made. A panel with nothing to say is noise, so a first run gets one quiet line
+ * that explains what the panel is for and when it will start being useful.
+ */
 export function DeltaPanel({ delta, noBaselineReason }: { delta: MapDelta | null; noBaselineReason?: string }) {
   if (!delta) {
     return noBaselineReason ? (
-      <div style={{ border: "1px solid var(--rule)", padding: "14px 18px", marginTop: 24 }}>
-        <span className="m meta">NO BASELINE</span>
-        <p style={{ fontSize: 16, marginTop: 8 }}>{noBaselineReason}</p>
+      <div className="card" style={{ padding: "16px 20px", marginTop: 44 }}>
+        <span className="m" style={{ color: "var(--meta)" }}>TRACKING STARTS HERE</span>
+        <p style={{ fontSize: 15.5, lineHeight: 1.55, marginTop: 8, maxWidth: "72ch" }}>
+          {noBaselineReason} Run the same category again in a month and this panel reports the questions that changed
+          hands, counted only on the questions both runs asked. That count is the number the work is judged on.
+        </p>
       </div>
     ) : null;
+  }
+
+  // a comparison with no shared questions and no movement has produced no information
+  if (delta.comparable === 0 && delta.won.length === 0 && delta.lost.length === 0 && delta.domains.length === 0) {
+    return null;
   }
 
   const churn = delta.won.length + delta.lost.length;
