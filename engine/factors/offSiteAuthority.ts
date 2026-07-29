@@ -34,10 +34,10 @@ export function offSiteAuthority(page: ParsedPage): FactorResult {
 
   return {
     key: "offSiteAuthority",
-    name: "Off-site brand authority (proxied on-page)",
+    name: "Authority signals on the page",
     score: Math.min(100, score),
     evidence,
-    reasoning: "Ahrefs 2026 factor #1 is third-party brand presence (YouTube above all). Offline proxy only; production mode measures the real thing via Profound.",
+    reasoning: "Ahrefs 2026 factor #1 is third-party brand presence. This reads only what is ON the page: a named author, linked profiles in the markup, and links out to primary sources. It does not, and cannot, check where else on the web the brand is cited.",
     partial: true,
   };
 }

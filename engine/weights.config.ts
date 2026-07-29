@@ -48,7 +48,7 @@ export const FACTORS: FactorConfig[] = [
     key: "offSiteAuthority",
     name: "Off-site brand authority (proxied on-page)",
     weight: 0.12,
-    source: "Ahrefs 2026 factor #1; YouTube presence = most correlated signal in their study. Full signal via Profound (production mode)",
+    source: "Ahrefs 2026 factor #1, third-party brand presence. Scored here on the page's own authority markers only, which is a proxy and is labelled as one on screen",
   },
   {
     key: "fanoutCoverage",

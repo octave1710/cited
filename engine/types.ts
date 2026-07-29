@@ -39,7 +39,7 @@ export interface FactorResult {
   /** Real extracts from the page backing the score. */
   evidence: string[];
   reasoning: string;
-  /** True when the full signal needs external data (Profound, SERP) — scored on on-page proxies only. */
+  /** True when the full signal needs data this tool does not have, so it is scored on on-page proxies only and says so. */
   partial?: boolean;
 }
 

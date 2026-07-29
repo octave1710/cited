@@ -10,7 +10,13 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const run = getPipeline(id);
   if (!run) return NextResponse.json({ error: `No pipeline "${id}".` }, { status: 404 });
 
-  const body = (await req.json().catch(() => ({}))) as { market?: string; approvedBy?: string; note?: string };
+  const body = (await req.json().catch(() => ({}))) as {
+    market?: string;
+    approvedBy?: string;
+    note?: string;
+    /** Required when the draft is below the floor or the originality check flagged it. */
+    override?: boolean;
+  };
   const market = (body.market ?? "").toUpperCase();
   const approvedBy = (body.approvedBy ?? "").trim();
 
@@ -24,9 +30,45 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     );
   }
 
+  /**
+   * The score floor was computed, printed in the gate note, and never enforced: a named
+   * person could sign a market scoring 20 out of 100 and nothing objected. The human
+   * still has the authority, which is the point of the gate, but signing off something
+   * below the bar is now a deliberate act with a recorded reason rather than the default.
+   */
+  const plan = run.plans.find((p) => p.market === market);
+  const belowFloor = plan ? plan.score < 55 : false;
+  const flaggedOriginality = plan?.originality?.needsReview ?? false;
+  if ((belowFloor || flaggedOriginality) && !body.override) {
+    return NextResponse.json(
+      {
+        error:
+          `${market} ` +
+          (belowFloor ? `scores ${plan?.score}/100, under the 55 minimum. ` : "") +
+          (flaggedOriginality ? `The originality check flagged it: ${plan?.originality?.reasons.join(" ")} ` : "") +
+          `Approving it anyway needs override:true and a note saying why, which is stored with your name.`,
+        needsOverride: true,
+        market,
+        score: plan?.score ?? null,
+      },
+      { status: 409 },
+    );
+  }
+  if ((belowFloor || flaggedOriginality) && !(body.note ?? "").trim()) {
+    return NextResponse.json(
+      { error: "An override needs a reason. It is stored with your name and travels to the CMS payload." },
+      { status: 400 },
+    );
+  }
+
   run.decisions = [
     ...run.decisions.filter((d) => d.market !== market),
-    { market, approvedBy, at: new Date().toISOString(), note: body.note },
+    {
+      market,
+      approvedBy,
+      at: new Date().toISOString(),
+      note: body.override ? `OVERRIDE: ${body.note}` : body.note,
+    },
   ];
 
   const pending = run.markets.filter((m) => !run.decisions.some((d) => d.market === m));

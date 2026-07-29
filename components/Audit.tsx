@@ -20,7 +20,7 @@ const MEASURES: Record<string, string> = {
   sourcedQuotes: "Claims attributed to a named expert or institution.",
   factualSpecificity: "Exact figures an engine can quote back with a source.",
   freshness: "How recently the page was verified.",
-  offSiteAuthority: "Whether the brand is cited anywhere else on the web.",
+  offSiteAuthority: "The authority markers the page carries itself: a named author, linked profiles, links out to primary sources. Not a check of where else the brand is cited.",
   fanoutCoverage: "How many sub-questions of the topic the page actually answers.",
   googleRank: "Classic ranking. Down-weighted on purpose, it no longer predicts citation.",
   schemaValidity: "Valid JSON-LD. Generated for hygiene, weighted at 1%, measured causal effect is zero.",
