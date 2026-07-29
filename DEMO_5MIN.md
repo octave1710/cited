@@ -39,7 +39,7 @@ the paragraph I read over it.
 > I asked six AI assistants eight of the questions someone buying a vitamin C serum
 > actually types. Four hundred and thirty-eight citations came back. Cleveland Clinic, a
 > hospital site, is in six of those eight answers. The Ordinary, one of the biggest brands
-> in the category, is in two, and never first.
+> in the category, is in three, and never first.
 >
 > Nothing in their reporting would tell them that, because a click that doesn't happen
 > leaves no trace."
@@ -56,8 +56,8 @@ the paragraph I read over it.
 
 **[POINT]** at the headline.
 
-> "The headline is the whole thing in one line. You're in two of the eight. Cleveland Clinic
-> is in six."
+> "The headline is the whole thing in one line. You're in three of the eight. Cleveland
+> Clinic is in six. And that three counts your Spanish site as you, not as a stranger."
 
 **[POINT]** at the first row, then the `QUESTIONS ANSWERED IN` column.
 

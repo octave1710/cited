@@ -99,6 +99,22 @@ function EngineMark({ engine, size = 20 }: { engine: EngineKey; size?: number })
   );
 }
 
+/**
+ * Name the brand's own country domains when the row merges more than one.
+ *
+ * The line read "theordinary.com is quoted 3 times" while the .com carries 2 and the .es
+ * carries the third. A count a viewer can check and find short is worse than no count.
+ */
+function hostNote(row: DomainRow): React.ReactNode {
+  if (row.hosts.length < 2) return null;
+  return (
+    <>
+      {" "}
+      Counted across your own domains: <Entity size={16}>{row.hosts.join(", ")}</Entity>.
+    </>
+  );
+}
+
 export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<string | null>(null);
@@ -129,18 +145,28 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
   useEffect(() => {
     if (!ref.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-seg]", { scaleX: 0, transformOrigin: "left center", duration: 0.5, ease: "expo.out", stagger: 0.012 });
-      gsap.from("[data-cell]", {
-        scale: 0,
-        transformOrigin: "center center",
-        duration: 0.55,
-        ease: "back.out(1.6)",
-        stagger: { each: 0.008, from: "start" },
-      });
-      gsap.from("[data-notch]", { scaleY: 0, transformOrigin: "bottom center", duration: 0.4, ease: "expo.out", delay: 0.3, stagger: 0.01 });
-    }, ref);
-    return () => ctx.revert();
+    const scope = ref.current;
+    /* fromTo, not from, and cleared after: a `from` that is interrupted leaves the mark at
+       its hidden start, which is how the pipeline rail rendered invisible */
+    const clear = () => gsap.set(scope.querySelectorAll("[data-seg],[data-cell],[data-notch]"), { clearProps: "transform" });
+    const ctx = gsap.context((self) => {
+      const reveal = (sel: string, from: gsap.TweenVars, to: gsap.TweenVars) => {
+        const els = self.selector?.(sel) ?? [];
+        if (!els.length) return;
+        gsap.fromTo(els, from, { ...to, clearProps: "transform", overwrite: "auto" });
+      };
+      reveal("[data-seg]", { scaleX: 0 }, { scaleX: 1, transformOrigin: "left center", duration: 0.5, ease: "expo.out", stagger: 0.012 });
+      reveal(
+        "[data-cell]",
+        { scale: 0 },
+        { scale: 1, transformOrigin: "center center", duration: 0.55, ease: "back.out(1.6)", stagger: { each: 0.008, from: "start" } },
+      );
+      reveal("[data-notch]", { scaleY: 0 }, { scaleY: 1, transformOrigin: "bottom center", duration: 0.4, ease: "expo.out", delay: 0.3, stagger: 0.01 });
+    }, scope);
+    return () => {
+      ctx.revert();
+      clear();
+    };
   }, [board]);
 
   // the domain column is capped: at 1.5fr it swallowed the slack and shoved the engine
@@ -528,12 +554,13 @@ function Legend({ board, rows, max }: { board: Board; rows: DomainRow[]; max: nu
           <>
             Orange is you. <Entity size={17}>{brandShown.domain}</Entity> is quoted{" "}
             <Num size={14}>{brandShown.totalCitations}</Num> times, by <Num size={14}>{brandShown.engineReach}</Num> of
-            the <Num size={14}>{ENGINES.length}</Num>.
+            the <Num size={14}>{ENGINES.length}</Num>.{hostNote(brandShown)}
           </>
         ) : brandRow ? (
           <>
             Orange is you. <Entity size={17}>{brandRow.domain}</Entity> is quoted{" "}
             <Num size={14}>{brandRow.totalCitations}</Num> times in all, too few to reach the rows above.
+            {hostNote(brandRow)}
           </>
         ) : (
           <>Orange is you. Nothing here is orange, because no page you own was quoted on this panel.</>

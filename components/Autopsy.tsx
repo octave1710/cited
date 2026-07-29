@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import type { Autopsy, BriefLine, PageSide } from "../autopsy/run";
 import { Favicon } from "./Territory";
 import { FacingBands } from "./Facing";
+import { revealIn } from "./da";
 import { useKept } from "../lib/keep";
 
 /** Factor names are written for the ledger. A headline needs the first clause only. */
@@ -81,17 +82,12 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   /* The bars grow out of the axis once, on arrival. Scale on the x axis only,
      so nothing reflows and the numbers stay put. */
   useEffect(() => {
-    if (!data || !barsRef.current) return;
+    const scope = barsRef.current;
+    if (!data || !scope) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-bar]", {
-        scaleX: 0,
-        duration: 0.62,
-        ease: "expo.out",
-        stagger: 0.045,
-      });
-    }, barsRef);
-    return () => ctx.revert();
+    return revealIn(scope, (reveal) =>
+      reveal("[data-bar]", { scaleX: 0 }, { scaleX: 1, duration: 0.62, ease: "expo.out", stagger: 0.045 }),
+    );
   }, [data]);
 
   const top = data?.diffs.find((d) => d.impact > 0);

@@ -77,12 +77,12 @@ export function Verdict({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!ref.current) return;
+    const scope = ref.current;
+    if (!scope) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-verdict]", { opacity: 0, y: 16, duration: 0.65, ease: "expo.out" });
-    }, ref);
-    return () => ctx.revert();
+    return revealIn(scope, (reveal) =>
+      reveal("[data-verdict]", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65, ease: "expo.out" }),
+    );
   }, [headline]);
 
   return (
@@ -137,6 +137,39 @@ export function Meter({ value, max = 100, accent = "var(--d3)", height = 6, trac
 }
 
 /** Runs the standing entry choreography for whatever marks a screen rendered. */
+/**
+ * The only safe way to reveal something.
+ *
+ * `gsap.from` writes the hidden state on frame one and animates out of it, so anything
+ * that interrupts it leaves the element exactly where it started. That is how the whole
+ * pipeline rail shipped invisible: seven node labels, three market names and their scores
+ * all sitting at opacity 0, with the text present in the DOM the entire time.
+ *
+ * `fromTo` with `clearProps` leaves no inline style behind once it lands, and the returned
+ * cleanup force-clears after the revert. The animation is allowed to fail; the content is
+ * not. Returns the effect cleanup, so a call site is `return revealIn(scope, ...)`.
+ */
+export function revealIn(
+  scope: HTMLElement,
+  build: (reveal: (sel: string, from: gsap.TweenVars, to: gsap.TweenVars) => void) => void,
+  props = "opacity,transform",
+): () => void {
+  const seen: string[] = [];
+  const ctx = gsap.context((self) => {
+    build((sel, from, to) => {
+      seen.push(sel);
+      // gsap warns on an empty target, and several of these are legitimately absent
+      const els = self.selector?.(sel) ?? [];
+      if (!els.length) return;
+      gsap.fromTo(els, from, { ...to, clearProps: props, overwrite: "auto" });
+    });
+  }, scope);
+  return () => {
+    ctx.revert();
+    if (seen.length) gsap.set(scope.querySelectorAll(seen.join(",")), { clearProps: props });
+  };
+}
+
 /** Everything this hook reveals. Listed once so the cleanup can un-hide all of it. */
 const REVEALED = "[data-meter],[data-band],[data-tile],[data-row]";
 

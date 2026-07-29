@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { revealIn } from "./da";
 import { squarify } from "../lib/treemap";
 import type { CitationMap, DomainStat } from "../citationmap/types";
 
@@ -114,20 +115,16 @@ export function TerritoryMap({
   /* Each tile grows from its own top-left, biggest first, so the eye lands on the
      dominant holder before the small ones arrive. */
   useLayoutEffect(() => {
-    if (!tiles.length || !wrapRef.current) return;
+    const scope = wrapRef.current;
+    if (!tiles.length || !scope) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-tile]", {
-        scaleX: 0.6,
-        scaleY: 0.6,
-        opacity: 0,
-        transformOrigin: "top left",
-        duration: 0.62,
-        ease: "expo.out",
-        stagger: 0.05,
-      });
-    }, wrapRef);
-    return () => ctx.revert();
+    return revealIn(scope, (reveal) =>
+      reveal(
+        "[data-tile]",
+        { scaleX: 0.6, scaleY: 0.6, opacity: 0 },
+        { scaleX: 1, scaleY: 1, opacity: 1, transformOrigin: "top left", duration: 0.62, ease: "expo.out", stagger: 0.05 },
+      ),
+    );
   }, [tiles.length, width]);
 
   return (

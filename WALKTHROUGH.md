@@ -45,7 +45,7 @@ under a second, autopsy about 5 seconds, pipeline about 40 seconds. Nothing make
 > I took vitamin C serum in the UK and I asked six assistants eight of the questions a
 > buyer actually types. Four hundred and thirty-eight citations came back. A hospital
 > site, Cleveland Clinic, is in the answer to six of those eight questions. The Ordinary,
-> which is one of the biggest brands in that category, is in two of them, and it is never
+> which is one of the biggest brands in that category, is in three of them, and it is never
 > the first source named.
 >
 > And the part I find interesting is that nothing in their reporting would tell them that.
@@ -140,7 +140,7 @@ while it runs. **[IF IT STALLS]** click **Cancel**; the previous result stays on
 
 **[POINT]** at the headline, then at the first row.
 
-> "And the headline is the whole thing in one line. You're in two of the eight. Cleveland
+> "And the headline is the whole thing in one line. You're in three of the eight. Cleveland
 > Clinic is in six. That domain is the top row, and the number six is right there in its
 > row, so you can check the sentence against the table without taking my word for it."
 
@@ -227,7 +227,7 @@ while it runs. **[IF IT STALLS]** click **Cancel**; the previous result stays on
 
 **[POINT]** at the score, also 42.
 
-> "And that's The Ordinary's own page, the one that's in two of the eight and never named
+> "And that's The Ordinary's own page, the one that's in three of the eight and never named
 > first. Also forty-two.
 >
 > Same score. Completely different outcome. So the page score is not the answer, and that's
@@ -518,7 +518,7 @@ Everything here was run on the deployed app on 29 July and matched.
 | Per engine | AI Mode 143, Perplexity 128, ChatGPT 77, Claude 67, AI Overview 17, Gemini 6 |
 | Engines that answered | 6 of 6 |
 | Top row | health.clevelandclinic.org, 6 of 8 questions, 4 engines, 11 citations, 4 lead slots, 2.5% |
-| The Ordinary | 2 of 8 questions, 0 lead slots, row 33 |
+| The Ordinary | 3 of 8 questions, 0 lead slots, row 18; the row merges theordinary.com and theordinary.es |
 | youtube.com | 5.0% of all citations, 0 lead slots |
 | Lead slots on the panel | 40 |
 | Teardown | reach 67, lead slots 100, named in prose 6 |

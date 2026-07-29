@@ -9,7 +9,7 @@ import type { PanelRun } from "../engines/types";
 import type { Board } from "../engines/board";
 import type { FactorFinding, Teardown } from "../engines/why";
 import { MARKETS } from "../citationmap/markets";
-import { Awaiting, Entity, Label, Num, Panel as Surface, Section, useEntry } from "./da";
+import { Awaiting, Entity, Label, Num, Panel as Surface, Section, revealIn, useEntry } from "./da";
 import { readSubject, writeSubject, toHost, DEFAULT_SUBJECT } from "../lib/subject";
 import { useKept } from "../lib/keep";
 
@@ -253,12 +253,12 @@ export function PanelScreen() {
 function Intro({ steps, busy, questions, asked }: { steps: Step[]; busy: boolean; questions: string[]; asked: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!ref.current) return;
+    const scope = ref.current;
+    if (!scope) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-engine]", { opacity: 0, y: 20, duration: 0.55, ease: "expo.out", stagger: 0.07, delay: 0.15 });
-    }, ref);
-    return () => ctx.revert();
+    return revealIn(scope, (reveal) =>
+      reveal("[data-engine]", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.55, ease: "expo.out", stagger: 0.07, delay: 0.15 }),
+    );
   }, [busy, questions.length]);
 
   return (
@@ -360,12 +360,13 @@ function Result({ run, board, teardown, questions }: { run: PanelRun; board: Boa
   const brandCited = board.brandRow;
 
   useEffect(() => {
-    if (!ref.current) return;
+    const scope = ref.current;
+    if (!scope) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-headline]", { opacity: 0, y: 18, duration: 0.7, ease: "expo.out" });
-    }, ref);
-    return () => ctx.revert();
+    /* the sentence the whole screen exists to say: it must never be the thing that hides */
+    return revealIn(scope, (reveal) =>
+      reveal("[data-headline]", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" }),
+    );
   }, [board]);
 
   const verdict = !run.brandDomain
