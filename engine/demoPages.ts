@@ -15,18 +15,35 @@
  * cannot be bundled for the client. Data and network code do not belong in one file.
  */
 
+/**
+ * Three pages taken from the recorded panel itself, so the audit continues the board's
+ * sentence instead of starting a new one.
+ *
+ * The old set did not. Its first button was labelled "the site that wins the category"
+ * and pointed at a healthline article that is thirteenth on the board, cited on three of
+ * the eight questions and never named first; its second pointed at a product page for a
+ * different ingredient that the panel never cited at all. Both labels were false against
+ * the screen the demo had just shown, which is the worst kind of false.
+ *
+ * Every claim below is checkable in the table one click away, and the three together are
+ * the argument: the two pages the engines treat completely differently score the same,
+ * and the page that scores highest is the one blocking half the crawlers.
+ */
 export const REAL_PAGES = [
   {
-    url: "https://www.healthline.com/nutrition/vitamin-c-benefits",
-    note: "the site that wins the category",
+    // rank 1 on the recorded panel: 11 citations, in the answer to 6 of the 8 questions
+    url: "https://health.clevelandclinic.org/vitamin-c-serum",
+    note: "the page cited most on the board",
   },
   {
-    url: "https://theordinary.com/en-us/azelaic-acid-suspension-10-exfoliator-100407.html",
-    note: "a brand product page",
+    // the brand's own page, cited on 2 of the 8, never named first
+    url: "https://theordinary.com/en-us/blog/vitamin-c-skincare.html",
+    note: "the brand's own page",
   },
   {
-    url: "https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-c/",
-    note: "an institutional page",
+    // scores highest of the three and blocks 4 of the 8 AI crawlers in its own robots.txt
+    url: "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums",
+    note: "best page, blocks the crawlers",
   },
 ] as const;
 

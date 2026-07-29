@@ -12,7 +12,7 @@ import { fanoutCoverage } from "../../../../engine/factors/fanoutCoverage";
 import { googleRank } from "../../../../engine/factors/googleRank";
 import { schemaValidity } from "../../../../engine/factors/schemaValidity";
 import { DEMO_PAGES, IngestError, fetchPage, normaliseUrl } from "../../../../engine/ingest";
-import { checkCrawlerAccess } from "../../../../engine/crawlerAccess";
+import { checkCrawlerAccess, type AccessReport } from "../../../../engine/crawlerAccess";
 import { newRunId, saveRun } from "../../../../lib/db";
 import { blankSteps, type Run } from "../../../../lib/types";
 import type { FactorResult, ParsedPage } from "../../../../engine/types";
@@ -36,7 +36,15 @@ export async function POST(req: Request) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const send = (obj: unknown) => controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
+      /* counted, not guessed: the header read "12 CHECKS" while the toggle 400px below it
+         read "Show all 13 checks", because 12 was checks.length + 3 on every route and the
+         real number is 11 on a bundled page and 13 on a live URL */
+      let emitted = 0;
+      const send = (obj: unknown) => {
+        const t = (obj as { type?: string }).type;
+        if (t === "check" || t === "factor") emitted++;
+        controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
+      };
 
       const run: Run = {
         id: newRunId(),
@@ -147,9 +155,12 @@ export async function POST(req: Request) {
       send({ type: "step", id: "ingest", state: "done", note: run.steps.ingest.note });
 
       // ---------- crawler access: verifiable by the client in their own robots.txt ----------
+      /* hoisted: the gate has to see these verdicts, or it prints OPEN on a page the
+         section below proves is refused by half the crawlers */
+      let access: AccessReport | null = null;
       if (!body.demoId && !body.html?.trim()) {
         const ta = performance.now();
-        const access = await checkCrawlerAccess(run.url);
+        access = await checkCrawlerAccess(run.url);
         run.access = access;
         send({
           type: "check",
@@ -185,7 +196,13 @@ export async function POST(req: Request) {
       const paras = page.sections.flatMap((s) => s.paragraphs).length;
 
       const checks: { key: string; run: () => FactorResult; inspected: string }[] = [
-        { key: "crawlability", run: () => crawlability(page), inspected: `robots meta · ${page.wordCount.toLocaleString("en-US")} server-rendered words · <title>` },
+        {
+          key: "crawlability",
+          run: () => crawlability(page, access),
+          inspected: access?.found
+            ? `robots meta · robots.txt (${access.verdicts.length} AI crawlers) · ${page.wordCount.toLocaleString("en-US")} server-rendered words · <title>`
+            : `robots meta · ${page.wordCount.toLocaleString("en-US")} server-rendered words · <title>`,
+        },
         { key: "answerStructure", run: () => answerStructure(page), inspected: `${subs} H2/H3 headings · ${paras} passages` },
         { key: "sourcedQuotes", run: () => sourcedQuotes(page), inspected: `${page.blockquotes.length} blockquote(s) · ${words.toLocaleString("en-US")} words scanned for attributions` },
         { key: "factualSpecificity", run: () => factualSpecificity(page), inspected: `${words.toLocaleString("en-US")} words scanned for figures, units and percentages` },
@@ -245,7 +262,7 @@ export async function POST(req: Request) {
       send({ type: "step", id: "score", state: "done", note: run.steps.score.note });
 
       const totalMs = +(performance.now() - t0).toFixed(1);
-      send({ type: "summary", overall, grade, gated, zeros, lostWeight, totalMs, checks: checks.length + 3 });
+      send({ type: "summary", overall, grade, gated, zeros, lostWeight, totalMs, checks: emitted });
 
       try {
         saveRun(run);

@@ -149,8 +149,15 @@ ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join(
     const flags = body
       .flatMap((line: string) => RISKY.filter((r) => r.re.test(line)).map((r) => ({ line, why: r.why })))
       .concat(
+        /**
+         * A standing policy, not a measurement, and it used to assert a provenance that
+         * is not true: the non-English drafts are assembled from their own question sets
+         * in the grounding file, not adapted from the UK page. It sat two lines under a
+         * badge saying the draft was written independently of the other markets, so the
+         * card contradicted itself in the two lines carrying its whole argument.
+         */
         m !== "UK"
-          ? [{ line: headline, why: `adapted from the UK angle, a native ${m} speaker must read it before it ships` }]
+          ? [{ line: headline, why: `written from the ${m} question set, and no native ${m} speaker has read it yet; the pipeline never signs off a non-English market on its own` }]
           : [],
       );
 
@@ -205,6 +212,9 @@ ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join(
   // ---- 6b. the wall
   const below = run.plans.filter((p) => p.score < MIN_SCORE);
   const worst = reports.length ? Math.max(...reports.map((r) => r.worstOverlap)) : 0;
+  /* the word measure is zero between two languages by construction, so the note has to
+     carry the figure-sequence measure too or it reports a pass the check cannot fail */
+  const worstFacts = reports.length ? Math.max(...reports.map((r) => r.worstFactOverlap)) : 0;
   run.nodes.gate = {
     state: "blocked",
     note:
@@ -212,8 +222,8 @@ ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join(
         ? `${below.map((p) => p.market).join(", ")} below the ${MIN_SCORE} minimum. `
         : `All markets clear the ${MIN_SCORE} minimum. `) +
       (flaggedOriginality.length
-        ? `${flaggedOriginality.length} flagged for overlap or unedited phrasing, worst overlap ${Math.round(worst * 100)}%. `
-        : `Highest overlap between markets ${Math.round(worst * 100)}%, under the ${Math.round(OVERLAP_REVIEW * 100)}% review line. `) +
+        ? `${flaggedOriginality.length} flagged: worst shared wording ${Math.round(worst * 100)}%, worst shared figure sequence ${Math.round(worstFacts * 100)}%. `
+        : `Shared wording between markets ${Math.round(worst * 100)}%, shared figure sequence ${Math.round(worstFacts * 100)}%, both under their review lines. `) +
       "Approval still required per market.",
   };
   run.nodes.publish = { state: "queued", note: "unreachable until every market is approved" };

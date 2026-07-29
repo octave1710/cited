@@ -602,7 +602,13 @@ function Rich({ text, size = 16.5, weight = 400 }: { text: string; size?: number
  */
 interface DeviceSpec {
   accent: string;
-  scale: string;
+  /**
+   * What the 0-100 is measured against. A function of the score, because a full bar means
+   * something different from a partial one: a domain holding 4 of the 40 lead slots on a
+   * panel scored 100, since 4 is the most anyone holds, and "4 times out of 40" sitting
+   * next to "100/100" reads as a bug unless the scale says which of the two it is.
+   */
+  scale: (v: number) => string;
   zero: string;
   mark: (v: number) => React.ReactNode;
 }
@@ -661,25 +667,25 @@ const COMB = (v: number) => {
 const DEVICES: Record<string, DeviceSpec> = {
   engineReach: {
     accent: "var(--d2)",
-    scale: "OF THE ENGINES THAT ANSWERED THIS PANEL",
+    scale: (v) => (v === 100 ? "EVERY ENGINE THAT ANSWERED REACHES IT" : "OF THE ENGINES THAT ANSWERED THIS PANEL"),
     zero: "NO ENGINE REACHES IT",
     mark: WEDGE,
   },
   leadSlotByIntent: {
     accent: "var(--d1)",
-    scale: "OF WHAT THE BIGGEST LEAD-SLOT HOLDER TAKES",
+    scale: (v) => (v === 100 ? "NOBODY ON THIS PANEL HOLDS MORE LEAD SLOTS" : "OF WHAT THE BIGGEST LEAD-SLOT HOLDER TAKES"),
     zero: "NEVER THE FIRST SOURCE",
     mark: STAIRS,
   },
   proseNamingGap: {
     accent: "var(--d3)",
-    scale: "OF THE ANSWERS THAT CARRY TEXT",
+    scale: (v) => (v === 100 ? "NAMED IN EVERY ANSWER THAT CARRIES TEXT" : "OF THE ANSWERS THAT CARRY TEXT"),
     zero: "NAMED IN NO ANSWER HERE",
     mark: COMB,
   },
 };
 
-const FALLBACK: DeviceSpec = { accent: "var(--d3)", scale: "OF THIS PANEL", zero: "NOTHING MEASURED HERE", mark: COMB };
+const FALLBACK: DeviceSpec = { accent: "var(--d3)", scale: () => "OF THIS PANEL", zero: "NOTHING MEASURED HERE", mark: COMB };
 
 const deviceFor = (key: string) => DEVICES[key] ?? FALLBACK;
 
@@ -781,7 +787,7 @@ function FindingCard({ f, i, open, onToggle }: { f: FactorFinding; i: number; op
 
       <span style={{ display: "flex", gap: 10, alignItems: "baseline", marginTop: 9, flexWrap: "wrap" }}>
         <Num size={15} tone={zero ? "var(--d1)" : "ink"}>{`${f.strength}/100`}</Num>
-        <Label tone={zero ? "d1" : "meta"} style={{ flex: "1 1 150px" }}>{zero ? d.zero : d.scale}</Label>
+        <Label tone={zero ? "d1" : "meta"} style={{ flex: "1 1 150px" }}>{zero ? d.zero : d.scale(f.strength)}</Label>
       </span>
 
       <span style={{ display: "block", marginTop: 14, paddingTop: 11, borderTop: "1px solid var(--line)" }}>

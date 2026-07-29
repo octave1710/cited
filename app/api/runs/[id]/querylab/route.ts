@@ -8,7 +8,7 @@ import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib
 import { getLLM } from "../../../../../adapters/llm";
 import { fanout, userQueries } from "../../../../../querylab/fanout";
 import { toLabDoc } from "../../../../../querylab/detect";
-import { runLab } from "../../../../../querylab/run";
+import { runLab, provenance } from "../../../../../querylab/run";
 import type { Run } from "../../../../../lib/types";
 
 export const runtime = "nodejs";
@@ -48,7 +48,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const llm = getLLM();
     const lab = await runLab(target, competitors, queries, llm);
     run.lab = lab;
-    markDone(run, "querylab", `${lab.citedCount}/${lab.total} queries cite this page · ${llm.label}`);
+    markDone(run, "querylab", `${lab.citedCount}/${lab.total} queries cite this page · ${provenance(lab)}`);
     saveRun(run);
     return NextResponse.json({ run: stripHtml(run) });
   } catch (e) {

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildGeoBundle } from "./assets";
-import { buildBoard } from "./board";
+import { buildBoard, primaryTarget } from "./board";
 import { extractAll } from "./extract";
 import { ENGINES, type PanelRun, type QuestionResult } from "./types";
 import { crc32 } from "../lib/zip";
@@ -197,8 +197,13 @@ describe("buildGeoBundle, on the recorded vitamin C panel", () => {
     // the client will sum this column in a spreadsheet, so it has to say 100
     expect(Math.abs(share - 100)).toBeLessThan(0.1);
 
-    // the fixture's own answer, so a change in extraction breaks this test
-    expect(body[0][0]).toBe("reddit.com");
+    /**
+     * The export's first row is the board's first row, whatever the ordering happens to
+     * be. Asserting a hardcoded domain froze an ordering that later turned out to be the
+     * wrong one, and the test passed while the screen contradicted its own headline.
+     */
+    expect(body[0][0]).toBe(board.rows[0].domain);
+    expect(body.map((r) => r[0])).toEqual(board.rows.map((r) => r.domain));
   });
 
   it("lists in gaps.csv exactly the questions the brand is absent from, and who took them", () => {
@@ -270,13 +275,20 @@ describe("buildGeoBundle, on the recorded vitamin C panel", () => {
     // the classes are named with their members, not asserted in the abstract
     expect(md).toContain("reddit.com");
     expect(md).toContain("user-post platforms");
+    expect(md).not.toContain("undefined");
     expect(md).toContain("health.harvard.edu");
     expect(md).toContain("institutional hostname");
 
     // the brand's real standing on this fixture: absent everywhere
     expect(md).toContain(`${BRAND} is cited by no engine`);
-    // the teardown target comes from the board's own ordering
-    expect(md).toContain("Take apart reddit.com first");
+    /**
+     * The brief, the headline and the table must name the same domain. That is the
+     * invariant, not the name: they used to disagree, and the brief pointed at a domain
+     * the board did not rank first.
+     */
+    const target = primaryTarget(board)!;
+    expect(md).toContain(`Take apart ${target.domain} first`);
+    expect(target.domain).toBe(board.rows.find((r) => !r.isBrand)!.domain);
     expect(md).toContain(`${board.totalCitations} citations`);
   });
 

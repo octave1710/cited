@@ -41,6 +41,11 @@ export interface FactorResult {
   reasoning: string;
   /** True when the full signal needs data this tool does not have, so it is scored on on-page proxies only and says so. */
   partial?: boolean;
+  /**
+   * Gate rows only. A binary pass/fail printed OPEN on a page whose robots.txt refuses
+   * half the crawlers, while the same screen said four of eight engines cannot read it.
+   */
+  state?: "open" | "partial" | "shut";
 }
 
 export interface AuditOptions {

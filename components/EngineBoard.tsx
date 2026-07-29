@@ -145,7 +145,7 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
 
   // the domain column is capped: at 1.5fr it swallowed the slack and shoved the engine
   // headers into each other, so PERPLEXITY and CHATGPT overlapped on a 1280 viewport
-  const cols = `minmax(180px, 300px) ${SPINE * ENGINES.length + 8}px repeat(${ENGINES.length}, ${CELL}px) 100px`;
+  const cols = `minmax(170px, 280px) 62px ${SPINE * ENGINES.length + 8}px repeat(${ENGINES.length}, ${CELL}px) 116px`;
 
   return (
     <div ref={ref}>
@@ -167,6 +167,12 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
         style={{ display: "grid", gridTemplateColumns: cols, gap: 10, alignItems: "end", paddingBottom: 12, justifyContent: "start" }}
       >
         <Label>DOMAIN</Label>
+        {/* the sort key, made visible: the order was unreadable while the column that
+            governs it was the one column not on screen */}
+        <span style={{ textAlign: "center" }} title="Distinct questions where this domain appears in at least one engine's answer">
+          <Label style={{ display: "block" }}>QUESTIONS</Label>
+          <Label style={{ display: "block" }}>ANSWERED IN</Label>
+        </span>
         <span>
           <Label style={{ display: "block" }}>ENGINES</Label>
           <Label style={{ display: "block" }}>THAT CITE</Label>
@@ -201,17 +207,23 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
             </span>
           );
         })}
+        {/* two different measures live in this column, and the header used to name only
+            the second: healthline read "1.8%" under "SHARE OF ALL NAMED 1ST" with
+            "NEVER 1ST" directly beneath it, which is a straight contradiction */}
         <span style={{ textAlign: "right" }}>
-          <Label style={{ display: "block" }}>SHARE OF ALL</Label>
-          <Label style={{ display: "block" }}>NAMED 1ST</Label>
+          <Label style={{ display: "block" }}>SHARE OF CITATIONS</Label>
+          <Label style={{ display: "block" }}>· TIMES NAMED 1ST</Label>
         </span>
       </div>
 
       {/* a full-width sentence ran across the matrix and broke the column rhythm; it sits
           under the domain column now, where there is no data to collide with */}
       <div style={{ display: "grid", gridTemplateColumns: cols, gap: 10, paddingBottom: 14 }}>
-        <p style={{ fontSize: 16, lineHeight: 1.45, gridColumn: "1 / 3", margin: 0 }}>
-          Read each engine as <strong>shown / total</strong>. Add its column and you get the first number.
+        {/* spans the domain and questions columns: a column was inserted and this used to
+            stop at 1/3, which now ends mid-number */}
+        <p style={{ fontSize: 16, lineHeight: 1.45, gridColumn: "1 / 4", margin: 0 }}>
+          Rows are ordered by <strong>questions answered in</strong>, so the top row is the domain in the headline. Read
+          each engine as <strong>shown / total</strong>.
         </p>
       </div>
 
@@ -270,6 +282,10 @@ function Row({
           >
             {row.domain}
           </Entity>
+        </span>
+
+        <span style={{ textAlign: "center" }} title={`${row.domain} appears in the answer to ${row.questions} of the questions asked`}>
+          <Num size={17} weight={500}>{row.questions}</Num>
         </span>
 
         {/* the spine: one segment per engine that cites this domain at all */}

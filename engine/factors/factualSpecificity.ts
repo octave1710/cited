@@ -22,7 +22,47 @@ export function isProse(p: string): boolean {
   if (!/[.!?]/.test(p)) return false;
   const jammed = (p.match(/[a-z][A-Z]/g) ?? []).length;
   // one or two are normal (iPhone, McDonald's); a run of them is a collapsed menu
-  return jammed <= 2;
+  if (jammed > 2) return false;
+  return !isBoilerplate(p);
+}
+
+/**
+ * Promotional and legal small print, which the menu test cannot see.
+ *
+ * The comment above says a product page scored 100 on its sweepstake terms. Only half of
+ * that was fixed: a menu has no full stop and jams its words, so it was caught, while
+ * legal copy is well-punctuated ordinary English and sailed through. So theordinary.com
+ * took a perfect 100 on "quantified factual specificity" with these as its evidence:
+ *
+ *   "Customers who purchase one (1) unit of The Ordinary Glycolic Acid 7% (100ml)..."
+ *   "Limit of one (1) Gift per order and two (2) Gifts per customer..."
+ *
+ * while the Cleveland Clinic page scored 29 quoting "73% of participants saw an
+ * improvement" and "a 14-person study". The page the engines actually lean on lost to
+ * the page they ignore, on the strength of its own promo terms, and the composite score
+ * flipped with it. A factor that confidently rewards the wrong text is worse than one
+ * that is missing.
+ *
+ * The signals are structural rather than a vocabulary list, because a list is whack-a-mole:
+ * the first pass caught "limit of one (1) Gift per order" and the same page simply scored
+ * its next clause instead. Contract drafting has three habits article prose does not have.
+ */
+
+/** "one (1) unit": a number written out and then repeated in brackets. */
+const LEGAL_NUMERAL = /\b(one|two|three|four|five|six|seven|eight|nine|ten)\s*\(\s*\d+\s*\)/i;
+
+/** '(the "Consultation Promotion")': a term defined mid-sentence so it can be referenced. */
+const DEFINED_TERM = /\((?:the\s+)?["“”][^"“”]{3,60}["“”]\)/;
+
+/** "(i) book a Consultation; (ii) attend": inline roman enumeration of conditions. */
+const ROMAN_CLAUSES = /\(\s*i+v?\s*\)[\s\S]{0,300}?\(\s*i{1,3}v?i*\s*\)/i;
+
+/** What is left after the structural tests: the stable words of offer and policy copy. */
+const OFFER_TERMS =
+  /\b(no purchase necessary|void where prohibited|terms (and|&) conditions|subject to (stock|availability|change|the terms)|while supplies last|limit(ed)? (of|to) one|per customer|per order|per household|sweepstakes?|giveaway|eligible (entrants|customers|participants)|offer (is )?valid|cannot be combined|promo(tional)? code|free shipping on|all rights reserved|privacy policy|cookie (policy|preferences)|returns? policy|excludes? taxes|at participating)\b/i;
+
+export function isBoilerplate(p: string): boolean {
+  return LEGAL_NUMERAL.test(p) || DEFINED_TERM.test(p) || ROMAN_CLAUSES.test(p) || OFFER_TERMS.test(p);
 }
 
 /** Density of quantified facts (numbers, units, stats) in body copy. */
@@ -51,7 +91,7 @@ export function factualSpecificity(page: ParsedPage): FactorResult {
     score,
     evidence: [
       `${matches.length} quantified facts in ${words} words of prose (${per100.toFixed(1)} per 100 words)`,
-      ...(dropped > 0 ? [`${dropped} block(s) skipped as navigation or boilerplate rather than article text`] : []),
+      ...(dropped > 0 ? [`${dropped} block(s) skipped as navigation, offer terms or boilerplate rather than article text`] : []),
       ...samples,
     ],
     reasoning: "The GEO paper measured a causal +31% citation share from adding statistics. Vague claims get paraphrased; numbers get cited.",

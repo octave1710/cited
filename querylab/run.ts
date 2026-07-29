@@ -24,20 +24,35 @@ function userPrompt(docs: LabDoc[], query: string): string {
 export async function runLab(target: LabDoc, competitors: LabDoc[], queries: LabQuery[], llm: LLMClient): Promise<LabRun> {
   const all = [target, ...competitors];
   const verdicts: QueryVerdict[] = [];
+  let live = 0;
+  let replayed = 0;
 
   for (const [i, query] of queries.entries()) {
     const rotated = all.map((_, j) => all[(j + i) % all.length]);
-    const answer = await llm.answer(SYSTEM, userPrompt(rotated, query.text));
-    const d = detect(answer, rotated, target.id);
-    verdicts.push({ query, status: d.status, citedDocs: d.citedDocs, matchedMarkers: d.matchedMarkers, answer });
+    // .call rather than .answer: the verdict has to record whether the network was used
+    const res = await llm.call(SYSTEM, userPrompt(rotated, query.text));
+    if (res.replayed) replayed++;
+    else live++;
+    const d = detect(res.text, rotated, target.id);
+    verdicts.push({ query, status: d.status, citedDocs: d.citedDocs, matchedMarkers: d.matchedMarkers, answer: res.text });
   }
 
   return {
     targetId: target.id,
     competitors: competitors.map((c) => c.id),
     llm: llm.label,
+    live,
+    replayed,
     verdicts,
     citedCount: verdicts.filter((v) => v.status === "cited").length,
     total: verdicts.length,
   };
+}
+
+/** "5 answers off the network" or "5 replayed from the recording", never a bare label. */
+export function provenance(run: { live: number; replayed: number; llm: string }): string {
+  const model = run.llm.replace(/\s*\(recording\)\s*/i, "");
+  if (run.live && run.replayed) return `${run.live} answered live, ${run.replayed} replayed from the recording · ${model}`;
+  if (run.live) return `${run.live} answers off the network · ${model}`;
+  return `${run.replayed} replayed from the recording, nothing billed · ${model}`;
 }

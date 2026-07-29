@@ -11,7 +11,7 @@ import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib
 import { getLLM } from "../../../../../adapters/llm";
 import { fanout } from "../../../../../querylab/fanout";
 import { toLabDoc } from "../../../../../querylab/detect";
-import { runLab } from "../../../../../querylab/run";
+import { runLab, provenance } from "../../../../../querylab/run";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -79,7 +79,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     markDone(
       run,
       "retest",
-      `${run.lab.citedCount}/${run.lab.total} → ${lab.citedCount}/${lab.total} cited · score ${before.overall} → ${after.overall}`,
+      `${run.lab.citedCount}/${run.lab.total} → ${lab.citedCount}/${lab.total} cited · score ${before.overall} → ${after.overall} · ${provenance(lab)}`,
     );
     saveRun(run);
     return NextResponse.json({ run: stripHtml(run) });

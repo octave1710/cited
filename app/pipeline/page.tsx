@@ -348,31 +348,44 @@ function MarketGate({
       {/* the plagiarism and AI-detection half of the gate: measured, quoted, never a verdict */}
       {plan.originality && (
         <div style={{ marginTop: 18, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
-          <div style={{ display: "flex", gap: 14, alignItems: "baseline", justifyContent: "space-between" }}>
-            <Label tone={plan.originality.needsReview ? "d1" : "d2"}>
-              OVERLAP WITH THE OTHER MARKETS
-            </Label>
-            <Num size={15} tone={plan.originality.needsReview ? "var(--d1)" : "var(--d2)"}>
-              {Math.round(plan.originality.worstOverlap * 100)}%
-            </Num>
-          </div>
-          <div style={{ marginTop: 8, height: 8, background: "var(--s2)", position: "relative" }}>
-            <span
-              data-meter
-              style={{
-                display: "block",
-                height: 8,
-                width: `${Math.min(100, Math.round(plan.originality.worstOverlap * 100))}%`,
-                background: plan.originality.needsReview ? "var(--d1)" : "var(--d2)",
-                transformOrigin: "left center",
-              }}
-            />
-            {/* the review line, drawn, so the number has something to be measured against */}
-            <span style={{ position: "absolute", left: "25%", top: -3, width: 2, height: 14, background: "var(--ink)" }} />
-          </div>
-          <div style={{ marginTop: 6 }}>
-            <Label>25% IS THE REVIEW LINE · 8-WORD SEQUENCES SHARED</Label>
-          </div>
+          {/*
+            Two meters, because one of them cannot fail across languages.
+            The word meter read 0% on a Swedish and a Danish draft that carry the same
+            figures in the same order, and the card then certified them as written
+            independently. Word overlap is the right measure inside one language; the
+            figure sequence is the one that survives a translation.
+          */}
+          {([
+            ["SAME WORDS AS ANOTHER MARKET", plan.originality.worstOverlap, 25, "8-WORD SEQUENCES SHARED · ONLY WORKS INSIDE ONE LANGUAGE"],
+            ["SAME FIGURES, SAME ORDER", plan.originality.worstFactOverlap, 34, "NUMBERS DO NOT TRANSLATE, SO THIS ONE CROSSES LANGUAGES"],
+          ] as const).map(([label, value, line, note]) => {
+            const over = value * 100 >= line;
+            return (
+              <div key={label} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", gap: 14, alignItems: "baseline", justifyContent: "space-between" }}>
+                  <Label tone={over ? "d1" : "d2"}>{label}</Label>
+                  <Num size={15} tone={over ? "var(--d1)" : "var(--d2)"}>{Math.round(value * 100)}%</Num>
+                </div>
+                <div style={{ marginTop: 8, height: 8, background: "var(--s2)", position: "relative" }}>
+                  <span
+                    data-meter
+                    style={{
+                      display: "block",
+                      height: 8,
+                      width: `${Math.min(100, Math.round(value * 100))}%`,
+                      background: over ? "var(--d1)" : "var(--d2)",
+                      transformOrigin: "left center",
+                    }}
+                  />
+                  {/* the review line, drawn, so the number has something to be measured against */}
+                  <span style={{ position: "absolute", left: `${line}%`, top: -3, width: 2, height: 14, background: "var(--ink)" }} />
+                </div>
+                <div style={{ marginTop: 6 }}>
+                  <Label>{`${line}% IS THE REVIEW LINE · ${note}`}</Label>
+                </div>
+              </div>
+            );
+          })}
           {plan.originality.needsReview ? (
             plan.originality.reasons.map((r, j) => (
               <p key={j} style={{ fontSize: 16, lineHeight: 1.45, marginTop: 10, color: "var(--ink)" }}>{r}</p>
@@ -380,7 +393,7 @@ function MarketGate({
           ) : (
             <p style={{ marginTop: 10 }}>
               <Label tone="d2">
-                WRITTEN INDEPENDENTLY OF THE OTHER MARKETS · {plan.originality.tells.length} UNEDITED PHRASES
+                UNDER BOTH REVIEW LINES · {plan.originality.tells.length} UNEDITED PHRASES
               </Label>
             </p>
           )}
@@ -392,7 +405,9 @@ function MarketGate({
           {plan.flags.slice(0, 3).map((f, j) => (
             <div key={j} style={{ borderLeft: "2px solid var(--d1)", paddingLeft: 13, marginTop: 10 }}>
               <span style={{ display: "block" }}>
-                <Label tone="d1">NEEDS HUMAN EYES</Label>
+                {/* a standing rule and a measured hit are not the same finding and were
+                    wearing the same red label */}
+                <Label tone="d1">{f.why.includes("has read it yet") ? "AWAITING A NATIVE READER" : "NEEDS HUMAN EYES"}</Label>
               </span>
               <span style={{ display: "block", fontSize: 16, lineHeight: 1.45, marginTop: 4 }}>{f.why}</span>
             </div>

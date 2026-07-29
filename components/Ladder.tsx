@@ -28,6 +28,8 @@ export interface LadderRow {
   evidence: string[];
   reasoning: string;
   partial?: boolean;
+  /** Gate rows only: OPEN was printed on pages half the crawlers are refused on. */
+  state?: "open" | "partial" | "shut";
 }
 
 export function rowsFromAudit(audit: AuditResult): LadderRow[] {
@@ -44,6 +46,7 @@ export function rowsFromAudit(audit: AuditResult): LadderRow[] {
         evidence: f.evidence,
         reasoning: f.reasoning,
         partial: f.partial,
+        state: f.state,
       };
     })
     // biggest weighted loss first: the order the work should actually be done in
@@ -188,9 +191,14 @@ function Row({ row, open, onToggle }: { row: LadderRow; open: boolean; onToggle:
 
 /** The gate is not a percentage of anything. It is a door, so it is drawn as one. */
 function GateRow({ row, open, onToggle }: { row: LadderRow; open: boolean; onToggle: () => void }) {
-  const shut = row.score < 100;
+  const state = row.state ?? (row.score < 100 ? "shut" : "open");
+  const shut = state === "shut";
+  const partial = state === "partial";
+  /* three states, because a page whose robots.txt refuses four of eight crawlers is not
+     shut and is certainly not open, and the access section below says so out loud */
+  const tone = shut ? "var(--brand)" : partial ? "var(--amber)" : "var(--d2)";
   return (
-    <div style={{ borderTop: `2px solid ${shut ? "var(--brand)" : "var(--d2)"}` }}>
+    <div style={{ borderTop: `2px solid ${tone}` }}>
       <button
         type="button"
         onClick={onToggle}
@@ -202,7 +210,7 @@ function GateRow({ row, open, onToggle }: { row: LadderRow; open: boolean; onTog
           style={{
             width: 54,
             height: 26,
-            background: shut ? "repeating-linear-gradient(135deg, var(--brand) 0 7px, var(--void) 7px 14px)" : "var(--d2)",
+            background: shut || partial ? `repeating-linear-gradient(135deg, ${tone} 0 7px, var(--void) 7px 14px)` : "var(--d2)",
             transformOrigin: "left center",
             flex: "0 0 auto",
           }}
@@ -210,7 +218,7 @@ function GateRow({ row, open, onToggle }: { row: LadderRow; open: boolean; onTog
         <span style={{ flex: 1, minWidth: 0 }}>
           <Entity size={19} style={{ display: "block" }}>{row.name}</Entity>
         </span>
-        <Label tone={shut ? "brand" : "d2"}>{shut ? "SHUT: NOTHING BELOW COUNTS" : "OPEN"}</Label>
+        <Label style={{ color: tone }}>{shut ? "SHUT: NOTHING BELOW COUNTS" : partial ? "PARTLY BLOCKED: SEE THE CRAWLERS BELOW" : "OPEN"}</Label>
       </button>
       {open && <Evidence row={row} />}
     </div>

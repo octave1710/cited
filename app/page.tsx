@@ -192,8 +192,12 @@ function Empty() {
       </p>
       <div style={{ display: "flex", gap: 40, marginTop: 46, flexWrap: "wrap" }}>
         {[
-          ["9", "weighted factors, sourced"],
-          ["12", "checks per run"],
+          /* 8 factors carry a percentage and crawlability is an unweighted gate, so
+             "9 weighted" contradicted the ladder a viewer can count. The check count was
+             checks.length + 3, a number no route ever produces: it is 11 on a bundled
+             page and 13 on a live URL, and the stream now reports what it emitted. */
+          ["9", "scored factors, sourced"],
+          ["13", "checks on a live URL"],
           ["0", "invented facts"],
         ].map(([n, l]) => (
           <div key={l}>

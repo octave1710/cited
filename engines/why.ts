@@ -175,6 +175,8 @@ export interface BrandEntry {
   name: string;
   /** Strings to look for in the prose. Matched on word boundaries. */
   aliases: string[];
+  /** Compare on letters alone. Set when the alias is derived from a hostname. */
+  letterMatch?: boolean;
   /** The brand's own sites, so naming and citing can be counted separately. */
   ownDomains: string[];
   /**
@@ -223,8 +225,46 @@ const PRODUCT_CONTEXT = /(serum|booster|skincare|skin care|brand|®|£|\d\s?ml)/
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** True when the prose names this brand, as opposed to using the same word for something else. */
+/** Letters only, so "Cleveland Clinic" and "clevelandclinic" are one token. */
+const letters = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+
+/**
+ * How the engines actually write this domain's name, taken from their own prose.
+ *
+ * Falls back to the domain label when nothing in the answers matches, and says so by
+ * returning the label unchanged rather than inventing a capitalisation.
+ */
+export function surfaceNameFor(domain: string, questions: QuestionResult[]): string {
+  const token = letters(nameTokenFor(domain));
+  if (token.length < 4) return nameTokenFor(domain);
+
+  /**
+   * The token's letters in order, with spaces, hyphens and apostrophes allowed between
+   * them, so "clevelandclinic" finds "Cleveland Clinic" and nothing looser. Scanning for
+   * capitalised runs instead matched "The Cleveland Clinic" and failed the comparison.
+   */
+  const re = new RegExp(token.split("").map((c) => c + "[\\s'-]*").join(""), "gi");
+  const counts = new Map<string, number>();
+  for (const q of questions) {
+    for (const a of q.answers) {
+      for (const m of (a.text ?? "").match(re) ?? []) {
+        const clean = m.trim().replace(/[\s'-]+$/, "");
+        if (letters(clean) === token) counts.set(clean, (counts.get(clean) ?? 0) + 1);
+      }
+    }
+  }
+  // the most common surface form wins; ties go to the one the engines wrote first
+  const best = [...counts.entries()].sort((x, y) => y[1] - x[1])[0];
+  return best ? best[0] : nameTokenFor(domain);
+}
+
 export function namesBrand(text: string, brand: BrandEntry): boolean {
   if (!text) return false;
+  if (brand.letterMatch) {
+    // the alias came from a hostname, so spacing and punctuation are not the engines' to match
+    const token = letters(brand.aliases[0] ?? brand.name);
+    return token.length >= 4 && letters(text).includes(token);
+  }
   for (const alias of brand.aliases) {
     const re = new RegExp(`\\b${escape(alias)}\\b`, brand.ambiguous ? "g" : "gi");
     let m: RegExpExecArray | null;
@@ -490,7 +530,22 @@ function leadSlotFinding(target: string, row: DomainRow | undefined, p: SlotPane
     .map(([c, n]) => `${CLASS_LABEL[c as SourceClass]} ${n}`)
     .join(", ")}.`;
 
-  const splitLine = `Split by intent, the class that leads flips: on the ${p.commercialQuestions} commercial questions ${p.commercialLeader ? `${CLASS_LABEL[p.commercialLeader.cls]} takes ${p.commercialLeader.n} of ${p.commercialSlots.length} lead slots` : "no engine named a first source"}; on the ${p.questionCount - p.commercialQuestions} informational ones ${p.informationalLeader ? `${CLASS_LABEL[p.informationalLeader.cls]} takes ${p.informationalLeader.n} of ${p.informationalSlots.length}` : "no engine named a first source"}.`;
+  /**
+   * The sentence used to open "the class that leads flips" whatever the panel said, and
+   * on a panel whose eight questions are all informational it then announced the flip and
+   * reported "0 commercial questions" in the same breath. A split needs both sides to
+   * exist; when one is empty the honest line says the panel has nothing to split.
+   */
+  const bothSides = p.commercialQuestions > 0 && p.questionCount - p.commercialQuestions > 0;
+  const flips =
+    bothSides && p.commercialLeader && p.informationalLeader && p.commercialLeader.cls !== p.informationalLeader.cls;
+  const splitLine = !bothSides
+    ? `All ${p.questionCount} questions on this panel read as ${p.commercialQuestions ? "commercial" : "informational"}, so there is no intent split to compare and ${
+        p.informationalLeader ?? p.commercialLeader
+          ? `${CLASS_LABEL[(p.informationalLeader ?? p.commercialLeader)!.cls]} leads all ${p.slots.length} lead slots with ${(p.informationalLeader ?? p.commercialLeader)!.n}`
+          : "no engine named a first source"
+      }.`
+    : `Split by intent, the class that leads ${flips ? "flips" : "holds"}: on the ${p.commercialQuestions} commercial questions ${p.commercialLeader ? `${CLASS_LABEL[p.commercialLeader.cls]} takes ${p.commercialLeader.n} of ${p.commercialSlots.length} lead slots` : "no engine named a first source"}; on the ${p.questionCount - p.commercialQuestions} informational ones ${p.informationalLeader ? `${CLASS_LABEL[p.informationalLeader.cls]} takes ${p.informationalLeader.n} of ${p.informationalSlots.length}` : "no engine named a first source"}.`;
 
   const shapeLine = `${p.slotsOnTopic} of the ${p.slots.length} lead-slot URLs carry at least half of the question's content words in their path, and ${p.homepages} of the ${p.totalCitations} citations on the panel point at a homepage.`;
 
@@ -539,10 +594,24 @@ function proseNamingFinding(
   brands: BrandEntry[],
   p: { naming: NamingRow[]; namedWithoutOwnCitation: number; answersWithText: number; answersTotal: number; answersWithoutCitations: number },
 ): FactorFinding {
-  // The target's own name in the prose, counted the same way as any brand's.
+  /**
+   * The target's own name in the prose, counted the same way as any brand's.
+   *
+   * For a domain outside the brand list the fallback used to be the domain label with the
+   * dots removed, so the card announced that "clevelandclinic" is named in 2 answers. No
+   * engine has ever written that string. They write "Cleveland Clinic", the count of 2
+   * came from URLs rather than prose, and the card's own question is whether the name
+   * appears in "the prose the reader actually reads".
+   *
+   * So the alias is matched on letters alone, which makes "clevelandclinic" and
+   * "Cleveland Clinic" the same token, and the card then quotes the surface form the
+   * engines actually used rather than the one this file made up.
+   */
+  const known = brands.find((b) => b.ownDomains.includes(target));
+  const surface = known?.name ?? surfaceNameFor(target, questions);
   const own =
-    brands.find((b) => b.ownDomains.includes(target)) ??
-    ({ name: nameTokenFor(target), aliases: [nameTokenFor(target)], ownDomains: [target] } as BrandEntry);
+    known ??
+    ({ name: surface, aliases: [surface], ownDomains: [target], letterMatch: true } as BrandEntry);
   const mine = brandNamingTable(questions, [own])[0] ?? {
     name: own.name,
     answers: 0,
@@ -551,12 +620,16 @@ function proseNamingFinding(
     answersWithNoCitations: 0,
   };
 
-  const table = p.naming
-    .slice(0, 7)
-    .map(
-      (n) =>
-        `${n.name}: named in ${plural(n.answers, "answer")} across ${plural(n.engines, "engine")}, own domain cited in ${n.answersCitingOwnDomain} of them.`,
-    );
+  /**
+   * Every named brand, not the first seven. The list was cut at 7 while the sentence
+   * beneath it counted all 9, so a viewer counting the rows in front of them got 3 of 7
+   * and read a claim of 5 of 9, and the two rows that carried the claim were the two the
+   * cut had removed.
+   */
+  const table = p.naming.map(
+    (n) =>
+      `${n.name}: named in ${plural(n.answers, "answer")} across ${plural(n.engines, "engine")}, own domain cited in ${n.answersCitingOwnDomain} of them.`,
+  );
 
   const uncitedNaming = p.naming.filter((n) => n.answersWithNoCitations > 0);
   const uncitedLine = uncitedNaming.length

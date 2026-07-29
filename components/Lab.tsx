@@ -1,5 +1,6 @@
 "use client";
 
+import { provenance } from "../querylab/run";
 import type { Run } from "../lib/types";
 import { BundleBox } from "./Fixes";
 
@@ -98,7 +99,7 @@ export function LabPanel({
           </div>
 
           <p className="lede" style={{ marginTop: 22, maxWidth: "70ch" }}>
-            Engine: {lab.llm}. Competing sources: {lab.competitors.join(", ")}.
+            Engine: {provenance(lab)}. Competing sources: {lab.competitors.join(", ")}.
           </p>
         </div>
       )}

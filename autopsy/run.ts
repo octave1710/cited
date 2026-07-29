@@ -120,18 +120,28 @@ export async function resolveCompetitorPage(
    * pages on GLP-1 it produced three /content/377/bmj.n246x paths, none of which exists.
    */
   let candidates: string[] = [];
+  let matched = 0;
   try {
     const access = await checkCrawlerAccess(`https://${domain}/`);
     let best: ReturnType<typeof rankSitemapCandidates> = [];
+    /**
+     * Keep a wider shortlist than the three that get fetched, so the line below can say
+     * how many pages actually matched. It used to print `candidates.length`, and
+     * rankSitemapCandidates defaults to a limit of 3, so "3 match the question" was the
+     * app's own cap wearing the costume of a measurement: the same scan with the cap
+     * lifted returns sixteen.
+     */
+    const SHORTLIST = 50;
     const scan = await scanSitemap(`https://${domain}/`, access.raw, (entries) => {
-      best = rankSitemapCandidates([...best.map((b) => ({ loc: b.loc })), ...entries], question);
+      best = rankSitemapCandidates([...best.map((b) => ({ loc: b.loc })), ...entries], question, SHORTLIST);
     });
-    candidates = best.map((b) => b.loc);
+    matched = best.length;
+    candidates = best.slice(0, 3).map((b) => b.loc);
     attempts.push(...scan.attempts.slice(0, 3));
     attempts.push({
       url: scan.source || `https://${domain}/sitemap.xml`,
       outcome: scan.urlsScanned
-        ? `${scan.urlsScanned.toLocaleString("en-US")} sitemap URLs scanned, ${candidates.length} match the question`
+        ? `${scan.urlsScanned.toLocaleString("en-US")} sitemap URLs scanned, ${matched} match the question${matched > candidates.length ? `, the top ${candidates.length} were fetched and scored` : ""}`
         : "no sitemap could be read on this domain",
     });
   } catch (e) {

@@ -110,12 +110,7 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
         .map(([url, p]) => ({ url, title: p.title, count: p.count }))
         .sort((a, b) => b.count - a.count),
     }))
-    /**
-     * Reach before volume. A domain cited once by every engine is a harder opponent
-     * than one cited nine times by a single engine, and sorting on the raw total hides
-     * exactly that.
-     */
-    .sort((a, b) => b.engineReach - a.engineReach || b.totalCitations - a.totalCitations || b.firstMentions - a.firstMentions);
+    .sort(byStanding);
 
   const brandAbsentFrom = brand
     ? questions.filter((q) => !q.answers.some((a) => a.citations.some((c) => c.domain === brand))).map((q) => q.question)
@@ -139,25 +134,32 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
 }
 
 /**
- * The one domain worth taking apart first.
+ * One order, used by the table, the headline and the deep dive.
  *
- * Not the biggest. The one with the widest engine reach, because a page that satisfies
- * five different retrieval systems is the one carrying transferable properties. Ties go
- * to whoever is named first most often.
+ * They used to disagree, and on screen that was indefensible. The table sorted on engine
+ * reach, the headline counted questions, and the deep dive picked on lead slots, so the
+ * sentence at the top named a domain sitting in row four while row one showed a lower
+ * number in every visible column. Three metrics, three orders, one screen.
+ *
+ * Question coverage leads because it is the sentence the product exists to say: a buyer
+ * asks eight questions and this domain is in the answer to six of them. Reach breaks ties,
+ * because a domain five engines reach independently is a harder opponent than one a single
+ * engine repeats; then volume, then lead slots.
+ */
+function byStanding(a: DomainRow, b: DomainRow): number {
+  return (
+    b.questions - a.questions ||
+    b.engineReach - a.engineReach ||
+    b.totalCitations - a.totalCitations ||
+    b.firstMentions - a.firstMentions
+  );
+}
+
+/**
+ * The one domain worth taking apart first: the top of the same standing, excluding the
+ * brand itself. Deriving it from the order rather than from its own comparator is the
+ * point, since the two cannot drift apart again.
  */
 export function primaryTarget(board: Board): DomainRow | undefined {
-  const rivals = board.rows.filter((r) => !r.isBrand);
-  if (!rivals.length) return undefined;
-
-  /**
-   * Lead slots first, then reach, then volume.
-   *
-   * The board is sorted for reading, so its top row is whoever has the widest reach.
-   * That is the wrong pick to take apart: it selected smytten.com on a live panel,
-   * a domain with eight citations and zero first slots. A domain the engines never
-   * lean on has nothing to teach about being leaned on.
-   */
-  return [...rivals].sort(
-    (a, b) => b.firstMentions - a.firstMentions || b.engineReach - a.engineReach || b.totalCitations - a.totalCitations,
-  )[0];
+  return board.rows.filter((r) => !r.isBrand).sort(byStanding)[0];
 }

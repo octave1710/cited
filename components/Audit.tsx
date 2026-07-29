@@ -65,7 +65,7 @@ export function AuditPanel({
       <div className="gut shell">
         <Awaiting
           title="Score one page the way an answer engine reads it."
-          what="Nine weighted factors, each carrying its published source, run against the page's real text. The score is what the page earned against what each factor is worth."
+          what="A crawlability gate plus eight weighted factors, each carrying its published source, run against the page's real text. The score is what the page earned against what each factor is worth."
           steps={busy ? [{ label: busy, state: "running" }] : undefined}
         />
       </div>

@@ -16,9 +16,13 @@ const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
  * how this screen read before; these are the proof that resolution works, and the
  * shape to copy for a domain of your own.
  */
-const OUR_PAGE = "https://theordinary.com/en-us/azelaic-acid-suspension-10-exfoliator-100407.html";
+/* the brand page the recorded panel actually cites, so the two screens describe one page */
+const OUR_PAGE = "https://theordinary.com/en-us/blog/vitamin-c-skincare.html";
 const WORKING = [
-  { domain: "healthline.com", question: "What are the benefits of vitamin C for skin?", ourUrl: OUR_PAGE },
+  /* the question is the one the resolver answers with a page the panel cites; the old
+     one resolved to an oral-supplements listicle with "skin" in neither its title nor
+     its URL, and the whole teardown below it then measured the wrong page */
+  { domain: "healthline.com", question: "What is the best vitamin C serum?", ourUrl: OUR_PAGE },
   { domain: "nhs.uk", question: "Is vitamin C good for skin?", ourUrl: OUR_PAGE },
   { domain: "medicalnewstoday.com", question: "What does vitamin C do for the skin?", ourUrl: "" },
 ] as const;
@@ -199,15 +203,18 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                     <>
                       {typeof ourScore === "number" && typeof theirScore === "number" && (
                         <>
+                          {/* the explanation used to render only when our page was ahead,
+                              so on the demo preset, where the two are one point apart the
+                              other way, the screen showed a bare score comparison and the
+                              narration pointed at a sentence that was not there */}
                           <strong>
-                            {ourScore > theirScore
-                              ? `Your page scores higher overall, ${ourScore} against ${theirScore}, and still loses this factor.`
-                              : ourScore < theirScore
-                                ? `Their page scores ${theirScore} against your ${ourScore} overall.`
-                                : `Both pages score ${ourScore} overall.`}
+                            {Math.abs(ourScore - theirScore) <= 2
+                              ? `The two pages score within ${Math.abs(ourScore - theirScore)} point${Math.abs(ourScore - theirScore) === 1 ? "" : "s"} of each other, ${ourScore} against ${theirScore}, and the engines treat them completely differently.`
+                              : ourScore > theirScore
+                                ? `Your page scores higher overall, ${ourScore} against ${theirScore}, and still loses this factor.`
+                                : `Their page scores ${theirScore} against your ${ourScore} overall.`}
                           </strong>{" "}
-                          {ourScore > theirScore &&
-                            "The engine quotes a passage, not a page, so a better page can still lose the passage. "}
+                          {"An engine quotes a passage, not a page, so the composite is the wrong number to argue with. The factor below is the one that decides this question. "}
                         </>
                       )}
                       {`They sit at ${top.theirs} out of 100 on it and you sit at ${top.ours}, on a factor carrying ${Math.round((top.weight ?? 0) * 100)}% of the score. ${top.theirReasoning}`}
@@ -290,7 +297,7 @@ function AutopsyEmpty() {
       <div>
         <h1 className="h1" style={{ maxWidth: "16ch" }}>Why does their page win?</h1>
         <p className="lede" style={{ maxWidth: "56ch", marginTop: 20 }}>
-          The same nine factors, run on the page that is actually being quoted and on yours, on one axis.
+          The same nine factors, run on the page their own sitemap puts closest to the question and on yours, on one axis.
           The advice stops being an opinion and becomes a measurement of the page that is winning.
         </p>
         <div style={{ marginTop: 26 }}>
@@ -365,7 +372,7 @@ function Sides({ data }: { data: Autopsy }) {
     /* side by side, not stacked: two tall cards in a narrow column left ~220px of dead
        space under the headline, which is the void that gets reported every time */
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, alignItems: "start" }}>
-      {side("THE PAGE BEING QUOTED", data.theirs, "var(--d3)")}
+      {side("THEIR CLOSEST PAGE TO THIS QUESTION", data.theirs, "var(--d3)")}
       {data.ours ? (
         side("YOUR PAGE", data.ours, "var(--brand)")
       ) : (
