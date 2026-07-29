@@ -60,6 +60,30 @@ export function PanelScreen() {
   const [board, setBoard] = useKept<Board | null>("cited.panel.board", null);
   const [teardown, setTeardown] = useKept<Teardown | null>("cited.panel.teardown", null);
 
+  /**
+   * The demo path. A live panel is five minutes; this is the same run in under a second.
+   * It exists because the live one failed on a call, and a five minute wait in front of
+   * three people is a failure whatever the server eventually returns.
+   */
+  const loadRecorded = useCallback(async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/panel/recorded");
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error ?? `Request failed (${res.status}).`);
+      setRun(j.run);
+      setBoard(j.board);
+      setTeardown(j.teardown ?? null);
+      setQuestions(j.allQuestions ?? []);
+      setSteps(STEPS.map((st) => ({ ...st, state: "done", note: "from the recorded run" })));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   const cancel = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = null;
@@ -154,11 +178,28 @@ export function PanelScreen() {
               Cancel
             </button>
           ) : (
-            <button className="btn btn--primary" type="submit">Run</button>
+            <>
+              <button className="btn btn--primary" type="submit" title="Queries all six engines for real. Roughly 40 seconds per question.">
+                Run live · ~{Math.max(1, Math.round((panelSize * 40) / 60))} min
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => void loadRecorded()}
+                title="The same run, recorded on 29 July 2026, loads instantly"
+              >
+                Load the recorded run
+              </button>
+            </>
           )}
         </form>
         {busy && progress && (
-          <div className="m-sm" style={{ color: "var(--d1)", marginTop: 10 }}>{progress.toUpperCase()}</div>
+          <div style={{ marginTop: 10, display: "flex", gap: 14, alignItems: "baseline", flexWrap: "wrap" }}>
+            <span className="m-sm" style={{ color: "var(--d1)" }}>{progress.toUpperCase()}</span>
+            <span className="m-sm" style={{ color: "var(--meta)" }}>
+              A LIVE PANEL IS ABOUT 40 SECONDS PER QUESTION. CANCEL AND LOAD THE RECORDED RUN IF YOU DO NOT WANT TO WAIT.
+            </span>
+          </div>
         )}
       </div>
 

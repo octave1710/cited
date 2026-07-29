@@ -110,8 +110,17 @@ export function openaiLLM(opts: OpenAIOpts = {}): LLMClient {
         // copy would drop siblings recorded while this request was in flight
         const recordings = loadRecordings(path);
         recordings[key] = { answer, model, recordedAt: new Date().toISOString() };
-        mkdirSync(dirname(path), { recursive: true });
-        writeFileSync(path, JSON.stringify(recordings, null, 2));
+        /**
+         * A hosted build has a read-only filesystem, so this threw ENOENT on mkdir and
+         * killed the whole run two seconds in. Recording is a convenience for local work,
+         * never a reason to fail a request: if the disk refuses, the answer still stands.
+         */
+        try {
+          mkdirSync(dirname(path), { recursive: true });
+          writeFileSync(path, JSON.stringify(recordings, null, 2));
+        } catch {
+          // read-only or full disk; the live answer is already in hand
+        }
       }
       return {
         text: answer,
