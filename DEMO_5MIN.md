@@ -10,15 +10,15 @@ The long version, with the AUDIT screen and the before-and-after proof, is in
 
 ## Before I hit record, 2 minutes
 
-**[TABS]** Open three, in this order, and leave them:
+**[ONE TAB, NOT THREE.]** Open `cited-precis.vercel.app/board` and move between screens by
+clicking BOARD, AUTOPSY and PIPELINE in the top navigation. One window is cleaner on video
+and there is nothing to fumble.
 
-| Tab | URL |
-|---|---|
-| 1 | `cited-precis.vercel.app/board` |
-| 2 | `cited-precis.vercel.app/autopsy` |
-| 3 | `cited-precis.vercel.app/pipeline` |
-
-**[CHECK]** On tab 1 the top bar reads **ENGINE LIVE** in green.
+**[USE THE DEPLOYED APP.]** Not localhost. If the top bar reads `ENGINE REPLAY` instead of
+`ENGINE LIVE` you are on a local build without the key loaded, and the URL bar will say
+`localhost`. Either bar is fine for these three screens, none of them bills an engine: the
+board loads a recording, the autopsy is handed the URL, and the pipeline reads the
+grounding file. It is just a tell that you are on the wrong build.
 
 **[RECORD]** Browser window only. Not the whole screen.
 
@@ -31,7 +31,7 @@ the paragraph I read over it.
 
 ## 0:00 – 0:30 · The opener
 
-**[SCREEN]** Tab 1, `/board`, empty.
+**[SCREEN]** `/board`, empty.
 
 > "Hi, quick one, five minutes. Last time this didn't run in front of you and I'm sorry
 > about that. It's fixed, so I'll just show you the thing.
@@ -81,7 +81,7 @@ the paragraph I read over it.
 
 ## 2:00 – 3:00 · AUTOPSY
 
-**[CLICK]** **AUTOPSY** in the top navigation. Tab 2.
+**[CLICK]** **AUTOPSY** in the top navigation.
 
 **[CLICK]** **healthline.com** under `CHECKED WORKING`. Takes about five seconds.
 
@@ -105,7 +105,7 @@ the paragraph I read over it.
 
 ## 3:00 – 4:25 · PIPELINE
 
-**[CLICK]** **PIPELINE** in the top navigation. Tab 3.
+**[CLICK]** **PIPELINE** in the top navigation.
 
 **[CLICK]** **Run the pipeline**. It runs for about forty seconds. Keep talking.
 
@@ -117,9 +117,11 @@ the paragraph I read over it.
 > Fourteen to one against the translation. So that's three different pages, not one page
 > translated three times."
 
-**[POINT]** at the hatched orange bar at step 06 when it appears.
+**[POINT]** at the MARKET LANE rail: three lanes, green through nodes 01 to 05, then the
+orange bars standing at 06.
 
-> "And there's the wall. Everything past it is a thin line because it's unreachable."
+> "And there's the wall. Three markets, green where the run got to, and it stops dead at
+> node six. Everything past it is a thin line because it's unreachable."
 
 **[SCROLL]** to the Swedish market card. **[POINT]** at the two meters.
 
@@ -149,26 +151,28 @@ the paragraph I read over it.
 
 ---
 
-## What I am leaving out, and why it matters
+## If I have slack left, in order of what I'd add
 
-The AUDIT screen is not in this cut. It holds the two strongest pieces of evidence:
+AUDIT is deliberately out: they have already seen it. So the spare seconds go on the two
+things inside these three screens that the cut skips over.
 
-- **The before and after.** Same page, same five buyer questions, changed and re-tested:
-  cited on 0 of 5, then 2 of 5, score 33 to 78. It is the only controlled measurement in
-  the whole tool.
-- **The robots.txt finding.** The best-scoring of the three real pages is healthline, and
-  it blocks four of the eight AI crawlers in its own robots.txt. The tool writes the exact
-  patch.
+**First choice, the teardown, about 20 seconds.** On BOARD, scroll past the table to
+`WHY THIS DOMAIN`.
 
-There are 20 seconds of slack already. To buy the other 10, drop the "never paraphrased"
-line on the autopsy and the second half of the close. Then:
+> "And it takes the top domain apart. Four of the six assistants reach it. It holds four of
+> the forty first positions, more than anyone here. And it's written out by name in three
+> of the forty-eight answers. Each one has a SHOW THE COUNTS button under it, and it lists
+> the factors it did not run rather than letting you assume it ran everything."
 
-**[CLICK]** **AUDIT**, then **best page, blocks the crawlers**.
+**Second choice, the CMS output, about 15 seconds.** On PIPELINE, after signing the three
+markets, scroll to the payloads.
 
-> "One last thing, thirty seconds. This page scores the best of the three, seventy-one. And
-> the gate at the top says partly blocked, because healthline blocks four of the eight AI
-> crawlers in their own robots.txt. Most marketing teams have no idea, because it's one line
-> in a file the dev team owns. The tool writes the exact fix."
+> "And what comes out is three files, one per market, with the hreflang tags that tell
+> Google which page is for which language. Ready for CMS, not published. It writes the file
+> and hands it over, it never pushes."
+
+To pay for either, drop the "never paraphrased" line on the autopsy and the second half of
+the close.
 
 ---
 
