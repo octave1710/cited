@@ -16,6 +16,13 @@ import type { GateDecision, MarketPlan, NodeId, NodeState, PipelineRun } from ".
 import { checkOriginality, OVERLAP_REVIEW } from "./originality";
 import { NODES } from "./nodes";
 
+/** One headline shape per market, written in that market's language, never translated. */
+const HEADLINES: Record<string, (t: string) => string> = {
+  UK: (t) => `${t}: what it does, how long it takes, and how to choose one`,
+  SE: (t) => `${t}: vad det gor, hur lang tid det tar och hur du valjer`,
+  DK: (t) => `${t}: hvad det gor, hvor lang tid det tager, og hvordan du vaelger`,
+};
+
 const MIN_SCORE = 55;
 
 function blankNodes(): PipelineRun["nodes"] {
@@ -25,7 +32,18 @@ function blankNodes(): PipelineRun["nodes"] {
   }, {} as PipelineRun["nodes"]);
 }
 
-type GroundRow = { term: string; monthlyVolume: number; note: string; runnerUp: string };
+/** One question and its answer, written for that market in that market's language. */
+type GroundSection = { q: string; a: string };
+
+type GroundRow = {
+  term: string;
+  monthlyVolume: number;
+  note: string;
+  runnerUp: string;
+  /** The market's own question set. Absent means the pipeline refuses to draft for it. */
+  sections?: GroundSection[];
+  marketNote?: string;
+};
 
 function grounding(topic: string): Record<string, GroundRow> | null {
   try {
@@ -94,29 +112,41 @@ export function runToGate(input: { id: string; topic: string; markets: string[];
   // ---- 3 to 5. draft, score, adapt
   for (const m of input.markets) {
     const g = rows[m];
-    const headline = `${g.term}: what it does, how long it takes, and how to choose one`;
-    // long enough to clear the 120-word crawlability gate: a draft that scores 0 for being
-    // short tells you nothing about the copy, which defeats the point of scoring it here
-    const body = [
-      `${g.term} reduced hyperpigmentation scores by 29% within 12 weeks across 31 published trials (2023 meta-analysis, PubMed 37298401). According to that review, the effect held at concentrations between 10% and 20%, and below 8% the measured change was not significant.`,
-      `Visible brightening appears at 8 weeks. Collagen-related change is measurable from week 12, which is why dermatologists frame it as a three-month commitment rather than a quick fix. A 2024 biopsy-confirmed trial of 84 subjects recorded a 22% rise in collagen density after 90 days of daily use.`,
-      `Three criteria predict whether a serum keeps its potency: 10-20% L-ascorbic acid, opaque airless packaging, and a pH between 3.0 and 3.5. L-ascorbic acid in a clear dropper bottle loses most of its potency within 4 weeks of opening, and tetrahexyldecyl ascorbate holds 87% potency at 6 months where pure L-ascorbic acid holds 41%.`,
-      `Apply 3 to 4 drops to clean skin each morning before moisturiser and SPF. Vitamin C neutralises roughly 45% of the UV free radicals that pass through sunscreen filters, which is why the morning slot matters more than the amount used.`,
-    ];
+    /**
+     * The draft is assembled from THAT MARKET's own question set, in that market's own
+     * language, not from one English body with the term swapped in.
+     *
+     * The version before this reused four identical English paragraphs across UK, SE and
+     * DK and changed only the search term. The originality check caught it immediately at
+     * 95% overlap, which is the right verdict: that is not localisation, it is the same
+     * page published three times, and it is exactly the failure the brief warns about
+     * when a client says "just use AI to generate it".
+     */
+    const sections: GroundSection[] = (g.sections ?? []).map((sec) => ({
+      q: sec.q.replaceAll("{term}", g.term),
+      a: sec.a.replaceAll("{term}", g.term),
+    }));
+    if (!sections.length) {
+      run.nodes.draft = {
+        state: "failed",
+        error: `No question set grounded for ${m}. A draft assembled from another market's copy is not a localisation, so the pipeline refuses to write one.`,
+      };
+      return run;
+    }
+
+    const headline = HEADLINES[m] ? HEADLINES[m](g.term) : `${g.term}: what it does, how long it takes, and how to choose one`;
+    const body = sections.map((sec: GroundSection) => sec.a);
 
     const html = `<!DOCTYPE html><html lang="${m.toLowerCase()}"><head><title>${headline}</title>
 <meta name="description" content="${body[0].slice(0, 150)}">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(headline)},"datePublished":"${new Date().toISOString().slice(0, 10)}","dateModified":"${new Date().toISOString().slice(0, 10)}","author":{"@type":"Person","name":"[SUPPLIED BY CLIENT]"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(headline)},"inLanguage":"${m.toLowerCase()}","datePublished":"${new Date().toISOString().slice(0, 10)}","dateModified":"${new Date().toISOString().slice(0, 10)}","author":{"@type":"Person","name":"[SUPPLIED BY CLIENT]"}}</script>
 </head><body><article><h1>${headline}</h1>
-<h2>What does ${g.term} actually do?</h2><p>${body[0]}</p>
-<h2>How long does it take to work?</h2><p>${body[1]}</p>
-<h2>How do you choose one?</h2><p>${body[2]}</p>
-<h2>How should you apply it?</h2><p>${body[3]}</p>
+${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join("")}
 </article></body></html>`;
 
     const scored = audit(parse(html));
     const flags = body
-      .flatMap((line) => RISKY.filter((r) => r.re.test(line)).map((r) => ({ line, why: r.why })))
+      .flatMap((line: string) => RISKY.filter((r) => r.re.test(line)).map((r) => ({ line, why: r.why })))
       .concat(
         m !== "UK"
           ? [{ line: headline, why: `adapted from the UK angle, a native ${m} speaker must read it before it ships` }]

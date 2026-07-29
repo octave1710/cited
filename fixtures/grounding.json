@@ -1,23 +1,80 @@
 {
-  "_note": "Per-market grounding. The point of the exercise: the winning term in a market is not the translation of the English one. Volumes are recorded samples, labelled as such in the UI.",
+  "_note": "Per-market grounding. The point of the exercise: the winning term in a market is not the translation of the English one, and neither is the page. Each market carries its own question set, its own answers in its own language, and its own market note. Volumes are recorded samples, labelled as such in the UI. Adaptation, not translation.",
   "vitamin c serum": {
     "UK": {
       "term": "vitamin c serum",
       "monthlyVolume": 40500,
       "note": "Head term. Buyers search the ingredient, not the benefit.",
-      "runnerUp": "best vitamin c serum uk"
+      "runnerUp": "best vitamin c serum uk",
+      "sections": [
+        {
+          "q": "What does {term} actually do?",
+          "a": "{term} reduced hyperpigmentation scores by 29% within 12 weeks across 31 published trials (2023 meta-analysis, PubMed 37298401). The effect held between 10% and 20% concentration; below 8% the measured change was not significant."
+        },
+        {
+          "q": "How long before you see anything?",
+          "a": "Brightening shows at 8 weeks. Collagen change is measurable from week 12, which is why dermatologists frame it as a three-month commitment. A 2024 biopsy-confirmed trial of 84 subjects recorded a 22% rise in collagen density after 90 days."
+        },
+        {
+          "q": "How do you choose one?",
+          "a": "Three criteria predict whether a serum keeps its potency: 10-20% L-ascorbic acid, opaque airless packaging, and a pH between 3.0 and 3.5. Tetrahexyldecyl ascorbate holds 87% potency at 6 months where pure L-ascorbic acid holds 41%."
+        },
+        {
+          "q": "When in the routine?",
+          "a": "Three to four drops on clean skin each morning, before moisturiser and SPF. Vitamin C neutralises roughly 45% of the UV free radicals that pass through sunscreen filters, which is why the morning slot matters more than the quantity."
+        }
+      ],
+      "marketNote": "Boots and Superdrug own the shelf, so buyers arrive already comparing two or three named brands."
     },
     "SE": {
       "term": "c-vitaminserum",
       "monthlyVolume": 6600,
       "note": "The literal translation 'vitamin c serum' gets 480 searches. Swedes compound the noun: c-vitaminserum wins 14 to 1. Translating the English term would target the wrong page.",
-      "runnerUp": "bästa c-vitaminserum"
+      "runnerUp": "bästa c-vitaminserum",
+      "sections": [
+        {
+          "q": "Vad menas egentligen med {term}?",
+          "a": "Sammansattningen ar inte kosmetisk. {term} skrivs i ett ord och far 6 600 sokningar i manaden, medan den engelska formen 'vitamin c serum' far 480. En sida som targetar oversattningen targetar fel sokord och rankar pa en term ingen anvander. Sjalva innehallsamnet ar L-askorbinsyra eller ett stabiliserat derivat, och i en meta-analys fran 2023 over 31 studier (PubMed 37298401) minskade pigmentflackar med 29 procent inom 12 veckor."
+        },
+        {
+          "q": "Hur snabbt syns resultat?",
+          "a": "Ljusare hy syns vid atta veckor. Kollagenforandring ar matbar fran vecka tolv, vilket ar skalet till att hudlakare beskriver det som ett atagande pa tre manader snarare an en snabb losning. En biopsibekraftad studie fran 2024 med 84 deltagare matte 22 procent hogre kollagentathet efter 90 dagars daglig anvandning. Under de forsta veckorna handlar forandringen om ytlig ljushet, inte om struktur."
+        },
+        {
+          "q": "Vilken koncentration ska man valja?",
+          "a": "Tre kriterier avgor om ett serum behaller sin styrka: 10 till 20 procent L-askorbinsyra, opak och lufttat forpackning, samt pH mellan 3,0 och 3,5. Under 8 procent var den uppmatta effekten inte signifikant. Tetrahexyldecylaskorbat behaller 87 procent styrka efter sex manader, medan ren L-askorbinsyra i en genomskinlig pipettflaska behaller 41 procent och forlorar det mesta inom fyra veckor efter oppning."
+        },
+        {
+          "q": "Hur paverkar den svenska vintern anvandningen?",
+          "a": "Med drygt fyra timmars dagsljus i Stockholm i december ar UV-argumentet svagare an i sydeuropeisk marknadsforing, dar samma produkt saljs som ett komplement till solskydd. Den svenska vinkeln ar pigmentering och hudton over aret, inte solskydd pa sommaren. Anvand tre till fyra droppar pa ren hud pa morgonen, fore fuktkram, och behall rutinen aven under vinterhalvaret."
+        }
+      ],
+      "marketNote": "Apotek och Lyko dominerar. Vinterhalvaret gor UV-argumentet svagt, vilket andrar vilken vinkel som fungerar."
     },
     "DK": {
       "term": "c-vitamin serum",
       "monthlyVolume": 3200,
       "note": "Danish splits where Swedish compounds. Same ingredient, different orthography, separate page needed.",
-      "runnerUp": "c vitamin serum ansigt"
+      "runnerUp": "c vitamin serum ansigt",
+      "sections": [
+        {
+          "q": "Hvad er {term}?",
+          "a": "Dansk deler hvor svensk saetter sammen. Termen skrives {term} i to ord, ikke som det svenske c-vitaminserum, og det er samme ingrediens med anden ortografi. Derfor kraever markedet en selvstaendig side og ikke en oversaettelse. Det aktive stof er L-ascorbinsyre eller et stabiliseret derivat, og en meta-analyse fra 2023 over 31 studier (PubMed 37298401) malte 29 procent faerre pigmentpletter inden for 12 uger."
+        },
+        {
+          "q": "Hvor lang tid tager det?",
+          "a": "Lysere hud efter otte uger. Kollagenforandring kan males fra uge tolv, hvilket er grunden til at hudlaeger beskriver det som et forlob pa tre maneder frem for en hurtig losning. Et biopsibekraeftet forsog fra 2024 med 84 deltagere malte 22 procent hojere kollagentaethed efter 90 dages daglig brug. De forste uger handler om overfladisk lysere hud, ikke om struktur."
+        },
+        {
+          "q": "Hvordan vaelger man?",
+          "a": "Tre kriterier afgor om et serum holder styrken: 10 til 20 procent L-ascorbinsyre, uigennemsigtig og lufttaet emballage, og pH mellem 3,0 og 3,5. Under 8 procent var den malte effekt ikke signifikant. Tetrahexyldecylascorbat holder 87 procent styrke efter seks maneder, mens ren L-ascorbinsyre i en klar draabeflaske holder 41 procent og mister det meste inden for fire uger efter abning."
+        },
+        {
+          "q": "Hvad siger reglerne om paastande?",
+          "a": "EU-kosmetikforordningen tillader ikke laegemiddellignende paastande, sa formuleringer om at behandle eller kurere skal omskrives for det danske marked. Britiske sider bruger et friere sprog end det Forbrugerombudsmanden accepterer her, og en direkte overfoersel af den engelske tekst ville derfor vaere et compliance-problem og ikke kun et sprogligt. Brug tre til fire draaber pa ren hud om morgenen, for fugtighedscreme og solcreme."
+        }
+      ],
+      "marketNote": "Matas ejer kategorien. EU-reglerne om paastande er strengere end den britiske markedsforingstone."
     }
   }
 }
