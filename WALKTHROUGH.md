@@ -1,408 +1,502 @@
-# CITED, interview script
+# CITED, my demo script
 
-For the call with the two managers. Everything below is measured on this machine and can be
-checked live. The figures quoted are real, not illustrations.
+This is what I say, in my own words. Everything here is measured on my machine and I can
+run it again in front of them.
 
----
-
-# PART 0. The opening, 90 seconds
-
-> "The brief says you want to see my judgement, not my volume. So I'll start with the
-> decision that cost the most: I threw away the first version of the part that measures
-> visibility, because it was wrong. I'll show you why."
-
-**The first version** asked `gpt-4o-mini`: *"which sites would you cite for this
-question?"*. That produced one site per question, and nothing was verifiable. It's a model
-describing its own imaginary behaviour.
-
-**What killed it**: a real assistant answer cites **several** sources, and they differ from
-one engine to the next. Measured on a single question: AI Overview 3 domains, AI Mode 27,
-Perplexity 12, ChatGPT 11, Gemini 3. So a single owner per question is wrong by
-construction.
-
-**What I did instead**: query the six real engines.
-
-If only one sentence from this interview sticks, it's that one.
+**The safe demo set is in the appendix.** If they don't ask for a specific brand or page,
+I use that one. It is tested and I know what comes out.
 
 ---
 
-# PART 1. The architecture, before clicking anything
+# PART 0. How I open, about 90 seconds
 
-## The principle that governs all the code
+> "So the brief says you care about judgement more than volume, so I want to start with
+> the decision that cost me the most time, which is that I built the main measurement
+> once, and then I threw it away, because it was wrong. I'll show you what was wrong with
+> it, because I think that's the most useful thing I can tell you about how I work.
+>
+> The first version asked an AI model a simple question: for this buyer question, which
+> websites would you cite? And the model answered. It gave me one website per question.
+>
+> The problem is that this is a model describing what it imagines it does. It isn't an
+> observation of anything. And when I actually went and looked at real answers, two things
+> were obviously wrong. First, a real answer cites several sources, not one. Second, the
+> sources are different depending on which assistant you ask.
+>
+> Here are the real numbers on a single question. Google's AI Overview cited three
+> websites. Google's AI Mode cited twenty-seven. Perplexity twelve, ChatGPT eleven, Gemini
+> three. So the idea that one site owns a question is just false.
+>
+> So I rebuilt it to ask the six real assistants and record what they actually cite. That
+> is the whole product now."
 
-**Everything displayed has to be verifiable outside the tool.** Three concrete
-consequences, and they live in the code, not in the pitch:
+**If I only get one sentence across in this call, it's that one.**
 
-1. A question is a sentence you can retype into an assistant.
-2. A `robots.txt` line is quoted word for word from a public file.
-3. A comparison sentence is pulled from the page as is, never paraphrased.
+---
 
-Corollary: **when data is missing, the hole stays visible**. The fix generator emits a
-`[SOURCED STAT]` placeholder and counts the fix as *refused* rather than inventing a
-number.
+# PART 1. What the two cases asked for, and what I built for each
 
-## The repo map
+I want to be really explicit about this, because it's the thing they're marking.
 
-```
-engines/     the measurement: six engines, the board, the teardown, the exports
-engine/      Case 1: ingestion, parsing, nine factors, fixes, schema
-autopsy/     the Case 1 bonus: resolving the competitor page, comparison
-pipeline/    Case 2: seven nodes, the gate, the originality check
-adapters/    the LLM boundary, with its live / replay / auto modes
-lib/         dependency-free zip, sqlite, shared topic, screen persistence
-app/         Next 16, four screens and the API routes
-```
+## Case 1 asked for a page optimiser
 
-## The stack, and why
+> "The scenario was: a client has a page that ranks fine on Google but never shows up when
+> someone asks an AI assistant. They want to know why, and what to change.
+>
+> So the tool takes a page, either from a URL or from HTML you paste in, scores it on nine
+> things that decide whether an assistant can quote it, and then writes the actual edits.
+> Not advice like 'improve clarity', but the sentence you have and the sentence to replace
+> it with, ordered by how much each one is worth.
+>
+> It also generates the structured data, which is the machine-readable summary you paste
+> into the page so a search engine knows what the page is about. And there was an optional
+> extra in the brief, which was to compare the page against whatever is being cited today.
+> I built that too, and it turned into the biggest part of the tool."
 
-| Choice | Reason |
+**Which screen does what for Case 1**
+
+| Screen | What it answers |
 |---|---|
-| Next 16 App Router | API routes and screens in one repo, native NDJSON streaming |
-| `node:sqlite` | no `better-sqlite3`: no compilation toolchain on this machine, and a native dependency is a debt for whoever picks the project up |
-| In-house ZIP writer | 120 lines, CRC32 and local headers. One less dependency to produce a deliverable |
-| vitest | 240 tests, each failing if the defect it documents comes back |
-| GSAP + Motion | entrance animation that carries information, not decoration |
-| Playwright | second-resort read path, see below |
+| BOARD | who is actually being cited for this category, and why them |
+| AUDIT | what's wrong with this specific page, and the exact edits |
+| AUTOPSY | how my page compares, factor by factor, against the page being cited |
+
+## Case 2 asked for a multi-market content engine
+
+> "The scenario was: the same client wants content in several markets, and they've heard
+> you can just use AI to generate it. And the brief is quite clear that a good engineer
+> doesn't just say yes to that.
+>
+> So I built the pipeline they described, seven steps from a topic to something ready for
+> a CMS. But the part I actually care about is that it refuses to publish. It physically
+> cannot publish a market until a named person has approved that market. And that refusal
+> is in the logic, not behind a greyed-out button, so if you call the publish endpoint
+> directly you still get refused."
+
+**Which screen does what for Case 2**
+
+| Screen | What it answers |
+|---|---|
+| PIPELINE | the seven steps, the quality checks, and the wall that stops publishing |
 
 ---
 
 # PART 2. The demo, screen by screen
 
-## Screen 1. BOARD, "who actually gets cited"
-
-### What you type
-A topic. A domain, optional. One market out of nine. The number of questions to ask.
-
-### What you say while typing
-> "The topic can be any category. The brand field is optional, the tool still answers
-> without one, because the question 'who wins in my category' comes up before you have a
-> client."
-
-### What happens, in order
-
-**Step 1, the questions.** Eight buying angles, each asking the model for N questions,
-deduplicated on a normalized form. Measured cost: **1.3 cents** for around 160 questions.
-
-> **If you're asked why an LLM here and not elsewhere:** writing the questions a buyer asks
-> is exactly what a language model is good at, and nobody is claiming these are search
-> volumes. They're readable and editable on screen. Measuring who gets cited is the
-> opposite: it takes observation, not generation.
-
-**Step 2, the six engines.** Five go through a single Apify actor that exposes them as
-add-ons: `aiOverview`, `aiModeSearch`, `perplexitySearch`, `chatGptSearch`, `geminiSearch`.
-
-> **Technical detail to keep in your back pocket:** each add-on is an **object**, not a
-> boolean. Passing `true` returns an HTTP 400. That cost me one round trip.
-
-**Claude is the sixth** and is not an add-on of that actor. It's called at the source, on
-the Anthropic Messages API with the `web_search` tool, **in parallel** with the actor: the
-actor takes minutes, these calls take seconds, chaining them would only add waiting. It's
-the only first-hand read of the six.
-
-**Step 3, the board.**
-
-### The device, and why it encodes three things separately
-
-> "A single total would hide the main finding."
-
-| Encoding | What it says |
-|---|---|
-| **Green blocks** on the left | how many engines cite this site |
-| **Blue squares**, area on a square root | how many times, per engine |
-| **Amber ticks** on the right | how many times this site **opens** the answer |
-
-**The finding that justifies the split, measured:** `youtube.com` has the largest citation
-share in one panel and **zero first positions**. Being cited and being the source the
-engine leans on are two different outcomes.
-
-> **Why the square root:** area reads as a quantity. A linear side makes a 9 read as nine
-> times a 1, when the eye is reading the square.
-
-### The header numbers
-`5/10`, `19/65`: the first is what the displayed rows contain, the second is everything
-that engine returned. **Add up the column and you land on the first number.** Invite the
-interviewer to do it.
-
-### The consensus
-The domains cited by **every engine that answered**. Not every engine defined: Gemini often
-stays silent, and requiring its vote would empty the set for a reason unrelated to the
-domains being compared.
-
-### The WHY section
-
-**How the target is chosen**, and it's written on screen: **first positions first**, then
-engine reach, then volume. Not the biggest volume.
-
-> **Anecdote to tell:** the initial sort was on reach. On a real panel it picked
-> `smytten.com`, eight citations and **zero** first positions. A domain the engines never
-> lean on teaches you nothing about how to get picked.
-
-**Three factors, three different devices**, each naming its denominator:
-- **Engine reach**: a corner, area on a square root
-- **First positions by intent**: a staircase, in amber
-- **Named without being cited**: a comb of 22 ticks
-
-**The third is the most commercial.** Measured: *Simple* is named in 8 answers across the 5
-engines, with its own domain cited **1 time**. *CeraVe* named in 5, cited **0**. On another
-panel, **5 brands out of 6** named in the answers had zero citations of their own site.
-
-> **What that proves, and it's the heart of the argument:** the lever is not on-page
-> markup. It's being named on somebody else's page.
-
-**The two bottom columns.** What a client can copy, and what no page will ever buy. The
-second one exists so we never sell a client a plan to become Reddit.
-
-**The honesty line, which stays on screen:** *"This teardown answers 3 of the 9 designed
-factors. The other 6 need a page fetch, a second engine run, or are not measurable at all"*,
-with the six named.
-
-> "I'd rather a tool declare what it didn't measure than hand you a score across nine
-> factors when six of them are guesses."
-
-### The download
-`citations.csv`, `board.csv`, `gaps.csv`, `brief.md`, `README.txt`. All built from the
-numbers of the run.
+For each screen I'll say the same three things: what you put in, what you get out, and why
+that's worth money.
 
 ---
 
-## Screen 2. AUDIT, Case 1
+## Screen 1. BOARD
 
-### Ingestion
-A URL, **or pasted HTML**. The brief asks for it explicitly.
+### In one line
+You type a category, and it tells you which websites the six assistants actually cite for
+that category, and which one to copy.
 
-**The SSRF guard, worth telling if they ask about security.** I found three bypasses
-testing myself:
-- `[::ffff:127.0.0.1]` and `2130706433` are legal spellings of localhost
-- a public URL answering `302` to `169.254.169.254`, the cloud metadata endpoint
+### What I say while it runs
 
-So: real parsing of the address, DNS resolution, and **redirects followed by hand** with
-host revalidation on **every** hop. `redirect: "follow"` validates the first URL then goes
-wherever it's sent.
+> "So I type a category here. It can be anything, and the brand field is optional, because
+> honestly the question 'who is winning in my category' is one you want to answer before
+> you even have the client.
+>
+> Two things happen. First it writes the questions a buyer of this thing actually asks.
+> It splits them across eight buying angles, so what is it, does it work, how do I choose,
+> what's it versus, what are the risks, how do I use it, what results, and what does it
+> cost. That gives about a hundred and sixty questions and it costs about one cent.
+>
+> I'm using an AI model for that part on purpose, because writing the questions people ask
+> is exactly what a language model is good at. And I'm not pretending these are search
+> volumes, they're just questions, and you can read them and edit them on the screen.
+>
+> Then it takes a panel of those questions and puts them to six real assistants. Google's
+> AI Overview, Google's AI Mode, Perplexity, ChatGPT, Gemini, and Claude. And it records
+> every source each one gives back."
 
-### The fallback read path, and why it isn't cheating
+> **If they ask why a panel and not all hundred and sixty:** "Because each question costs
+> about two and a half cents across all six, and about ten seconds. So all of them would
+> be four dollars and most of an hour. The screen tells you exactly how many it asked and
+> lists the ones it didn't, so nothing is hidden."
 
-Three sites answered 403 to any automated read, including their own robots.txt.
-**Measured, in this order:**
+### Reading the board out loud
 
-| Route | mayoclinic.org | bmj.com | nutrition.org |
-|---|---|---|---|
-| `fetch` declared as CITEDBot | 403 | 403 | 403 |
-| **Headless** browser | 403 | 403 | 403 |
-| **Windowed Chrome** | **200, 1,151 words** | **200, 3,915 words** | **200, 482 words** |
+> "So each row is a website. And there are three different things on the row, on purpose,
+> because they're three different problems.
+>
+> The green blocks on the left are how many of the six assistants cite this site at all.
+> Five green blocks means five of them reach for it.
+>
+> The blue squares are how many times, per assistant. Bigger square, more mentions.
+>
+> And the orange ticks on the right are how many times this site is the one that opens the
+> answer. Being mentioned and being the source the assistant leans on are two different
+> things.
+>
+> And here's why I kept them separate. On one of my test runs, YouTube had the biggest
+> share of mentions of anything on the board, and it opened zero answers. Zero. If I'd put
+> those in one number, that would have been invisible, and you'd have spent budget on the
+> wrong thing."
 
-> "The wall isn't detecting 'are you a bot', it's detecting 'are you headless'. Faking the
-> user-agent would have done nothing. Opening the page in Chrome isn't impersonation:
-> Chrome is Chrome. And the route used is shown on every result, because a site that serves
-> humans and refuses automated readers is probably invisible to the engines too. That's a
-> finding, not a workaround."
+> **The numbers at the top of each column:** "Those are two numbers, like five out of ten.
+> The first one is what's in the rows you can see. The second is everything that assistant
+> gave across the whole run. So if you add up a column you get the first number. You can
+> literally check it with your finger."
 
-The DNS guard is applied to **every request the browser makes**, not just the main
-navigation.
+### The WHY section, which is the commercial part
 
-### The nine factors
+> "So now it picks one site and takes it apart. And the way it picks is written on the
+> screen: it's the site that opens the most answers, not the one with the most mentions.
+>
+> That took me a wrong turn to get to, by the way. My first version sorted by how many
+> assistants cite you, and on a real run it picked a site with eight mentions and zero
+> first positions. Which is useless, because a site the assistants never lean on can't
+> teach you anything about how to get chosen.
+>
+> Then there are three findings, and the third one is the one I'd lead with in a client
+> meeting.
+>
+> It checks whether a brand is named in the actual text of the answer, even when the
+> brand's own website is nowhere in the sources. And on my runs, five brands out of six
+> that got named in answers had zero citations of their own site.
+>
+> So what that tells you is that the way into these answers is mostly not your own page.
+> It's being named on somebody else's page. Which changes what you'd actually spend on."
 
-Each one carries **its weight and its published source**. Answer structure 24%, sourced
-citations 20%, numeric specificity 18%, freshness 14%, off-site authority 12%, fan-out 8%,
-Google rank 3%, structured data **1%**.
+> **The two columns at the bottom:** "One is what a client can copy. The other is what no
+> amount of page work will ever buy them. That second column exists so nobody sells a
+> client a plan to become Reddit, which is not a plan."
 
-> **The 1% is the detail that shows judgement.** A study across 1,885 pages found no causal
-> effect from markup. I still generate it for hygiene, and I weight it at 1% instead of
-> claiming it matters.
+### What you leave with
+A zip with every citation as a spreadsheet, the board, the list of questions you're absent
+from and who took them, and a brief written from those numbers.
 
-And **crawlability is a binary gate**, not a weighted factor. An engine that can't read the
-page can't cite it, whatever the other eight say.
+### Why this is worth money
 
-### The device: the weight scale
-A band's width is what the factor is worth, the fill is what the page earned. **The empty
-space IS the missing score, to scale.** On `healthline.com`, the eye lands on the fully dark
-20% band before reading a single number: sourced citations at 0/100, which costs exactly 20
-of the 54 missing points.
-
-### The fixes
-Each one names the sentence it replaces. **The ones that call for a number or a named
-expert are not invented**: they come back in `facts-needed.csv`, one row per refusal, with
-the sentence from the page itself that the answer would replace.
-
-> **Detail to own if they ask:** the ordering is `impact × (6 − effort)`, so impact against
-> effort, not impact alone. That's the right commercial trade-off, and both columns are
-> displayed so it can be judged.
-
-### The closed loop
-On the sample page in the repo: **33 → 81**, with **every** substance fix refused for lack
-of a supplied fact. The refusal is the feature.
-
-> **Why a page from the repo and not a real one:** you can't publish a fix on `nhs.uk`. The
-> apply-then-retest loop can only close on a page you control. It's labelled as such on
-> screen.
-
----
-
-## Screen 3. AUTOPSY, the Case 1 bonus
-
-### How the competitor page is found
-**The site's sitemap first.** Every URL it contains is a page the site has published.
-
-> **The anecdote that explains the decision:** the first version asked the model to name
-> the URL. For a GLP-1 question on BMJ it produced three paths like
-> `/content/377/bmj.n246x`. **None of them exist.** A model remembers the *shape* of a
-> publisher's URLs, not which ones exist.
-
-**Three false positives, each worse than a failure**, and the three guards that came out of
-them:
-- "work" matched `worksop-pharmacy` → matching on **whole segments**
-- "effects", seven letters, matched `/antibiotics/side-effects/` → a set of **generic**
-  words that length alone doesn't rule out
-- "vitamin C" lost its C and matched `vitamin-b` → **adjacent pairs**, and if one URL
-  carries the compound, the ones carrying only "vitamin" are dropped
-
-And if the model does get called anyway, `onTopic()` checks that the title and the address
-carry a discriminating word. It rejected a page about **type 1 diabetes** offered for a
-vitamin C question, which loaded 200 with 736 words.
-
-### The contradiction I fixed
-The heading said "they win on X" above two cards showing **41 for our page against 27 for
-theirs**. Both were true and nothing reconciled them.
-
-> "An engine cites a **passage**, not a page. So a better page can still lose the passage.
-> That's written on the screen now."
-
-### The device: facing bars
-One axis, their page pushes right, yours pushes left. A tie is a split marker, and a tie
-**at zero** is a fixed stub, because a bar of zero width reads as missing data.
+> "Two reasons. One, it's a deliverable that doesn't exist today, and it's cheap enough to
+> run on a prospect before you meet them.
+>
+> Two, and this is the bit I like, the work queue points at the weakest site sitting in an
+> answer, not at the category leader. Because beating the site that wins everything is a
+> year of work, and taking the seat of a site that wins nowhere else is one page."
 
 ---
 
-## Screen 4. PIPELINE, Case 2
+## Screen 2. AUDIT
 
-### The eight steps in the brief, and where they live
+### In one line
+You give it one page, and it tells you what to change on that page, with the actual
+sentences.
 
-| Step | Where | What happens |
+### What I say
+
+> "So this is the core of Case 1. You paste a URL, or you paste the HTML directly, which
+> the brief specifically asked for and which is also useful because some websites refuse to
+> be read automatically.
+>
+> It scores the page out of a hundred on nine things. And every one of the nine carries its
+> weight and where that weight comes from, so it's not me deciding what matters.
+>
+> The thing on the screen is a bar split into nine sections. The width of each section is
+> what that factor is worth, and how full it is, is what the page earned. So the dark
+> empty space is literally the score you're missing, drawn to scale. You don't read numbers
+> first, you look at where the biggest dark block is."
+
+> **The detail I'd point at:** "Structured data is weighted at one percent. And that's
+> deliberate, because there's a study on eighteen hundred and eighty-five pages that found
+> no causal effect from it. I still generate it, because it's basic hygiene, but I'm not
+> going to tell a client it's important when the evidence says it isn't.
+>
+> And crawlability isn't weighted at all, it's a gate. If an assistant literally can't
+> fetch your page, nothing else matters, so it either passes or the rest is off."
+
+### The bit I'm proudest of
+
+> "The fix list writes the actual replacement sentences. But some fixes need a real number
+> or a real named expert, and the tool refuses to make those up. It leaves a marked gap and
+> puts that fix in a separate list, which comes out as a spreadsheet the client fills in.
+>
+> On the sample page in the repo, the automatic fixes take it from thirty-three to
+> eighty-one out of a hundred, and every single substantive fix is refused for lack of a
+> supplied fact. That refusal is the feature, not a limitation."
+
+### Why this is worth money
+
+> "It's the shape an agency invoices. The client leaves with a corrected file and a ranked
+> to-do list, not a slide. And the facts sheet turns the thing that normally stalls a
+> content project, which is getting a real number out of the client, into a form their team
+> fills in."
+
+---
+
+## Screen 3. AUTOPSY
+
+### In one line
+Your page and the page that's actually being cited, side by side, on the same nine things.
+
+### What I say
+
+> "So the board tells you who to go after. This tells you why they win, on one axis. Their
+> page grows to the right, yours grows to the left, and the widest gap is the work order.
+>
+> The part I want to explain is how it finds their page. It reads the website's own sitemap,
+> which is the list of pages a site publishes for search engines. Every URL in there is a
+> page that actually exists.
+>
+> I did it the other way first. I asked a model to name the URL. And for a medical question
+> on the BMJ it gave me three addresses that looked completely real and none of them
+> existed. Because a model remembers the shape of a publisher's URLs, not which ones are
+> real.
+>
+> And even then, if it does fall back to the model, there's a check that the page is
+> actually about the question. It caught a page about type 1 diabetes being offered for a
+> vitamin C question. That page loaded fine, it had seven hundred words. It was just the
+> wrong page, and a confidently wrong page is worse than no page."
+
+> **One thing I fixed that I'd mention:** "At one point the headline said 'they win on
+> this factor' while the two score cards showed my page higher overall. Both were true and
+> the screen never reconciled them. So now it says both, and it says why they can disagree:
+> an assistant quotes a passage, not a page, so a better page can still lose the passage."
+
+---
+
+## Screen 4. PIPELINE
+
+### In one line
+A topic goes in, three market-ready pages come out, and nothing publishes until a named
+person signs off.
+
+### What I say
+
+> "So this is Case 2. Seven steps, and I'll go through the two that matter.
+>
+> Step one is grounding each market separately, and this is where the whole argument sits.
+> In the UK the term is 'vitamin c serum' and it gets forty thousand five hundred searches
+> a month. In Sweden the literal translation gets four hundred and eighty. The word Swedes
+> actually type is c-vitaminserum, one word, and that gets six thousand six hundred. So
+> that's fourteen to one against the translation.
+>
+> And Danish splits the word where Swedish joins it. So it's three different pages, not one
+> page translated three times.
+>
+> Each market gets its own set of questions, in its own language, with its own angle. The
+> Swedish page leads on pigmentation across the year, because there are four hours of
+> daylight in Stockholm in December so the sun protection angle doesn't land. The Danish
+> page has to deal with EU rules on health claims, which are stricter than the tone British
+> pages use, so copying the British text isn't a language problem, it's a compliance
+> problem."
+
+### The quality gate
+
+> "The brief asked for quality scoring, plagiarism and AI-detection checks, and a human
+> approval step.
+>
+> The scoring reuses the exact same engine as Case 1, the same nine factors, so a draft
+> gets scored before anyone sees it.
+>
+> On the plagiarism and AI-detection part, I want to be straight about what I refuse to
+> claim. There's no honest plagiarism check without a database of everything ever written,
+> and no classifier can tell you a piece of text was written by a machine at an error rate
+> you'd want to act on. So I don't claim either.
+>
+> What it does instead is measure two things you can check by hand. It compares every draft
+> against the other drafts, eight words at a time, and it quotes the longest passage they
+> share. And it counts the phrases that survive an unedited AI draft, and shows you the
+> sentence each one is in.
+>
+> And here's the good part. When I first ran that check, it reported ninety-five percent
+> overlap between my three markets. And it was right. My own generator was writing four
+> identical English paragraphs and just swapping the keyword. So the tool caught me doing
+> exactly what the brief warns about. After I fixed it, it's zero percent."
+
+### Where I refuse to automate
+
+> "The brief says explicitly that they want to know where I refuse to automate, so here it
+> is, and all four are in the logic rather than the interface.
+>
+> Nothing publishes without a named person, per market. If you call the publish endpoint
+> directly, you get refused. An approval with no name gets refused too, because an anonymous
+> sign-off isn't a sign-off.
+>
+> If a market has no grounding data, the run stops. It doesn't translate from English.
+>
+> The hreflang tags, which are what tells Google which language version is which, are
+> proposed but never pushed.
+>
+> And if a draft scores below the bar, or the overlap check flags it, approving it anyway
+> needs an explicit override with a written reason, and that reason is stored with your
+> name and follows the content into the CMS."
+
+---
+
+# PART 3. Questions I expect, and what I say
+
+**Why Apify and not the APIs directly?**
+> "Perplexity and Gemini have APIs, but Google's AI Overview and AI Mode don't. There's one
+> Apify actor that exposes five of them, so that's one integration instead of five and one
+> bill instead of five. Claude isn't in it, so I call Anthropic directly, and that one runs
+> at the same time as the others. If I wanted to swap to direct APIs later it's one file."
+
+**What does it cost?**
+> "About two and a half cents per question across all six assistants. Writing the hundred
+> and sixty questions is about one cent. A demo run of six questions was sixteen cents."
+
+**What's real and what's mocked?**
+> "Real: the six assistants, fetching pages, the scoring, the fixes, the structured data,
+> the exports. Mocked: the search volumes per market, which come from a fixture that's
+> labelled as a recorded sample on the screen. The brief allowed real data or a realistic
+> mock for that."
+
+**What would you do with another week?**
+> "Three things. First, put the keyword data behind an interface the way I did with the AI
+> models, so plugging in a real provider like DataForSEO is a config change and not a
+> rewrite. Second, wire the before-and-after test to the real questions and the real
+> competitors from the board, instead of the template queries it uses now. Third, a proper
+> entity clarity check, which is basically: does the page say what it's about in the first
+> hundred words, and does it call itself the same name all the way through."
+
+**How did you use AI to build it?**
+> "Claude Code, in short loops. And the thing I'd point at is that I used adversarial
+> sub-agents: I'd have an agent whose only job was to try to break a claim by reading the
+> code. That's how I found that my hreflang tags were declaring the British page as
+> Ukrainian, that the Swedish pages had English subheadings, and that one screen's headline
+> named one website while the section underneath took apart a different one."
+
+**What's weak?**
+> "Three things and I'll say them before you ask. The board records what an assistant cites
+> today, not what it will index tomorrow. The authority factor only reads what's on the
+> page, and the screen says so. And the pipeline runs on one grounded topic across three
+> markets, the six-market cap is in the code but not in the data."
+
+---
+
+# PART 4. Running order, about twelve minutes
+
+| Time | Screen | The one point |
 |---|---|---|
-| Input | `app/pipeline/page.tsx` | topic + markets, capped at six |
-| Per-market grounding | `fixtures/grounding.json` | UK 40,500/month, SE 6,600, DK 3,200 |
-| Brief | `pipeline/run.ts` | each angle cites its grounding row |
-| Drafting | `pipeline/run.ts` | question set **per market, in its own language** |
-| Optimization | `engine/score.ts` | **the Case 1 engine, imported** |
-| Localization | `pipeline/run.ts` | hreflang + lines flagged for review |
-| Quality gate | `pipeline/originality.ts` + gate | score, plagiarism/AI, named approval |
-| CMS output | `pipeline/run.ts` | markdown, metadata, hreflang |
-
-### The grounding point, to show slowly
-> "The literal translation *vitamin c serum* gets **480** searches in Sweden.
-> *c-vitaminserum*, one word, gets **6,600**. **14 to 1.** A page that targets the
-> translation targets a term nobody types. And Danish **splits** where Swedish
-> **compounds**. Three markets, three pages, not one page translated three times."
-
-### The quality gate, and being honest about the plagiarism/AI check
-
-The brief asks for "plagiarism / AI-detection checks". **What I refuse to claim is the
-point.**
-
-> "There's no honest plagiarism check without a corpus, and no classifier can tell you a
-> passage was written by a machine at a false positive rate you'd want to defend. So I
-> claim neither."
-
-What is measured, local and checkable by hand:
-- **8-word shingle overlap** between each draft and its siblings, with the longest shared
-  run **quoted**
-- **the stock phrases that survive an unedited draft**, counted, each with its sentence
-
-**The anecdote worth gold:** the check immediately reported **95% overlap** between UK, SE
-and DK. It was right. My generator was producing four identical English paragraphs and
-swapping the keyword. *Adaptation, not translation* was neither.
-
-**After the fix: 95% → 0%.** Each market has its own question set, its own language, its own
-angle:
-- **SE**: four hours of daylight in December, the UV argument is weak, the angle is
-  year-round pigmentation
-- **DK**: the European cosmetics regulation bans drug claims, so reusing the UK copy is a
-  **compliance** problem
-
-> "The tool caught my own pipeline doing exactly what the brief holds against 'just use AI
-> to generate it'. That's the best proof the check is worth having."
-
-### The three refusals the brief explicitly asks for
-
-| Refusal | Where it's enforced |
-|---|---|
-| Publishing without a name, per market | `publish()` throws, the route returns **409** |
-| Anonymous sign-off | the approval route returns **400** |
-| Guessing a market | no grounding, hard stop with the reason |
-| Deploying a localization | hreflang **proposed, never pushed** |
-
-> "The refusal lives in the business logic, not behind a disabled button. Call the publish
-> endpoint directly and you get a 409."
-
----
-
-# PART 3. The questions they will ask
-
-**"Why Apify and not the direct APIs?"**
-Perplexity and Gemini have APIs, but AI Overview and AI Mode don't. One actor that exposes
-the five as add-ons is one integration instead of five, and a single bill. Claude isn't on
-it, so I call it at the source. The seam is `engines/run.ts`: swapping the actor for direct
-APIs doesn't touch the rest.
-
-**"What does it cost, and does it scale?"**
-2.5 cents per question across the six engines, measured. The panel is a subset **by
-design**: the full 160 questions would cost four dollars and take an hour. The screen says
-how many were asked and lists the ones that weren't.
-
-**"What's real and what's simulated?"**
-Real: the six engines, the page fetches, the scoring, the fixes, the schema, the zip.
-Simulated: the per-market search volumes, which come from a fixture labelled as a recorded
-sample. The brief explicitly allows "real data or a realistic mock".
-
-**"What would you do with another week?"**
-1. Pull a `GroundingClient` out behind an interface like the LLM boundary, so DataForSEO or
-   Semrush can be plugged in by configuration instead of a `readFileSync`.
-2. Wire the retest to the real questions from the board and the real competitors cited,
-   instead of the current template query set.
-3. A dedicated *entity clarity* factor: does the H1 subject appear in the first 100 words,
-   is the name consistent, is there an `Organization` node with a `sameAs`.
-
-**"How did you use AI to build this?"**
-Claude Code, in short loops with adversarial subagents: I have every claim reread by an
-agent whose instruction is to **break** it by reading the code. That's how I found the
-Ukrainian hreflang, the English titles on the Nordic pages, and the fact that one screen's
-heading named one domain while the section below it took apart another.
-
-**"What's weak?"**
-Three things, and I say them before anyone asks:
-- The board records what an engine **cites today**, not what it will index tomorrow.
-- Off-site authority is an on-page **proxy**, written on screen on the row concerned.
-- The pipeline runs on **one grounded topic**, across three markets. The cap of six is in
-  the code, not in the data.
-
----
-
-# PART 4. The demo running order, 12 minutes
-
-| Time | Screen | The point to land |
-|---|---|---|
-| 0:00 | . | "I threw away the first version because it was wrong" |
-| 1:30 | **BOARD**, live run | six engines, real citations, the board fills up |
-| 4:00 | **BOARD**, the WHY | named without being cited: the lever isn't on-page |
-| 6:00 | **AUDIT** | the weight scale, the empty space IS the missing score |
-| 8:00 | **AUDIT**, fixes | the fix refused for lack of a supplied fact |
-| 9:30 | **PIPELINE** | 480 against 6,600, then the wall and the 409 |
+| 0:00 | . | I threw away the first version because it was wrong |
+| 1:30 | BOARD, live run | six real assistants, real citations |
+| 4:00 | BOARD, the WHY | named without being cited: the lever isn't your own page |
+| 6:00 | AUDIT | the dark space is the score you're missing |
+| 8:00 | AUDIT, fixes | the fix it refuses to write without a real number |
+| 9:30 | PIPELINE | 480 against 6,600, then the wall |
 | 11:30 | . | what I'd do with another week |
 
-**Do not show**: the `/map` route, taken out of the navigation. It carries the old,
-invalidated method.
+**Don't show:** the `/map` route. It's off the navigation, it holds the old broken method.
 
 ---
 
-# APPENDIX. The numbers to know by heart
+# APPENDIX A. The safe demo set
+
+This is tested. These exact inputs produce these exact outputs, and I've run them.
+
+## BOARD
+
+```
+Topic     vitamin C serum
+Domain    theordinary.com
+Market    United Kingdom
+Panel     6 to the engines
+```
+
+**What comes out**
 
 | | |
 |---|---|
-| Engines queried | **6** |
-| Cost per question, six engines | **~2.5 cents** |
-| Cost of the ~160 questions written | **1.3 cents** |
-| Demo run, 8 questions | **$0.229**, ~4 min |
-| Tests | **240**, typecheck and build clean |
-| Closed loop on the sample page | **33 → 81** |
-| Swedish: literal translation vs real term | **480 vs 6,600** |
-| Cross-market overlap, before / after | **95% → 0%** |
-| Weight of structured data | **1%**, study across 1,885 pages |
+| Cost | $0.1635 |
+| Time | about 4 minutes |
+| Citations | 343 across 162 domains |
+| Engines that answered | 5 of 6, Gemini silent and it says so |
+| Per engine | AI Mode 112, Perplexity 92, ChatGPT 75, Claude 53, AI Overview 11, Gemini 0 |
+| Cited by every engine that answered | health.harvard.edu, health.clevelandclinic.org, skincare.com |
+| The Ordinary | cited on 1 of the 6 questions |
+| Target for the teardown | health.clevelandclinic.org, 5 of 29 first positions |
+
+**The line to say:** "Three sites are cited by every assistant that answered. The Ordinary
+is on one question out of six. And the site to copy is the one that opens five of the
+twenty-nine answers, not the one with the most mentions."
+
+## AUDIT
+
+```
+URL   https://www.healthline.com/nutrition/vitamin-c-benefits
+```
+
+**What comes out**
+
+| | |
+|---|---|
+| Score | 43 out of 100, at-risk |
+| Biggest hole | Sourced quotes at 0, worth 20 points |
+| Facts | 33 in 1,581 words of prose |
+| Skipped | 92 blocks of navigation, not counted as article text |
+| Crawlers blocked | GPTBot, ClaudeBot, Applebot-Extended, CCBot |
+
+**The line to say:** "This is the site that wins the category, and four of the eight AI
+crawlers are blocked in its own robots.txt. I can open that file with them in one click."
+
+## AUTOPSY
+
+```
+Your page    https://theordinary.com/en-us/azelaic-acid-suspension-10-exfoliator-100407.html
+Competitor   healthline.com
+Question     What are the benefits of vitamin C for skin?
+```
+
+**What comes out**
+
+| | |
+|---|---|
+| Their page | healthline.com/nutrition/vitamin-c-benefits, 43 out of 100 |
+| Your page | the azelaic acid page, 42 out of 100 |
+| Biggest gaps | authority signals 0 against 55, freshness 0 against 20 |
+| How it was found | their own sitemap, HTTP 200, 1,794 words |
+
+**The line to say:** "Almost the same overall score, and we still lose. Because the
+assistant quotes a passage, not a page."
+
+## PIPELINE
+
+```
+Topic     vitamin c serum
+Markets   UK, SE, DK
+```
+
+**What comes out**
+
+| | |
+|---|---|
+| Terms | UK vitamin c serum 40,500/mo, SE c-vitaminserum 6,600/mo, DK c-vitamin serum 3,200/mo |
+| Scores | 67, 68, 68, all above the 55 floor |
+| Overlap between markets | 0 percent |
+| Flagged for a human | 2 lines |
+| Gate | blocked, publish unreachable |
+
+**Then:** try to publish with no names. It refuses. Approve one market with an empty name.
+It refuses. Approve all three with names. It publishes, and the Swedish page has Swedish
+headings and an `sv-SE` language tag.
+
+## If they want a page of their own
+
+The tool works on any public URL. If it refuses to be read automatically, there's a paste
+HTML button, and that route can't be blocked by anyone.
+
+If they want a different category, the safest second choice is one I've already run:
+`marketing attribution software` in US English, which returns 301 citations across 132
+domains and gives properly B2B questions like "are there scenarios where this could be a
+waste".
+
+---
+
+# APPENDIX B. Numbers I should know without looking
+
+| | |
+|---|---|
+| Assistants queried | 6 |
+| Cost per question, all six | about 2.5 cents |
+| Cost of writing 160 questions | about 1 cent |
+| Demo run, 6 questions | $0.1635, 4 minutes |
+| Tests | 240, typecheck and build clean |
+| Sample page, before and after fixes | 33 to 81 |
+| Swedish, literal translation against real term | 480 against 6,600 |
+| Cross-market overlap, before and after | 95 percent to 0 |
+| Structured data weight | 1 percent, from a study of 1,885 pages |
