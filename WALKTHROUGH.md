@@ -1,18 +1,41 @@
 # CITED, my demo script
 
-This is what I say, in my own words. Everything here is measured on my machine and I can
-run it again in front of them.
+Everything I say, every page I go to, every button I click.
 
-**The safe demo set is in the appendix.** If they don't ask for a specific brand or page,
-I use that one. It is tested and I know what comes out.
+**Stage directions are in bold brackets.** Everything in a quote block is what I say out
+loud. The tested demo set is in Appendix A, and it is what I use unless they ask for
+something specific.
 
 ---
 
-# PART 0. How I open, about 90 seconds
+# BEFORE THE CALL, 5 minutes
+
+**[TERMINAL]** `npm run dev` in `C:\Users\octav\Documents\precis-case`
+
+**[CHECK]** Open `http://localhost:3000/board`. The top bar should read **ENGINE LIVE** in
+green. If it reads REPLAY, my `.env` is not loading and the live run will not work.
+
+**[TABS]** Open these five and leave them:
+
+| Tab | URL | Why |
+|---|---|---|
+| 1 | `localhost:3000/board` | where I start |
+| 2 | `localhost:3000/` | the audit |
+| 3 | `localhost:3000/autopsy` | the comparison |
+| 4 | `localhost:3000/pipeline` | Case 2 |
+| 5 | `healthline.com/robots.txt` | the raw file, it lands better if it is already open |
+
+**[SHARE]** Browser window only, not the whole screen. Nothing else visible.
+
+---
+
+# PART 0. The opening, about 90 seconds
+
+**[SCREEN]** Tab 1, `/board`, empty. Do not type anything yet. Let them look at it while I
+talk.
 
 The rule for this bit: it is about their client's money, not about me and not about how I
-built anything. One real number, the reason nobody sees it today, and what I'm about to
-show them.
+built anything.
 
 > "Before I show you anything, one number from a run I did last night.
 >
@@ -26,393 +49,515 @@ show them.
 > not in the ad platform, so there's no line in the monthly deck that says it happened.
 > The budget just quietly stops working and nobody can point at where.
 >
-> So that's the gap I built for. In the next ten minutes I'll show you three things:
-> the tool measuring who actually gets cited, then explaining why those sites win, then
+> So that's the gap I built for. In the next ten minutes I'll show you three things: the
+> tool measuring who actually gets cited, then explaining why those sites win, then
 > writing the fixes for the client's own page. And everything on the screen is something
 > you can check yourself without me."
 
-**Why I open this way.** It puts a real figure on the table in twenty seconds, it names
-the commercial problem in a way a CFO would follow, and the last sentence sets up the one
-thing that makes the tool different, which is that nothing in it is unverifiable.
+**If they look impatient, the two-sentence version:**
 
-**If they look impatient and I need the short version:**
-
-> "The short version is: buying research is moving into assistants, an assistant names
-> three or four sources instead of ten links, and right now nobody can tell a client
-> whether they're one of them. This measures it, explains it, and writes the fixes."
+> "Buying research is moving into assistants, an assistant names three or four sources
+> instead of ten links, and right now nobody can tell a client whether they're one of
+> them. This measures it, explains it, and writes the fixes."
 
 ---
 
-# PART 1. What the two cases asked for, and what I built for each
+# PART 1. What each case asked for, about 60 seconds
 
-I want to be really explicit about this, because it's the thing they're marking.
+**[SCREEN]** Still tab 1. I point at the four words in the top navigation as I name them:
+BOARD, AUTOPSY, AUDIT, PIPELINE.
 
-## Case 1 asked for a page optimiser
-
-> "The scenario was: a client has a page that ranks fine on Google but never shows up when
-> someone asks an AI assistant. They want to know why, and what to change.
+> "Quickly, so you know what you're looking at. There are four screens and they map onto
+> your two cases.
 >
-> So the tool takes a page, either from a URL or from HTML you paste in, scores it on nine
-> things that decide whether an assistant can quote it, and then writes the actual edits.
-> Not advice like 'improve clarity', but the sentence you have and the sentence to replace
-> it with, ordered by how much each one is worth.
+> Case one was the page optimiser: a client ranks fine on Google, never shows up in an AI
+> answer, they want to know why and what to change. That's three of these screens. BOARD
+> finds who is being cited instead of them. AUTOPSY compares their page against the page
+> that's winning. AUDIT scores their page and writes the actual edits.
 >
-> It also generates the structured data, which is the machine-readable summary you paste
-> into the page so a search engine knows what the page is about. And there was an optional
-> extra in the brief, which was to compare the page against whatever is being cited today.
-> I built that too, and it turned into the biggest part of the tool."
-
-**Which screen does what for Case 1**
-
-| Screen | What it answers |
-|---|---|
-| BOARD | who is actually being cited for this category, and why them |
-| AUDIT | what's wrong with this specific page, and the exact edits |
-| AUTOPSY | how my page compares, factor by factor, against the page being cited |
-
-## Case 2 asked for a multi-market content engine
-
-> "The scenario was: the same client wants content in several markets, and they've heard
-> you can just use AI to generate it. And the brief is quite clear that a good engineer
-> doesn't just say yes to that.
+> Case two was the multi-market content engine. That's PIPELINE, the last one. Seven steps
+> from a topic to something ready for a CMS, and it refuses to publish until a named
+> person signs off per market.
 >
-> So I built the pipeline they described, seven steps from a topic to something ready for
-> a CMS. But the part I actually care about is that it refuses to publish. It physically
-> cannot publish a market until a named person has approved that market. And that refusal
-> is in the logic, not behind a greyed-out button, so if you call the publish endpoint
-> directly you still get refused."
-
-**Which screen does what for Case 2**
-
-| Screen | What it answers |
-|---|---|
-| PIPELINE | the seven steps, the quality checks, and the wall that stops publishing |
+> I'll go left to right."
 
 ---
 
-# PART 2. The demo, screen by screen
-
-For each screen I'll say the same three things: what you put in, what you get out, and why
-that's worth money.
+# PART 2. Screen by screen
 
 ---
 
-## Screen 1. BOARD
+## Screen 1. BOARD, about 6 minutes
 
-### In one line
-You type a category, and it tells you which websites the six assistants actually cite for
-that category, and which one to copy.
+**[SCREEN]** Tab 1, `/board`
 
-### What I say while it runs
+### Fill the form
 
-> "So I type a category here. It can be anything, and the brand field is optional, because
-> honestly the question 'who is winning in my category' is one you want to answer before
-> you even have the client.
+**[TYPE]** in the first field (placeholder *"The category, in a buyer's words"*):
+`vitamin C serum`
+
+**[TYPE]** in the second field (placeholder *"yourbrand.com (optional)"*):
+`theordinary.com`
+
+**[LEAVE]** the market dropdown on **United Kingdom**
+
+**[SET]** the last dropdown to **6 to the engines**
+
+> "So the category goes here, in the words a buyer would use. The brand field is optional,
+> and I mean that, because the question 'who is winning in my category' is one you want to
+> answer before you even have the client. The market matters because it sets the language
+> the questions get written in, not just the country.
 >
-> Two things happen. First it writes the questions a buyer of this thing actually asks.
-> It splits them across eight buying angles, so what is it, does it work, how do I choose,
-> what's it versus, what are the risks, how do I use it, what results, and what does it
-> cost. That gives about a hundred and sixty questions and it costs about one cent.
->
-> I'm using an AI model for that part on purpose, because writing the questions people ask
-> is exactly what a language model is good at. And I'm not pretending these are search
-> volumes, they're just questions, and you can read them and edit them on the screen.
->
-> Then it takes a panel of those questions and puts them to six real assistants. Google's
-> AI Overview, Google's AI Mode, Perplexity, ChatGPT, Gemini, and Claude. And it records
-> every source each one gives back."
+> And this last one is how many questions actually go to the assistants."
 
-> **If they ask why a panel and not all hundred and sixty:** "Because each question costs
-> about two and a half cents across all six, and about ten seconds. So all of them would
-> be four dollars and most of an hour. The screen tells you exactly how many it asked and
+**[DO NOT CLICK RUN YET.]** Explain the cost first, it makes the wait feel deliberate.
+
+> "Each question costs about two and a half cents across all six assistants, and about ten
+> seconds. So asking all hundred and sixty would be four dollars and most of an hour. Six
+> is enough to show you the shape, and the screen tells you exactly how many it asked and
 > lists the ones it didn't, so nothing is hidden."
 
-### Reading the board out loud
+**[CLICK]** the orange **RUN** button.
 
-> "So each row is a website. And there are three different things on the row, on purpose,
-> because they're three different problems.
+### While it runs, about 4 minutes
+
+**[SCREEN]** Three steps appear on the left and turn amber then green. Talk over it.
+
+> "Two things are happening. First it's writing the questions a buyer of this thing
+> actually asks, split across eight buying angles: what is it, does it work, how do I
+> choose, what's it versus, what are the risks, how do I use it, what results should I
+> expect, and what does it cost. That's about a hundred and sixty questions and it costs
+> about a cent.
 >
-> The green blocks on the left are how many of the six assistants cite this site at all.
-> Five green blocks means five of them reach for it.
+> I'm using an AI model for that part on purpose, because writing the questions people ask
+> is exactly what a language model is good at. I'm not pretending these are search
+> volumes. They're just questions, and you can read every one of them on this screen.
+>
+> Then it takes six of those and puts them to six real assistants: Google's AI Overview,
+> Google's AI Mode, Perplexity, ChatGPT, Gemini and Claude. Five of those come through one
+> scraping service, Claude I call directly at Anthropic, and those two run at the same
+> time so we're not waiting twice.
+>
+> And it records every single source each assistant gives back."
+
+**[IF THE SILENCE GETS LONG]** point at the amber progress line under the form, which says
+what it is doing right now.
+
+### When the board appears
+
+**[POINT]** at the meta line above the headline: `MEASURED LIVE · UK · 6 QUESTIONS · 343
+CITATIONS · $0.1635`
+
+> "So that's live, six questions, three hundred and forty-three citations, sixteen cents."
+
+**[POINT]** at the column headers.
+
+> "Six columns, one per assistant. And under each one there are two numbers, like eleven
+> out of eleven. The first is what's in the rows you can see, the second is everything that
+> assistant gave across the whole run. So if you add up a column, you get the first number.
+> You can check it with your finger, and I'd rather you did."
+
+**[POINT]** at the green blocks on the left of the top row.
+
+> "Now the rows. Each row is a website, and there are three separate things on it, on
+> purpose, because they're three different problems.
+>
+> The green blocks are how many assistants cite this site at all. Five green blocks, five
+> assistants reach for it.
 >
 > The blue squares are how many times, per assistant. Bigger square, more mentions.
 >
-> And the orange ticks on the right are how many times this site is the one that opens the
-> answer. Being mentioned and being the source the assistant leans on are two different
-> things.
->
-> And here's why I kept them separate. On one of my test runs, YouTube had the biggest
-> share of mentions of anything on the board, and it opened zero answers. Zero. If I'd put
-> those in one number, that would have been invisible, and you'd have spent budget on the
-> wrong thing."
+> And these orange ticks on the right are how many times this site is the one that opens
+> the answer. Because being mentioned and being the source the assistant leans on are two
+> completely different outcomes."
 
-> **The numbers at the top of each column:** "Those are two numbers, like five out of ten.
-> The first one is what's in the rows you can see. The second is everything that assistant
-> gave across the whole run. So if you add up a column you get the first number. You can
-> literally check it with your finger."
+**[SCROLL]** down slowly until a row marked `NEVER 1ST` is visible.
 
-### The WHY section, which is the commercial part
+> "Here's why I kept them apart. On one of my runs YouTube had the biggest share of
+> mentions on the whole board, and it opened zero answers. Zero. If I'd collapsed that
+> into one score, it would have been invisible, and you'd have spent budget on the wrong
+> thing."
 
-> "So now it picks one site and takes it apart. And the way it picks is written on the
-> screen: it's the site that opens the most answers, not the one with the most mentions.
+**[CLICK]** any row to expand it.
+
+> "And every row opens to the exact pages that were cited. So none of this is my tool
+> asserting something. You can click through and read the page."
+
+**[CLICK]** the same row again to close it.
+
+### The WHY section
+
+**[SCROLL]** to the section headed `WHY THIS DOMAIN AND NOT ANOTHER`.
+
+**[POINT]** at that header, then at the domain name under it.
+
+> "So now it picks one site and takes it apart, and how it picks is written right here: the
+> site that opens the most answers. Not the one with the most mentions.
 >
-> That took me a wrong turn to get to, by the way. My first version sorted by how many
-> assistants cite you, and on a real run it picked a site with eight mentions and zero
-> first positions. Which is useless, because a site the assistants never lean on can't
-> teach you anything about how to get chosen.
+> Here it's the Cleveland Clinic, which opens five of the twenty-nine answers on this
+> panel."
+
+**[SCROLL]** to the third card, the one about a brand being named in the text.
+
+> "Three findings, and this third one is the one I'd lead with in a client meeting.
 >
-> Then there are three findings, and the third one is the one I'd lead with in a client
-> meeting.
->
-> It checks whether a brand is named in the actual text of the answer, even when the
-> brand's own website is nowhere in the sources. And on my runs, five brands out of six
+> It checks whether a brand gets named in the actual text of the answer, even when that
+> brand's own website is nowhere in the sources. And across my runs, five brands out of six
 > that got named in answers had zero citations of their own site.
 >
-> So what that tells you is that the way into these answers is mostly not your own page.
-> It's being named on somebody else's page. Which changes what you'd actually spend on."
+> Which means the way into these answers is mostly not your own page. It's being named on
+> somebody else's page. And that changes what you'd actually spend money on."
 
-> **The two columns at the bottom:** "One is what a client can copy. The other is what no
-> amount of page work will ever buy them. That second column exists so nobody sells a
-> client a plan to become Reddit, which is not a plan."
+**[SCROLL]** to the two columns at the bottom.
 
-### What you leave with
-A zip with every citation as a spreadsheet, the board, the list of questions you're absent
-from and who took them, and a brief written from those numbers.
+> "Then two lists. What a client can copy, and what no amount of page work will ever buy
+> them. That second list exists so nobody sells a client a plan to become Reddit, which is
+> not a plan."
 
-### Why this is worth money
+**[POINT]** at the quiet line at the very bottom about factors not run.
 
-> "Two reasons. One, it's a deliverable that doesn't exist today, and it's cheap enough to
-> run on a prospect before you meet them.
->
-> Two, and this is the bit I like, the work queue points at the weakest site sitting in an
-> answer, not at the category leader. Because beating the site that wins everything is a
-> year of work, and taking the seat of a site that wins nowhere else is one page."
+> "And this line stays on screen permanently. It says the teardown answers three of the
+> nine factors I designed, and names the other six and what each would need. I'd rather the
+> tool tell you what it didn't measure than give you a score where two thirds is guesswork."
+
+### The download
+
+**[SCROLL]** to the orange panel headed *"Take the run with you"*.
+
+**[CLICK]** **Download the files**.
+
+**[OPEN]** the zip if the file manager shows it.
+
+> "And it all comes out as files. Every citation as a spreadsheet, the board, the list of
+> questions you're absent from and who took them, and a brief written from those numbers.
+> Nothing in there is templated, it's all built from this run."
 
 ---
 
-## Screen 2. AUDIT
+## Screen 2. AUDIT, about 3 minutes
 
-### In one line
-You give it one page, and it tells you what to change on that page, with the actual
-sentences.
+**[CLICK]** **AUDIT** in the top navigation. That is tab 2, `localhost:3000/`
 
-### What I say
+**[POINT]** at the row of buttons labelled `LIVE PAGES`.
 
-> "So this is the core of Case 1. You paste a URL, or you paste the HTML directly, which
-> the brief specifically asked for and which is also useful because some websites refuse to
-> be read automatically.
+**[CLICK]** **the site that wins the category**
+
+> "So this is case one proper. I've put three real pages on one-click buttons so I'm not
+> typing URLs in front of you, but the field takes any public URL, and there's a paste HTML
+> button next to it because some sites refuse to be read automatically and I wanted a route
+> nobody can block."
+
+**[SCREEN]** The score appears in about a second.
+
+**[POINT]** at the big number, 43.
+
+> "Forty-three out of a hundred. And this is the site that wins the category we just looked
+> at, so straight away that's interesting.
 >
-> It scores the page out of a hundred on nine things. And every one of the nine carries its
-> weight and where that weight comes from, so it's not me deciding what matters.
->
-> The thing on the screen is a bar split into nine sections. The width of each section is
-> what that factor is worth, and how full it is, is what the page earned. So the dark
-> empty space is literally the score you're missing, drawn to scale. You don't read numbers
-> first, you look at where the biggest dark block is."
+> Nine factors, and each one carries its weight and where the weight comes from, so it's
+> not me deciding what matters."
 
-> **The detail I'd point at:** "Structured data is weighted at one percent. And that's
-> deliberate, because there's a study on eighteen hundred and eighty-five pages that found
-> no causal effect from it. I still generate it, because it's basic hygiene, but I'm not
-> going to tell a client it's important when the evidence says it isn't.
->
-> And crawlability isn't weighted at all, it's a gate. If an assistant literally can't
-> fetch your page, nothing else matters, so it either passes or the rest is off."
+**[POINT]** at the horizontal bar split into sections.
 
-### The bit I'm proudest of
+> "This bar is the whole score. The width of each section is what that factor is worth, and
+> how full it is, is what the page earned. So the dark empty space is literally the score
+> they're missing, drawn to scale. You look at where the biggest dark block is, you don't
+> read numbers."
 
-> "The fix list writes the actual replacement sentences. But some fixes need a real number
-> or a real named expert, and the tool refuses to make those up. It leaves a marked gap and
-> puts that fix in a separate list, which comes out as a spreadsheet the client fills in.
+**[POINT]** at the widest dark section.
+
+> "Here it's sourced quotes, worth twenty points, and they score zero. That's twenty of
+> their fifty-seven missing points in one factor."
+
+### Two details worth saying
+
+**[SCROLL]** to the row for structured data, at 1%.
+
+> "One thing I'd flag. Structured data is weighted at one percent, and that's deliberate.
+> There's a study on eighteen hundred and eighty-five pages that found no causal effect
+> from it. I still generate it, because it's basic hygiene, but I'm not going to tell a
+> client it's important when the evidence says it isn't."
+
+**[SCROLL]** to the crawlability row at the top, the one with its own rule above it.
+
+> "And crawlability isn't weighted at all, it's a gate. If an assistant literally can't
+> fetch the page, nothing else matters."
+
+### The robots.txt moment
+
+**[SCROLL]** down to the crawler verdicts.
+
+**[POINT]** at the four rows showing blocked.
+
+> "And this is my favourite thing the tool has ever found. Healthline wins this category,
+> they're cited everywhere. And in their own robots.txt, which is the file a site uses to
+> tell robots what they're allowed to read, they block four of the eight AI crawlers.
+> GPTBot, ClaudeBot, Applebot-Extended and CCBot."
+
+**[SWITCH]** to tab 5, the raw `healthline.com/robots.txt`.
+
+**[SCROLL]** to a `Disallow: /` line.
+
+> "That's their file, not my tool. A lot of publishers blocked these in 2023 and 2024 so
+> they weren't feeding AI for free, and most marketing teams have no idea it happened,
+> because it's one line in a file the dev team owns."
+
+**[SWITCH BACK]** to tab 2.
+
+> "And the tool writes the exact block to paste to undo it. That's probably the only thing
+> in here a client can fix this afternoon."
+
+### The fixes
+
+**[CLICK]** **Write the fix plan**.
+
+> "And this writes the actual replacements. Not 'improve clarity', the sentence they have
+> and the sentence to replace it with, ranked."
+
+**[SCROLL]** to a fix marked as needing a supplied fact.
+
+> "And this is the part I'm most attached to. Some fixes need a real number or a real named
+> expert, and the tool refuses to invent them. It leaves a marked gap and puts that fix on
+> a separate list, which comes out as a spreadsheet the client fills in.
 >
-> On the sample page in the repo, the automatic fixes take it from thirty-three to
+> On the sample page in the repo the automatic fixes take it from thirty-three to
 > eighty-one out of a hundred, and every single substantive fix is refused for lack of a
-> supplied fact. That refusal is the feature, not a limitation."
-
-### Why this is worth money
-
-> "It's the shape an agency invoices. The client leaves with a corrected file and a ranked
-> to-do list, not a slide. And the facts sheet turns the thing that normally stalls a
-> content project, which is getting a real number out of the client, into a form their team
-> fills in."
+> supplied fact. That refusal is the feature."
 
 ---
 
-## Screen 3. AUTOPSY
+## Screen 3. AUTOPSY, about 2 minutes
 
-### In one line
-Your page and the page that's actually being cited, side by side, on the same nine things.
+**[CLICK]** **AUTOPSY** in the top navigation. Tab 3.
 
-### What I say
+**[POINT]** at the row labelled `CHECKED WORKING`.
 
-> "So the board tells you who to go after. This tells you why they win, on one axis. Their
-> page grows to the right, yours grows to the left, and the widest gap is the work order.
+**[CLICK]** **HEALTHLINE.COM**
+
+> "So the board tells you who to go after. This tells you why they win.
 >
-> The part I want to explain is how it finds their page. It reads the website's own sitemap,
-> which is the list of pages a site publishes for search engines. Every URL in there is a
-> page that actually exists.
+> These three are pre-checked pairs so nothing fails live, but the fields take any domain
+> and any question."
+
+**[SCREEN]** Two cards appear, then the rows.
+
+**[POINT]** at the two score cards.
+
+> "Their page forty-three, ours forty-two. Almost identical. And we still lose."
+
+**[POINT]** at the paragraph under the headline.
+
+> "And the tool says why, right here: an assistant quotes a passage, not a page. So a
+> better page overall can still lose the passage. That's the whole reason page-level SEO
+> thinking doesn't transfer to this."
+
+**[POINT]** at the widest bands.
+
+> "One axis. Their page grows right, ours grows left, and the widest gap is the work order.
+> Here it's authority signals, zero against fifty-five."
+
+**[CLICK]** the top row to expand it.
+
+> "And every row opens to the exact sentences pulled off both pages. Never paraphrased."
+
+**[SCROLL]** to the bottom, `How their page was found`.
+
+> "And this is how it found their page. It reads the website's own sitemap, which is the
+> list of pages a site publishes for search engines, so every URL in there is a page that
+> actually exists.
 >
-> I did it the other way first. I asked a model to name the URL. And for a medical question
+> I did it the other way first. I asked a model to name the URL, and for a medical question
 > on the BMJ it gave me three addresses that looked completely real and none of them
 > existed. Because a model remembers the shape of a publisher's URLs, not which ones are
-> real.
->
-> And even then, if it does fall back to the model, there's a check that the page is
-> actually about the question. It caught a page about type 1 diabetes being offered for a
-> vitamin C question. That page loaded fine, it had seven hundred words. It was just the
-> wrong page, and a confidently wrong page is worse than no page."
-
-> **One thing I fixed that I'd mention:** "At one point the headline said 'they win on
-> this factor' while the two score cards showed my page higher overall. Both were true and
-> the screen never reconciled them. So now it says both, and it says why they can disagree:
-> an assistant quotes a passage, not a page, so a better page can still lose the passage."
+> real."
 
 ---
 
-## Screen 4. PIPELINE
+## Screen 4. PIPELINE, about 3 minutes
 
-### In one line
-A topic goes in, three market-ready pages come out, and nothing publishes until a named
-person signs off.
+**[CLICK]** **PIPELINE** in the top navigation. Tab 4.
 
-### What I say
+**[CHECK]** the topic field reads `vitamin c serum`
 
-> "So this is Case 2. Seven steps, and I'll go through the two that matter.
->
-> Step one is grounding each market separately, and this is where the whole argument sits.
-> In the UK the term is 'vitamin c serum' and it gets forty thousand five hundred searches
-> a month. In Sweden the literal translation gets four hundred and eighty. The word Swedes
-> actually type is c-vitaminserum, one word, and that gets six thousand six hundred. So
-> that's fourteen to one against the translation.
->
-> And Danish splits the word where Swedish joins it. So it's three different pages, not one
-> page translated three times.
->
-> Each market gets its own set of questions, in its own language, with its own angle. The
-> Swedish page leads on pigmentation across the year, because there are four hours of
-> daylight in Stockholm in December so the sun protection angle doesn't land. The Danish
-> page has to deal with EU rules on health claims, which are stricter than the tone British
-> pages use, so copying the British text isn't a language problem, it's a compliance
-> problem."
+**[CLICK]** **Run the pipeline**
 
-### The quality gate
+**[SCREEN]** Seven columns fill in, then a hatched orange bar appears at step 06.
 
-> "The brief asked for quality scoring, plagiarism and AI-detection checks, and a human
-> approval step.
->
-> The scoring reuses the exact same engine as Case 1, the same nine factors, so a draft
-> gets scored before anyone sees it.
->
-> On the plagiarism and AI-detection part, I want to be straight about what I refuse to
-> claim. There's no honest plagiarism check without a database of everything ever written,
-> and no classifier can tell you a piece of text was written by a machine at an error rate
-> you'd want to act on. So I don't claim either.
->
-> What it does instead is measure two things you can check by hand. It compares every draft
-> against the other drafts, eight words at a time, and it quotes the longest passage they
-> share. And it counts the phrases that survive an unedited AI draft, and shows you the
-> sentence each one is in.
->
-> And here's the good part. When I first ran that check, it reported ninety-five percent
-> overlap between my three markets. And it was right. My own generator was writing four
-> identical English paragraphs and just swapping the keyword. So the tool caught me doing
-> exactly what the brief warns about. After I fixed it, it's zero percent."
+> "Case two. Seven steps, a topic in, market-ready content out. Watch where it stops."
 
-### Where I refuse to automate
+**[POINT]** at the orange hatched bar.
 
-> "The brief says explicitly that they want to know where I refuse to automate, so here it
-> is, and all four are in the logic rather than the interface.
+> "There. It ran five steps and then it hit a wall, and everything past the wall is a thin
+> line because it's unreachable."
+
+### The grounding, which is the argument
+
+**[SCROLL]** down to the three market cards.
+
+**[POINT]** at the UK card, then the SE card.
+
+> "But first the bit that matters most. Each market gets grounded on its own.
 >
-> Nothing publishes without a named person, per market. If you call the publish endpoint
-> directly, you get refused. An approval with no name gets refused too, because an anonymous
-> sign-off isn't a sign-off.
+> In the UK the term is 'vitamin c serum', forty thousand five hundred searches a month. In
+> Sweden, the literal translation gets four hundred and eighty. The word Swedes actually
+> type is c-vitaminserum, one word, and that gets six thousand six hundred. So that's
+> fourteen to one against the translation.
 >
-> If a market has no grounding data, the run stops. It doesn't translate from English.
+> And Danish splits the word where Swedish joins it. So that's three different pages, not
+> one page translated three times."
+
+**[POINT]** at the Swedish grounding note on the card.
+
+> "And each market gets its own angle. The Swedish page leads on pigmentation across the
+> year, because there are four hours of daylight in Stockholm in December so the sun
+> protection angle doesn't land. The Danish one has to deal with EU rules on health claims,
+> which are stricter than the tone British pages use, so copying the British text isn't a
+> language problem, it's a compliance problem."
+
+### The originality check
+
+**[POINT]** at the overlap meter on any market card.
+
+> "And this is the plagiarism and AI-detection part your brief asked for, and I want to be
+> straight about what I refuse to claim.
 >
-> The hreflang tags, which are what tells Google which language version is which, are
-> proposed but never pushed.
+> There's no honest plagiarism check without a database of everything ever written, and no
+> classifier can tell you text was machine-written at an error rate you'd act on. So I
+> claim neither.
 >
-> And if a draft scores below the bar, or the overlap check flags it, approving it anyway
-> needs an explicit override with a written reason, and that reason is stored with your
-> name and follows the content into the CMS."
+> What it does is compare every draft against the other drafts, eight words at a time, and
+> quote the longest passage they share. Zero percent here.
+>
+> And when I first ran that check it said ninety-five percent. And it was right. My own
+> generator was writing four identical English paragraphs and swapping the keyword. So the
+> tool caught me doing exactly what your brief warns about."
+
+### The wall
+
+**[SCROLL]** to a market card with an approver field.
+
+**[CLICK]** **Send it unsigned**
+
+**[SCREEN]** It refuses.
+
+> "An approval with no name isn't an approval."
+
+**[SCROLL]** to the panel headed *"Try to publish with the names missing"*.
+
+**[CLICK]** **Attempt the publish**
+
+**[SCREEN]** It refuses with a 409.
+
+> "And that's hitting the same endpoint a CMS would. So the refusal is in the logic, not
+> behind a greyed-out button. You can't get round it from outside."
+
+**[TYPE]** a name into each of the three approver fields, `Octave` is fine
+
+**[CLICK]** **Sign UK**, then **Sign SE**, then **Sign DK**
+
+**[SCREEN]** The content payloads appear.
+
+**[POINT]** at the Swedish payload.
+
+> "And now it publishes. And the Swedish page has Swedish headings and an sv-SE language
+> tag, not English headings with Swedish body text, which is what it was doing until I
+> caught it."
 
 ---
 
-# PART 3. Questions I expect, and what I say
+# PART 3. Closing, about 45 seconds
 
-**Why Apify and not the APIs directly?**
-> "Perplexity and Gemini have APIs, but Google's AI Overview and AI Mode don't. There's one
-> Apify actor that exposes five of them, so that's one integration instead of five and one
-> bill instead of five. Claude isn't in it, so I call Anthropic directly, and that one runs
-> at the same time as the others. If I wanted to swap to direct APIs later it's one file."
+**[CLICK]** back to **BOARD**, tab 1, so the board is the last thing on screen.
 
-**What does it cost?**
-> "About two and a half cents per question across all six assistants. Writing the hundred
-> and sixty questions is about one cent. A demo run of six questions was sixteen cents."
+> "So to close. Everything you saw is checkable without me. The questions are sentences you
+> can retype into ChatGPT. The robots.txt lines are quoted from a public file. The
+> comparison sentences are pulled off the pages as they are.
+>
+> And where the tool doesn't know something, it says so and leaves the gap visible rather
+> than filling it in.
+>
+> With another week I'd do three things: put the keyword data behind an interface so
+> plugging in a real provider is a config change, wire the before-and-after test to the
+> real questions from the board instead of template queries, and add a proper entity
+> clarity check."
+
+---
+
+# PART 4. Questions I expect
+
+**Why a scraping service and not the APIs directly?**
+> "Perplexity and Gemini have APIs, but Google's AI Overview and AI Mode don't. One Apify
+> actor exposes five of them, so that's one integration instead of five and one bill
+> instead of five. Claude isn't in it so I call Anthropic directly. If I wanted to move to
+> direct APIs later it's one file."
+
+**What does it cost to run?**
+> "About two and a half cents per question across all six. Writing the hundred and sixty
+> questions is about one cent. The run you just watched was sixteen cents."
 
 **What's real and what's mocked?**
 > "Real: the six assistants, fetching pages, the scoring, the fixes, the structured data,
 > the exports. Mocked: the search volumes per market, which come from a fixture that's
-> labelled as a recorded sample on the screen. The brief allowed real data or a realistic
-> mock for that."
-
-**What would you do with another week?**
-> "Three things. First, put the keyword data behind an interface the way I did with the AI
-> models, so plugging in a real provider like DataForSEO is a config change and not a
-> rewrite. Second, wire the before-and-after test to the real questions and the real
-> competitors from the board, instead of the template queries it uses now. Third, a proper
-> entity clarity check, which is basically: does the page say what it's about in the first
-> hundred words, and does it call itself the same name all the way through."
-
-**How did you use AI to build it?**
-> "Claude Code, in short loops. And the thing I'd point at is that I used adversarial
-> sub-agents: I'd have an agent whose only job was to try to break a claim by reading the
-> code. That's how I found that my hreflang tags were declaring the British page as
-> Ukrainian, that the Swedish pages had English subheadings, and that one screen's headline
-> named one website while the section underneath took apart a different one."
+> labelled on screen as a recorded sample. Your brief allowed real data or a realistic mock
+> for that."
 
 **What did you get wrong, or what would you do differently?**
-> "The main measurement, I built it once and threw it away. The first version asked an AI
-> model which websites it would cite for a question. And it answered, and it gave me one
+> "The main measurement. I built it once and threw it away. The first version asked an AI
+> model which websites it would cite for a question, and it answered, and it gave me one
 > site per question, and it looked completely fine on the screen.
 >
-> Then I actually went and looked at real answers, and two things were wrong. A real answer
-> cites several sources, not one. And the sources are different depending on which
-> assistant you ask. On a single question I got three domains from Google's AI Overview,
-> twenty-seven from AI Mode, twelve from Perplexity. So the idea that one site owns a
-> question is just false.
+> Then I looked at real answers and two things were wrong. A real answer cites several
+> sources, not one. And the sources differ per assistant: three domains from AI Overview,
+> twenty-seven from AI Mode, twelve from Perplexity, on the same question.
 >
-> What I'd take from that is that the model was describing what it imagines it does, and I
-> had no way to check it. So the rule I ended up with, and it's the rule the whole build
-> follows now, is that if I can't verify a number outside the tool, I don't put it on the
-> screen."
+> The model was describing what it imagines it does, and I had no way to check it. So the
+> rule I ended up with, and it's the rule the whole build follows now, is that if I can't
+> verify a number outside the tool, it doesn't go on the screen."
+
+**How did you use AI to build this?**
+> "Claude Code, in short loops. The thing I'd point at is adversarial sub-agents: I'd run
+> an agent whose only job was to try to break a claim by reading the code. That's how I
+> found that my language tags were declaring the British page as Ukrainian, that the
+> Swedish pages had English subheadings, and that one screen's headline named one website
+> while the section underneath took apart a different one."
+
+**Where do you refuse to automate?**
+> "Four places, all in the logic rather than the interface. Nothing publishes without a
+> named person per market. A market with no grounding data stops the run rather than being
+> translated from English. Language tags are proposed and never pushed. And a draft below
+> the quality bar needs an explicit override with a written reason, stored with the name."
 
 **What's weak?**
-> "Three things and I'll say them before you ask. The board records what an assistant cites
-> today, not what it will index tomorrow. The authority factor only reads what's on the
-> page, and the screen says so. And the pipeline runs on one grounded topic across three
-> markets, the six-market cap is in the code but not in the data."
+> "Three things. The board records what an assistant cites today, not what it will index
+> tomorrow. The authority factor only reads what's on the page, and the screen says so. And
+> the pipeline runs on one grounded topic across three markets, the six-market cap is in
+> the code but not in the data."
 
 ---
 
-# PART 4. Running order, about twelve minutes
+# PART 5. Running order
 
 | Time | Screen | The one point |
 |---|---|---|
-| 0:00 | . | one number: The Ordinary cited on 1 of 6 questions, and nothing reports it |
-| 1:30 | BOARD, live run | six real assistants, real citations |
-| 4:00 | BOARD, the WHY | named without being cited: the lever isn't your own page |
-| 6:00 | AUDIT | the dark space is the score you're missing |
-| 8:00 | AUDIT, fixes | the fix it refuses to write without a real number |
-| 9:30 | PIPELINE | 480 against 6,600, then the wall |
-| 11:30 | . | what I'd do with another week |
+| 0:00 | board, empty | one number: The Ordinary cited on 1 of 6, and nothing reports it |
+| 1:30 | board, form | fill it, explain the cost, click Run |
+| 2:00 | board, running | what the two steps are doing |
+| 6:00 | board, result | reach, mentions, first position are three different problems |
+| 7:30 | board, WHY | named in the answer without being cited |
+| 9:00 | audit | the dark space is the score they're missing |
+| 10:00 | robots.txt tab | healthline blocks four of eight AI crawlers |
+| 11:00 | audit, fixes | the fix it refuses to write without a real number |
+| 12:00 | autopsy | 43 against 42, and we still lose |
+| 13:30 | pipeline | 480 against 6,600, then the wall and the 409 |
+| 16:00 | back to board | everything is checkable without me |
 
-**Don't show:** the `/map` route. It's off the navigation, it holds the old broken method.
+**Never open** the `/map` route. It is off the navigation and holds the old broken method.
 
 ---
 
-# APPENDIX A. The safe demo set
+# APPENDIX A. The tested demo set
 
-This is tested. These exact inputs produce these exact outputs, and I've run them.
+Run and recorded. These exact inputs give these exact outputs.
 
 ## BOARD
 
@@ -423,61 +568,40 @@ Market    United Kingdom
 Panel     6 to the engines
 ```
 
-**What comes out**
-
 | | |
 |---|---|
 | Cost | $0.1635 |
 | Time | about 4 minutes |
 | Citations | 343 across 162 domains |
-| Engines that answered | 5 of 6, Gemini silent and it says so |
+| Engines that answered | 5 of 6, Gemini silent and the screen says so |
 | Per engine | AI Mode 112, Perplexity 92, ChatGPT 75, Claude 53, AI Overview 11, Gemini 0 |
 | Cited by every engine that answered | health.harvard.edu, health.clevelandclinic.org, skincare.com |
 | The Ordinary | cited on 1 of the 6 questions |
-| Target for the teardown | health.clevelandclinic.org, 5 of 29 first positions |
-
-**The line to say:** "Three sites are cited by every assistant that answered. The Ordinary
-is on one question out of six. And the site to copy is the one that opens five of the
-twenty-nine answers, not the one with the most mentions."
+| Teardown target | health.clevelandclinic.org, 5 of 29 first positions |
 
 ## AUDIT
 
-```
-URL   https://www.healthline.com/nutrition/vitamin-c-benefits
-```
-
-**What comes out**
+**[CLICK]** the button labelled **the site that wins the category**, which is
+`healthline.com/nutrition/vitamin-c-benefits`
 
 | | |
 |---|---|
 | Score | 43 out of 100, at-risk |
-| Biggest hole | Sourced quotes at 0, worth 20 points |
+| Biggest hole | sourced quotes at 0, worth 20 points |
 | Facts | 33 in 1,581 words of prose |
 | Skipped | 92 blocks of navigation, not counted as article text |
 | Crawlers blocked | GPTBot, ClaudeBot, Applebot-Extended, CCBot |
 
-**The line to say:** "This is the site that wins the category, and four of the eight AI
-crawlers are blocked in its own robots.txt. I can open that file with them in one click."
-
 ## AUTOPSY
 
-```
-Your page    https://theordinary.com/en-us/azelaic-acid-suspension-10-exfoliator-100407.html
-Competitor   healthline.com
-Question     What are the benefits of vitamin C for skin?
-```
-
-**What comes out**
+**[CLICK]** **HEALTHLINE.COM** under `CHECKED WORKING`
 
 | | |
 |---|---|
 | Their page | healthline.com/nutrition/vitamin-c-benefits, 43 out of 100 |
 | Your page | the azelaic acid page, 42 out of 100 |
 | Biggest gaps | authority signals 0 against 55, freshness 0 against 20 |
-| How it was found | their own sitemap, HTTP 200, 1,794 words |
-
-**The line to say:** "Almost the same overall score, and we still lose. Because the
-assistant quotes a passage, not a page."
+| Found via | their own sitemap, HTTP 200, 1,794 words |
 
 ## PIPELINE
 
@@ -486,42 +610,38 @@ Topic     vitamin c serum
 Markets   UK, SE, DK
 ```
 
-**What comes out**
-
 | | |
 |---|---|
-| Terms | UK vitamin c serum 40,500/mo, SE c-vitaminserum 6,600/mo, DK c-vitamin serum 3,200/mo |
+| Terms | UK 40,500/mo, SE 6,600/mo, DK 3,200/mo |
 | Scores | 67, 68, 68, all above the 55 floor |
 | Overlap between markets | 0 percent |
 | Flagged for a human | 2 lines |
 | Gate | blocked, publish unreachable |
 
-**Then:** try to publish with no names. It refuses. Approve one market with an empty name.
-It refuses. Approve all three with names. It publishes, and the Swedish page has Swedish
-headings and an `sv-SE` language tag.
+## If they ask for a different category
 
-## If they want a page of their own
+`marketing attribution software`, US English, is also tested: 301 citations across 132
+domains, and it produces properly B2B questions like "are there scenarios where investing
+in this could be a waste".
 
-The tool works on any public URL. If it refuses to be read automatically, there's a paste
-HTML button, and that route can't be blocked by anyone.
+## If they ask for a page of their own
 
-If they want a different category, the safest second choice is one I've already run:
-`marketing attribution software` in US English, which returns 301 citations across 132
-domains and gives properly B2B questions like "are there scenarios where this could be a
-waste".
+Any public URL works. If the site refuses to be read, the **Paste HTML instead** button
+takes the page source and nobody can block that route.
 
 ---
 
-# APPENDIX B. Numbers I should know without looking
+# APPENDIX B. Numbers to know without looking
 
 | | |
 |---|---|
 | Assistants queried | 6 |
 | Cost per question, all six | about 2.5 cents |
 | Cost of writing 160 questions | about 1 cent |
-| Demo run, 6 questions | $0.1635, 4 minutes |
+| The demo run | $0.1635, 6 questions, 4 minutes |
 | Tests | 240, typecheck and build clean |
 | Sample page, before and after fixes | 33 to 81 |
 | Swedish, literal translation against real term | 480 against 6,600 |
 | Cross-market overlap, before and after | 95 percent to 0 |
 | Structured data weight | 1 percent, from a study of 1,885 pages |
+| Healthline | wins the category, blocks 4 of 8 AI crawlers |

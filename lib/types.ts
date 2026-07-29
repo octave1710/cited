@@ -81,7 +81,14 @@ export interface ProductionTruth {
   bots: BotRow[];
 }
 
-export const STEP_ORDER: StepId[] = ["ingest", "score", "fixes", "schema", "querylab", "retest", "truth"];
+/**
+ * "truth" is deliberately absent from the visible order. It was the Profound step, and
+ * Profound was evaluated and dropped: the key authenticates but the account has rights to
+ * no domain that matters, so the step could only ever report its own unavailability. A
+ * row that can never turn green is noise on a live demo. The type and the route survive
+ * so nothing breaks, it simply is not offered.
+ */
+export const STEP_ORDER: StepId[] = ["ingest", "score", "fixes", "schema", "querylab", "retest"];
 
 export const STEP_LABEL: Record<StepId, string> = {
   ingest: "Fetch and parse the page",
@@ -90,7 +97,7 @@ export const STEP_LABEL: Record<StepId, string> = {
   schema: "Generate structured data",
   querylab: "Test citations on a live engine",
   retest: "Apply fixes and re-test",
-  truth: "Production truth from Profound",
+  truth: "Production truth (not available)",
 };
 
 export function blankSteps(): Record<StepId, Step> {
