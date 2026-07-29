@@ -2,6 +2,7 @@ import { getLLM } from "../../../adapters/llm";
 import { generateQuestions } from "../../../citationmap/questions";
 import { runPanel, hasApifyToken } from "../../../engines/run";
 import { buildBoard, primaryTarget } from "../../../engines/board";
+import { ENGINES } from "../../../engines/types";
 import { teardownFromCitations } from "../../../engines/why";
 
 export const runtime = "nodejs";
@@ -18,7 +19,7 @@ export const maxDuration = 800;
  *    would cite, which named one site per question and could not be checked.
  *
  * The panel is a subset on purpose. Every question costs about 2.7 cents across the
- * five engines and roughly ten seconds of wall clock, so asking all 160 would cost
+ * six engines and roughly ten seconds of wall clock, so asking all 160 would cost
  * four dollars and take most of an hour. The screen says exactly how many were asked.
  */
 
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
           id: "engines",
           state: "running",
           note: hasApifyToken()
-            ? `Asking 5 engines ${panel.length} of the ${all.length} questions`
+            ? `Asking ${ENGINES.length} engines ${panel.length} of the ${all.length} questions`
             : "No APIFY_TOKEN, replaying the recorded panel",
         });
         send({ type: "panelQuestions", questions: panel });

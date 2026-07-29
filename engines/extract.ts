@@ -88,6 +88,8 @@ const SLOTS: Record<EngineKey, (i: RawItem) => { text: string; citations: Citati
       : null,
   gemini: (i) =>
     i.geminiSearchResult ? { text: i.geminiSearchResult.text ?? "", citations: citationsFrom(i.geminiSearchResult.sources) } : null,
+  // Claude does not travel in the Apify item; it is merged in by run.ts after the fact
+  claude: () => null,
 };
 
 export function extractQuestion(item: RawItem): QuestionResult {

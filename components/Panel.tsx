@@ -27,7 +27,7 @@ interface Step {
 
 const STEPS: Step[] = [
   { id: "questions", label: "Write the questions a buyer asks", state: "queued" },
-  { id: "engines", label: "Put them to five answer engines", state: "queued" },
+  { id: "engines", label: `Put them to ${ENGINES.length} answer engines`, state: "queued" },
   { id: "board", label: "Count who each engine cites", state: "queued" },
 ];
 
@@ -150,7 +150,7 @@ function Intro({ steps, busy, questions, asked }: { steps: Step[]; busy: boolean
           Ask the engines. Not a model guessing.
         </h1>
         <p className="lede" style={{ marginTop: 24, maxWidth: "54ch" }}>
-          Google AI Overview, Google AI Mode, Perplexity, ChatGPT and Gemini are each asked your
+          Google AI Overview, Google AI Mode, Perplexity, ChatGPT, Gemini and Claude are each asked your
           category&apos;s questions, and every source they cite comes back with the answer.
         </p>
 
@@ -160,7 +160,7 @@ function Intro({ steps, busy, questions, asked }: { steps: Step[]; busy: boolean
           <Stat n={0} label="CITATIONS INVENTED" />
         </div>
 
-        {/* the five engines, named, so the claim is concrete before anything runs */}
+        {/* the engines, named, so the claim is concrete before anything runs */}
         {!busy && questions.length === 0 && (
           <div style={{ marginTop: 56, display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 2 }}>
             {ENGINES.map((e, i) => (
@@ -193,7 +193,7 @@ function Intro({ steps, busy, questions, asked }: { steps: Step[]; busy: boolean
           nothing about it can be checked.
         </p>
         <p style={{ fontSize: 16.5, lineHeight: 1.6, marginTop: 14 }}>
-          These five engines are asked the real question and return the real pages behind their real
+          These engines are asked the real question and return the real pages behind their real
           answer. Every row on the board opens to the page it came from.
         </p>
         {asked.length > 0 && (
@@ -262,8 +262,8 @@ function Result({ run, board, teardown, questions }: { run: PanelRun; board: Boa
       {board.consensus.length > 0 && (
         <p className="lede" style={{ marginTop: 22, maxWidth: "62ch" }}>
           {board.consensus.length === 1
-            ? `${board.consensus[0]} is the only domain all five engines cite.`
-            : `${board.consensus.slice(0, 3).join(", ")} ${board.consensus.length > 3 ? `and ${board.consensus.length - 3} more ` : ""}are cited by all five engines. That set is the consensus, and it is the hardest to displace.`}
+            ? `${board.consensus[0]} is the only domain every engine that answered cites.`
+            : `${board.consensus.slice(0, 3).join(", ")} ${board.consensus.length > 3 ? `and ${board.consensus.length - 3} more ` : ""}are cited by every engine that answered. That set is the consensus, and it is the hardest to displace.`}
         </p>
       )}
 

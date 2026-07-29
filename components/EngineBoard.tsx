@@ -11,7 +11,7 @@ import { Favicon } from "./Territory";
  *
  * Three facts are encoded separately because they are separate problems:
  *   the SPINE on the left is engine reach, one lit segment per engine that cites you.
- *     A domain all five engines quote is unavoidable; one engine quoting you nine times
+ *     A domain every engine quotes is unavoidable; one engine quoting you nine times
  *     is a single point of failure. Sorting on the raw total hides exactly that.
  *   each CELL is an area, scaled on the square root of the count, because area is read
  *     as quantity and a linear height makes a 9 look nine times a 1 when the eye reads
@@ -22,7 +22,8 @@ import { Favicon } from "./Territory";
  * Nothing here is modelled. Every mark is a citation an engine returned.
  */
 
-const CELL = 66;
+// six engines now, not five: 66px each plus a 360px domain column overflowed at 1280
+const CELL = 58;
 const SPINE = 12;
 
 export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: number }) {
@@ -54,7 +55,7 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
 
   // the domain column is capped: at 1.5fr it swallowed the slack and shoved the engine
   // headers into each other, so PERPLEXITY and CHATGPT overlapped on a 1280 viewport
-  const cols = `minmax(200px, 360px) ${SPINE * 5 + 8}px repeat(${ENGINES.length}, ${CELL}px) 104px`;
+  const cols = `minmax(180px, 300px) ${SPINE * ENGINES.length + 8}px repeat(${ENGINES.length}, ${CELL}px) 100px`;
 
   return (
     <div ref={ref}>

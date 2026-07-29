@@ -16,7 +16,7 @@ export interface DomainRow {
   perEngine: Record<EngineKey, number>;
   /** Distinct questions where this domain appears in at least one engine. */
   questions: number;
-  /** Distinct engines that ever cite it. Five means it is unavoidable. */
+  /** Distinct engines that ever cite it. All of them means it is unavoidable. */
   engineReach: number;
   /** Times it is the first source an engine lists. */
   firstMentions: number;
@@ -37,8 +37,15 @@ export interface Board {
   /** Questions where the brand appears in no engine at all. */
   brandAbsentFrom: string[];
   brandRow?: DomainRow;
-  /** Domains cited by every engine. The consensus set, the hardest to displace. */
+  /**
+   * Domains cited by every engine that ANSWERED on this panel. Requiring all six
+   * defined engines made the set empty the moment one went silent, and Gemini goes
+   * silent often, so the bar would have moved for a reason that has nothing to do
+   * with the domains being compared.
+   */
   consensus: string[];
+  /** Engines that produced at least one citation here. The denominator for consensus. */
+  activeEngines: EngineKey[];
 }
 
 const blank = (): Record<EngineKey, number> =>
@@ -86,6 +93,9 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
     }
   }
 
+  // an engine that never cited anything cannot be part of a consensus about who is cited
+  const active: EngineKey[] = ENGINES.map((e) => e.key).filter((k) => engineCitations[k] > 0);
+
   const rows: DomainRow[] = [...acc.entries()]
     .map(([domain, r]) => ({
       domain,
@@ -101,7 +111,7 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
         .sort((a, b) => b.count - a.count),
     }))
     /**
-     * Reach before volume. A domain cited once by all five engines is a harder opponent
+     * Reach before volume. A domain cited once by every engine is a harder opponent
      * than one cited nine times by a single engine, and sorting on the raw total hides
      * exactly that.
      */
@@ -123,7 +133,8 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
     })),
     brandAbsentFrom,
     brandRow: rows.find((r) => r.isBrand),
-    consensus: rows.filter((r) => r.engineReach === ENGINES.length).map((r) => r.domain),
+    consensus: active.length ? rows.filter((r) => active.every((k) => r.perEngine[k] > 0)).map((r) => r.domain) : [],
+    activeEngines: active,
   };
 }
 

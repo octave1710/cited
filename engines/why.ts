@@ -327,6 +327,14 @@ export function teardownFromCitations(
   domain: string,
   brands: BrandEntry[] = SKINCARE_BRANDS,
 ): Teardown {
+  /**
+   * The denominator for reach is the engines that actually answered on THIS panel, not
+   * every engine the tool knows about. Adding Claude turned "cited by 5 of 5 engines"
+   * into "5 of 6" on a fixture Claude was never asked, which is a number the reader
+   * cannot check against anything on screen.
+   */
+  const engineCount = board.activeEngines.length || ENGINES.length;
+
   const target = domain.toLowerCase().replace(/^www\./, "");
   const row = board.rows.find((r) => r.domain === target);
   const brandDomains = new Set(brands.flatMap((b) => b.ownDomains));
@@ -385,7 +393,7 @@ export function teardownFromCitations(
   ];
 
   const headline = row
-    ? `${target}: cited by ${row.engineReach} of ${ENGINES.length} engines, ${row.firstMentions} of ${slots.length} lead slots, ${row.totalCitations} of ${board.totalCitations} citations.`
+    ? `${target}: cited by ${row.engineReach} of ${engineCount} engines, ${row.firstMentions} of ${slots.length} lead slots, ${row.totalCitations} of ${board.totalCitations} citations.`
     : `${target}: not cited once in this panel of ${board.totalCitations} citations across ${board.questionCount} questions.`;
 
   return {
@@ -393,7 +401,7 @@ export function teardownFromCitations(
     headline,
     findings,
     replicable: replicable(target, row, cls, { slots, slotsOnTopic, homepages, totalCitations: board.totalCitations, naming, namedWithoutOwnCitation, questionCount: board.questionCount }),
-    notReplicable: notReplicable(target, row, cls, { slots, slotsByClass, byVolume, totalCitations: board.totalCitations, consensus: board.consensus }),
+    notReplicable: notReplicable(target, row, cls, { slots, slotsByClass, byVolume, totalCitations: board.totalCitations, consensus: board.consensus, engineCount }),
   };
 }
 
@@ -405,22 +413,24 @@ function engineReachFinding(
   board: Board,
   panel: { reachOne: number; citedOnce: number; byVolume: DomainRow | undefined },
 ): FactorFinding {
+  // engines that ANSWERED here, so the ratio is checkable against the board on screen
+  const engineCount = board.activeEngines.length || ENGINES.length;
   const base = {
     key: "engineReach",
-    name: "Engine reach across the five-engine panel",
-    question: "Do all five engines reach for this domain, or is it one engine's habit?",
+    name: `Engine reach across the ${engineCount}-engine panel`,
+    question: `Do all ${engineCount} engines reach for this domain, or is it one engine's habit?`,
     source: "citation-data" as const,
   };
 
   const floor = `On this panel ${panel.reachOne} of the ${board.rows.length} cited domains are reached by exactly one engine and ${panel.citedOnce} are cited exactly once, so one engine is the noise floor and two or more is already above it.`;
   const consensusLine = board.consensus.length
-    ? `${board.consensus.length} of ${board.rows.length} domains are cited by all ${ENGINES.length} engines: ${board.consensus.join(", ")}.`
-    : `No domain on this panel is cited by all ${ENGINES.length} engines.`;
+    ? `${board.consensus.length} of ${board.rows.length} domains are cited by all ${engineCount} engines: ${board.consensus.join(", ")}.`
+    : `No domain on this panel is cited by all ${engineCount} engines.`;
 
   if (!row) {
     return {
       ...base,
-      verdict: `${target} is cited by 0 of the ${ENGINES.length} engines on this panel.`,
+      verdict: `${target} is cited by 0 of the ${engineCount} engines on this panel.`,
       evidence: [`${target} appears in none of the ${board.totalCitations} citations across ${board.questionCount} questions.`, floor, consensusLine],
       strength: 0,
     };
@@ -430,23 +440,23 @@ function engineReachFinding(
   const volumeLine = !panel.byVolume
     ? ""
     : panel.byVolume.domain === target
-      ? `Reach and volume stay separate numbers: ${target} holds the largest citation share on the panel (${row.totalCitations} of ${board.totalCitations}, ${pct(row.totalCitations, board.totalCitations)}%) on only ${row.engineReach} of ${ENGINES.length} engines, so its volume is not reach.`
-      : `Reach and volume stay separate numbers: ${panel.byVolume.domain} holds the largest citation share on the panel (${panel.byVolume.totalCitations} of ${board.totalCitations}, ${pct(panel.byVolume.totalCitations, board.totalCitations)}%) on ${panel.byVolume.engineReach} of ${ENGINES.length} engines, while ${target} holds ${row.totalCitations} (${pct(row.totalCitations, board.totalCitations)}%) on ${row.engineReach}.`;
+      ? `Reach and volume stay separate numbers: ${target} holds the largest citation share on the panel (${row.totalCitations} of ${board.totalCitations}, ${pct(row.totalCitations, board.totalCitations)}%) on only ${row.engineReach} of ${engineCount} engines, so its volume is not reach.`
+      : `Reach and volume stay separate numbers: ${panel.byVolume.domain} holds the largest citation share on the panel (${panel.byVolume.totalCitations} of ${board.totalCitations}, ${pct(panel.byVolume.totalCitations, board.totalCitations)}%) on ${panel.byVolume.engineReach} of ${engineCount} engines, while ${target} holds ${row.totalCitations} (${pct(row.totalCitations, board.totalCitations)}%) on ${row.engineReach}.`;
 
   return {
     ...base,
     verdict:
-      row.engineReach === ENGINES.length
+      row.engineReach === engineCount
         ? `Every engine reaches for ${target}, so what it carries transfers across five different retrieval stacks.`
-        : `${target} is reached by ${row.engineReach} of the ${ENGINES.length} engines, so part of its standing is one stack's behaviour rather than a property all five select for.`,
+        : `${target} is reached by ${row.engineReach} of the ${engineCount} engines, so part of its standing is one stack's behaviour rather than a property all of them select for.`,
     evidence: [
-      `${target} is cited by ${row.engineReach} of ${ENGINES.length} engines: ${per.join(", ")}.`,
+      `${target} is cited by ${row.engineReach} of ${engineCount} engines: ${per.join(", ")}.`,
       `It appears on ${row.questions} of the ${board.questionCount} questions, ${row.totalCitations} citations in total, ${pct(row.totalCitations, board.totalCitations)}% of the panel.`,
       floor,
       consensusLine,
       volumeLine,
     ].filter(Boolean),
-    strength: clamp((row.engineReach / ENGINES.length) * 100),
+    strength: clamp((row.engineReach / engineCount) * 100),
   };
 }
 
@@ -623,8 +633,9 @@ function notReplicable(
   target: string,
   row: DomainRow | undefined,
   cls: SourceClass,
-  p: { slots: LeadSlot[]; slotsByClass: Record<string, number>; byVolume: DomainRow | undefined; totalCitations: number; consensus: string[] },
+  p: { slots: LeadSlot[]; slotsByClass: Record<string, number>; byVolume: DomainRow | undefined; totalCitations: number; consensus: string[]; engineCount: number },
 ): string[] {
+  const engineCount = p.engineCount;
   const mine = p.slots.filter((s) => s.domain === target).length;
   const out: string[] = [];
 
@@ -648,9 +659,9 @@ function notReplicable(
       `${target} is the platform, not a publisher a brand can become. Presence on it is possible, being it is not.`,
     );
   }
-  if (row && row.engineReach === ENGINES.length) {
+  if (row && row.engineReach === engineCount) {
     out.push(
-      `${target} is one of ${p.consensus.length} domains on this panel cited by all ${ENGINES.length} engines. That position is the hardest to displace and no page a client publishes removes it.`,
+      `${target} is one of ${p.consensus.length} domains on this panel cited by all ${engineCount} engines. That position is the hardest to displace and no page a client publishes removes it.`,
     );
   }
   if (p.byVolume && p.byVolume.firstMentions === 0) {

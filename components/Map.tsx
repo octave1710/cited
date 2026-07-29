@@ -48,6 +48,13 @@ import {
 /** The screen remembers the run you were on; only the id, so nothing cached goes stale. */
 const LAST = "cited.lastMap";
 
+/**
+ * The scaffold is a shape, not a promise. The generator asks for 20 per angle and
+ * deduplicates across them, so real columns land at 18 to 21 and drawing exactly 20
+ * would overstate every column before a run exists.
+ */
+const SCAFFOLD_TILES = 18;
+
 const TILE_H = 13;
 const TILE_GAP = 4;
 
@@ -516,7 +523,7 @@ function MapEmpty() {
     <div>
       <Awaiting
         title="No category mapped yet."
-        what="A run writes the questions buyers actually type, eight angles at twenty each, then puts every one of them to the engine."
+        what="A run writes the questions buyers actually type, eight angles, roughly twenty each after duplicates are dropped, then puts every one of them to the engine."
         steps={[
           { label: "Write the questions", state: "queued", note: "8 ANGLES" },
           { label: "Ask the engine each one", state: "queued", note: "1 CALL EACH" },
@@ -527,7 +534,7 @@ function MapEmpty() {
         <div style={{ minWidth: 760, display: "grid", gridTemplateColumns: `repeat(${INTENTS.length}, minmax(0,1fr))`, gap: 12, alignItems: "end" }}>
           {INTENTS.map((i) => (
             <div key={i.id} style={{ display: "flex", flexDirection: "column-reverse", gap: TILE_GAP }}>
-              {Array.from({ length: 20 }, (_, n) => (
+              {Array.from({ length: SCAFFOLD_TILES }, (_, n) => (
                 <span key={n} data-tile style={{ display: "block", height: TILE_H, background: "var(--s1)" }} />
               ))}
             </div>

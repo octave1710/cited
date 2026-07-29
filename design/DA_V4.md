@@ -79,8 +79,17 @@ GSAP on arrival, always inside a `gsap.context` scoped to a ref, always reverted
 ## 7. Spacing
 
 `--gutter` 40px horizontal. A section starts at 84 to 96px of top padding. A row is 10 to 18px
-of vertical padding with a 1px `--line` rule between. Two visual objects per screen maximum.
-Forty words of running text per screen maximum.
+of vertical padding with a 1px `--line` rule between.
+
+**One dominant device per screen, and no second object competing with it.** The earlier wording
+here said "two visual objects per screen maximum", which was carried over from a rule written for
+text-heavy marketing pages and is wrong for an instrument: a screen here is a device, the evidence
+under it, and the action attached to the number, which is three things by definition. What the rule
+is actually protecting against is a second object of the same weight as the device. Sections below
+the device are subordinate: smaller, quieter, and never a second chart.
+
+Forty words of running text above the device. Below it, the evidence ledger is as long as the
+evidence is; truncating a receipt to hit a word count would be the wrong trade.
 
 ## 8. The check before showing anything
 

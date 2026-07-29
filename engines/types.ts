@@ -14,6 +14,12 @@ export const ENGINES = [
   { key: "perplexity", label: "Perplexity", short: "Perplexity" },
   { key: "chatgpt", label: "ChatGPT search", short: "ChatGPT" },
   { key: "gemini", label: "Gemini", short: "Gemini" },
+  /**
+   * Called at the source rather than through the Apify actor, which has no Claude
+   * add-on: the Anthropic Messages API with the web_search tool returns the pages the
+   * answer was built from, so this is a first-party read rather than a scrape.
+   */
+  { key: "claude", label: "Claude", short: "Claude" },
 ] as const;
 
 export type EngineKey = (typeof ENGINES)[number]["key"];

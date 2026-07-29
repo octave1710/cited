@@ -33,14 +33,14 @@ const row = (d: string) => board.rows.find((r) => r.domain === d);
 const numbersIn = (s: string) => (s.match(/\d+(\.\d+)?/g) ?? []).map(Number);
 
 describe("the fixture the factors are measured on", () => {
-  it("is the six-question, five-engine panel with 289 citations", () => {
+  it("is the six-question panel, six engine slots per question, 289 citations", () => {
     expect(questions).toHaveLength(6);
-    expect(questions.flatMap((q) => q.answers)).toHaveLength(30);
+    expect(questions.flatMap((q) => q.answers)).toHaveLength(36);
     expect(board.totalCitations).toBe(289);
     expect(board.rows).toHaveLength(145);
   });
 
-  it("has reddit.com and theguardian.com on all five engines, and nobody else", () => {
+  it("has reddit.com and theguardian.com on every engine that answered, and nobody else", () => {
     expect(row("reddit.com")!.engineReach).toBe(5);
     expect(row("theguardian.com")!.engineReach).toBe(5);
     expect(board.consensus).toEqual(["reddit.com", "theguardian.com"]);
@@ -61,9 +61,9 @@ describe("the fixture the factors are measured on", () => {
 });
 
 describe("lead slots", () => {
-  it("counts 23, not 30, because 7 answers cited nothing", () => {
+  it("counts 23 lead slots, because 13 of the 36 engine answers cited nothing", () => {
     expect(slots).toHaveLength(23);
-    expect(questions.flatMap((q) => q.answers).filter((a) => !a.citations.length)).toHaveLength(7);
+    expect(questions.flatMap((q) => q.answers).filter((a) => !a.citations.length)).toHaveLength(13);
     expect(board.rows.reduce((n, r) => n + r.firstMentions, 0)).toBe(23);
   });
 

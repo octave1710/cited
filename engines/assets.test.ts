@@ -140,7 +140,7 @@ describe("buildGeoBundle, on the recorded vitamin C panel", () => {
     expect(new Set(body.map((r) => r[0])).size).toBe(new Set(allCitations.map((x) => x.q)).size);
   });
 
-  it("carries one board.csv row per domain, with the five engine columns adding up", () => {
+  it("carries one board.csv row per domain, with one column per engine adding up", () => {
     const rows = parseCsv(files.get("board.csv")!);
     expect(rows[0]).toEqual([
       "domain",
@@ -150,6 +150,7 @@ describe("buildGeoBundle, on the recorded vitamin C panel", () => {
       "perplexity",
       "chatgpt",
       "gemini",
+      "claude",
       "questions",
       "total_citations",
       "engine_reach",
@@ -161,17 +162,35 @@ describe("buildGeoBundle, on the recorded vitamin C panel", () => {
     expect(body.length).toBe(board.rows.length);
     expect(body.length).toBeGreaterThan(0);
 
+    /**
+     * Column positions are read off the header rather than hardcoded. They were fixed
+     * indexes, and adding a sixth engine shifted every one of them by a column while
+     * the assertions still passed on the wrong fields.
+     */
+    const head = rows[0];
+    const at = (name: string) => {
+      const i = head.indexOf(name);
+      expect(i, `board.csv is missing the ${name} column`).toBeGreaterThan(-1);
+      return i;
+    };
+    const first = at("ai_overview");
+    const last = at("questions");
+    const iTotal = at("total_citations");
+    const iReach = at("engine_reach");
+    const iFirst = at("first_mentions");
+    const iShare = at("share_pct");
+
     let share = 0;
     let citations = 0;
     for (const r of body) {
-      const perEngine = r.slice(2, 7).map(Number);
-      const total = Number(r[8]);
-      // the five columns are the row, not a summary of it
+      const perEngine = r.slice(first, last).map(Number);
+      const total = Number(r[iTotal]);
+      // the engine columns ARE the row, not a summary of it
       expect(perEngine.reduce((a, b) => a + b, 0)).toBe(total);
-      expect(Number(r[9])).toBe(perEngine.filter((n) => n > 0).length);
-      expect(Number(r[10])).toBeLessThanOrEqual(total);
-      expect(Number(r[7])).toBeGreaterThan(0);
-      share += Number(r[11]);
+      expect(Number(r[iReach])).toBe(perEngine.filter((n) => n > 0).length);
+      expect(Number(r[iFirst])).toBeLessThanOrEqual(total);
+      expect(Number(r[last])).toBeGreaterThan(0);
+      share += Number(r[iShare]);
       citations += total;
     }
     expect(citations).toBe(board.totalCitations);

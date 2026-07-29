@@ -22,6 +22,7 @@ const ENGINE_COLUMN: Record<EngineKey, string> = {
   perplexity: "perplexity",
   chatgpt: "chatgpt",
   gemini: "gemini",
+  claude: "claude",
 };
 
 const SHORT: Record<EngineKey, string> = Object.fromEntries(
@@ -572,7 +573,7 @@ export function buildGeoBundle(input: { panel: PanelRun; board: Board; teardown?
     {
       name: "board.csv",
       content: boardCsv(board),
-      note: `${board.rows.length} domains, sorted by how many engines cite them before how often. Reach beats volume: one citation from all five engines is a harder opponent than nine from one.`,
+      note: `${board.rows.length} domains, sorted by how many engines cite them before how often. Reach beats volume: one citation from every engine is a harder opponent than nine from one.`,
     },
     {
       name: "gaps.csv",

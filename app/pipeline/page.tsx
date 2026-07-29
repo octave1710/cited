@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { TopBar } from "../../components/Chrome";
 import { NODES, type MarketPlan, type PipelineRun } from "../../pipeline/nodes";
 import { Rail, type RailLane } from "../../components/Rail";
-import { Entity, Label, Num, Panel, Section, Verdict } from "../../components/da";
+import { Entity, Label, Num, Panel, Section, Verdict, useEntry } from "../../components/da";
 
 /** The markets this run asks for. Sent to the API and drawn as lanes before it answers. */
 const MARKETS = ["UK", "SE", "DK"];
@@ -112,8 +112,12 @@ function PipelineScreen() {
             ? `${pending[0]} still carries no name, so nothing in it can publish.`
             : `${pending.join(" and ")} carry no names, so those lanes stay shut.`;
 
+  /* the gate cards, the CMS panels and the trace rows had no arrival motion at all */
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEntry([run?.id, run?.plans.length, run?.output?.length, busy], pageRef);
+
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div ref={pageRef} style={{ minHeight: "100vh" }}>
       <TopBar runId={run?.id} />
 
       <div className="gut rule-b" style={{ paddingTop: 22, paddingBottom: 20, background: "var(--s1)" }}>
@@ -164,7 +168,7 @@ function PipelineScreen() {
             headline={headline}
             lede={
               <>
-                Grounding, brief, draft, score, adaptation. Then <code style={{ fontFamily: "var(--mono)", fontSize: 15 }}>publish()</code> throws
+                Grounding, brief, draft, score, adaptation. Then <code style={{ fontFamily: "var(--mono)", fontSize: 16.5 }}>publish()</code> throws
                 unless every market carries a named human decision, and the route answers <Num size={15}>409</Num>. That refusal lives in the
                 domain logic, not on this screen.
               </>
@@ -182,7 +186,7 @@ function PipelineScreen() {
             <div style={{ marginBottom: 20 }}>
               <Label>THE GATE · ONE NAMED DECISION PER MARKET</Label>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 2 }}>
+            <div data-row style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))", gap: 2 }}>
               {run.plans.map((p) => (
                 <MarketGate
                   key={p.market}
@@ -277,8 +281,8 @@ function PipelineScreen() {
                   }}
                 >
                   <Label>{t.step.toUpperCase()}</Label>
-                  <span style={{ fontSize: 16.5, lineHeight: 1.45 }}>{t.claim}</span>
-                  <span style={{ fontFamily: "var(--mono)", fontSize: 12.5, lineHeight: 1.7, color: "var(--ink)" }}>{t.source}</span>
+                  <span style={{ fontSize: 16.5, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" }}>{t.claim}</span>
+                  <span style={{ fontFamily: "var(--mono)", fontSize: 16, lineHeight: 1.6, color: "var(--ink)" }}>{t.source}</span>
                 </div>
               ))}
             </div>
@@ -338,7 +342,7 @@ function MarketGate({
         </span>
       </div>
 
-      <p style={{ fontSize: 16, lineHeight: 1.5, marginTop: 18 }}>{plan.groundingNote}</p>
+      <p style={{ fontSize: 16.5, lineHeight: 1.5, marginTop: 18, fontVariantNumeric: "tabular-nums" }}>{plan.groundingNote}</p>
 
       {plan.flags.length > 0 ? (
         <div style={{ marginTop: 16 }}>
