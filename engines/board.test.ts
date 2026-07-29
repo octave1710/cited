@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildBoard, primaryTarget } from "./board";
+import { buildBoard, isBrandHost, primaryTarget } from "./board";
 import type { PanelRun } from "./types";
 
 /**
@@ -61,11 +61,31 @@ describe("the board agrees with itself", () => {
     // the headline reads "cited on N of M questions", so both halves come from here
     expect(brand!.questions).toBe(
       panel.questions.filter((q) =>
-        q.answers.some((a) => a.citations.some((c) => c.domain === panel.brandDomain)),
+        q.answers.some((a) => a.citations.some((c) => isBrandHost(c.domain, panel.brandDomain))),
       ).length,
     );
     expect(board.questionCount).toBe(panel.questions.length);
     expect(board.brandAbsentFrom.length).toBe(board.questionCount - brand!.questions);
+  });
+
+  it("counts the brand's own country domains as the brand", () => {
+    /**
+     * This assertion used to compare `c.domain === brandDomain`, which is the bug it was
+     * supposed to catch written out as the expectation. The panel cites theordinary.com
+     * twice and theordinary.es once, and the headline said "cited on 2 of 8".
+     */
+    const brand = board.rows.find((r) => r.isBrand)!;
+    expect(brand.hosts).toContain("theordinary.com");
+    expect(brand.hosts).toContain("theordinary.es");
+    expect(brand.questions).toBe(3);
+
+    // and a rival's country domains stay separate rows, because they are separate pages
+    const inkey = board.rows.filter((r) => r.domain.endsWith("theinkeylist.com"));
+    expect(inkey.length).toBeGreaterThan(1);
+
+    // the label floor: a short token must not swallow an unrelated host
+    expect(isBrandHost("boots.com", "bio.com")).toBe(false);
+    expect(isBrandHost("notheordinary.com", "theordinary.com")).toBe(false);
   });
 
   it("keeps share of citations and lead slots as two separate measures", () => {

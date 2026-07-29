@@ -24,6 +24,11 @@ export interface DomainRow {
   /** Share of all citations on the panel, 0 to 1. */
   share: number;
   isBrand: boolean;
+  /**
+   * Every host that fed this row. One entry for a rival; the brand's row carries all of
+   * its own country domains, so the screen can name them rather than imply one site.
+   */
+  hosts: string[];
   /** The exact pages cited, most cited first, so every row is openable. */
   pages: { url: string; title: string; count: number }[];
 }
@@ -51,11 +56,40 @@ export interface Board {
 const blank = (): Record<EngineKey, number> =>
   Object.fromEntries(ENGINES.map((e) => [e.key, 0])) as Record<EngineKey, number>;
 
+/** Public suffixes, so `theordinary.co.uk` and `theordinary.com` reduce to one label. */
+const SUFFIX = new Set(["com", "co", "uk", "org", "net", "io", "ai", "es", "fr", "de", "it", "nl", "se", "dk", "no", "fi", "eu", "us", "ca", "au", "nz", "ie", "be", "pt", "pl", "jp", "in", "br", "mx", "shop", "store", "www"]);
+
+/**
+ * The label that identifies an owner, with the suffixes and the country prefix removed.
+ * `theordinary.com`, `theordinary.es` and `uk.theordinary.com` all reduce to `theordinary`.
+ */
+function ownerLabel(host: string): string {
+  const parts = host.toLowerCase().split(".").filter((p) => p && !SUFFIX.has(p));
+  return parts[parts.length - 1] ?? host.toLowerCase();
+}
+
+/**
+ * Is this host one of the brand's own?
+ *
+ * Exact string equality was the test, so `theordinary.es` counted as somebody else's site.
+ * The recorded panel cites the brand on three of its eight questions, two on the .com and
+ * one on the .es, and the headline read "you are cited on 2 of 8". On a product whose other
+ * half is about running one brand across several markets, splitting a brand across its own
+ * country domains and then under-reporting it is the wrong answer twice over.
+ *
+ * Four letters is the floor, so a short label cannot swallow an unrelated host.
+ */
+export function isBrandHost(host: string, brandDomain?: string): boolean {
+  if (!brandDomain) return false;
+  const label = ownerLabel(brandDomain);
+  return label.length >= 4 && ownerLabel(host) === label;
+}
+
 export function buildBoard(questions: QuestionResult[], brandDomain?: string): Board {
   const brand = brandDomain?.toLowerCase().replace(/^www\./, "");
   const acc = new Map<
     string,
-    { perEngine: Record<EngineKey, number>; questions: Set<string>; engines: Set<EngineKey>; first: number; pages: Map<string, { title: string; count: number }> }
+    { perEngine: Record<EngineKey, number>; questions: Set<string>; engines: Set<EngineKey>; first: number; pages: Map<string, { title: string; count: number }>; hosts: Set<string> }
   >();
 
   let total = 0;
@@ -76,11 +110,21 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
         engineCitations[a.engine] += 1;
         engineDomains[a.engine].add(c.domain);
 
-        let row = acc.get(c.domain);
+        /**
+         * The brand's country domains land on the brand's own row. A rival's do not: their
+         * .com and their .co.uk are two pages you would have to displace separately, so
+         * they stay two rows. Yours are one footprint and the headline speaks about it in
+         * the second person, so it has to count all of it.
+         */
+        const mine = isBrandHost(c.domain, brand);
+        const key = mine && brand ? brand : c.domain;
+
+        let row = acc.get(key);
         if (!row) {
-          row = { perEngine: blank(), questions: new Set(), engines: new Set(), first: 0, pages: new Map() };
-          acc.set(c.domain, row);
+          row = { perEngine: blank(), questions: new Set(), engines: new Set(), first: 0, pages: new Map(), hosts: new Set() };
+          acc.set(key, row);
         }
+        row.hosts.add(c.domain);
         row.perEngine[a.engine] += 1;
         row.questions.add(q.question);
         row.engines.add(a.engine);
@@ -105,7 +149,9 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
       firstMentions: r.first,
       totalCitations: Object.values(r.perEngine).reduce((a, b) => a + b, 0),
       share: total ? Object.values(r.perEngine).reduce((a, b) => a + b, 0) / total : 0,
-      isBrand: Boolean(brand) && domain === brand,
+      isBrand: isBrandHost(domain, brand),
+      /* every host that fed this row, so a merged brand row can name its own country sites */
+      hosts: [...r.hosts].sort(),
       pages: [...r.pages.entries()]
         .map(([url, p]) => ({ url, title: p.title, count: p.count }))
         .sort((a, b) => b.count - a.count),
@@ -113,7 +159,9 @@ export function buildBoard(questions: QuestionResult[], brandDomain?: string): B
     .sort(byStanding);
 
   const brandAbsentFrom = brand
-    ? questions.filter((q) => !q.answers.some((a) => a.citations.some((c) => c.domain === brand))).map((q) => q.question)
+    ? questions
+        .filter((q) => !q.answers.some((a) => a.citations.some((c) => isBrandHost(c.domain, brand))))
+        .map((q) => q.question)
     : [];
 
   return {
