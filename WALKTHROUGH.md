@@ -10,27 +10,36 @@ I use that one. It is tested and I know what comes out.
 
 # PART 0. How I open, about 90 seconds
 
-> "So the brief says you care about judgement more than volume, so I want to start with
-> the decision that cost me the most time, which is that I built the main measurement
-> once, and then I threw it away, because it was wrong. I'll show you what was wrong with
-> it, because I think that's the most useful thing I can tell you about how I work.
->
-> The first version asked an AI model a simple question: for this buyer question, which
-> websites would you cite? And the model answered. It gave me one website per question.
->
-> The problem is that this is a model describing what it imagines it does. It isn't an
-> observation of anything. And when I actually went and looked at real answers, two things
-> were obviously wrong. First, a real answer cites several sources, not one. Second, the
-> sources are different depending on which assistant you ask.
->
-> Here are the real numbers on a single question. Google's AI Overview cited three
-> websites. Google's AI Mode cited twenty-seven. Perplexity twelve, ChatGPT eleven, Gemini
-> three. So the idea that one site owns a question is just false.
->
-> So I rebuilt it to ask the six real assistants and record what they actually cite. That
-> is the whole product now."
+The rule for this bit: it is about their client's money, not about me and not about how I
+built anything. One real number, the reason nobody sees it today, and what I'm about to
+show them.
 
-**If I only get one sentence across in this call, it's that one.**
+> "Before I show you anything, one number from a run I did last night.
+>
+> I took vitamin C serum in the UK, and I asked six assistants six of the questions a
+> buyer actually types. Three hundred and forty-three citations came back. The Ordinary,
+> which is one of the biggest brands in that category, was cited on one of those six
+> questions.
+>
+> And the part I find interesting is that nothing in their reporting would ever tell them
+> that. Because a click that doesn't happen leaves no trace. It's not in analytics, it's
+> not in the ad platform, so there's no line in the monthly deck that says it happened.
+> The budget just quietly stops working and nobody can point at where.
+>
+> So that's the gap I built for. In the next ten minutes I'll show you three things:
+> the tool measuring who actually gets cited, then explaining why those sites win, then
+> writing the fixes for the client's own page. And everything on the screen is something
+> you can check yourself without me."
+
+**Why I open this way.** It puts a real figure on the table in twenty seconds, it names
+the commercial problem in a way a CFO would follow, and the last sentence sets up the one
+thing that makes the tool different, which is that nothing in it is unverifiable.
+
+**If they look impatient and I need the short version:**
+
+> "The short version is: buying research is moving into assistants, an assistant names
+> three or four sources instead of ten links, and right now nobody can tell a client
+> whether they're one of them. This measures it, explains it, and writes the fixes."
 
 ---
 
@@ -361,6 +370,22 @@ person signs off.
 > Ukrainian, that the Swedish pages had English subheadings, and that one screen's headline
 > named one website while the section underneath took apart a different one."
 
+**What did you get wrong, or what would you do differently?**
+> "The main measurement, I built it once and threw it away. The first version asked an AI
+> model which websites it would cite for a question. And it answered, and it gave me one
+> site per question, and it looked completely fine on the screen.
+>
+> Then I actually went and looked at real answers, and two things were wrong. A real answer
+> cites several sources, not one. And the sources are different depending on which
+> assistant you ask. On a single question I got three domains from Google's AI Overview,
+> twenty-seven from AI Mode, twelve from Perplexity. So the idea that one site owns a
+> question is just false.
+>
+> What I'd take from that is that the model was describing what it imagines it does, and I
+> had no way to check it. So the rule I ended up with, and it's the rule the whole build
+> follows now, is that if I can't verify a number outside the tool, I don't put it on the
+> screen."
+
 **What's weak?**
 > "Three things and I'll say them before you ask. The board records what an assistant cites
 > today, not what it will index tomorrow. The authority factor only reads what's on the
@@ -373,7 +398,7 @@ person signs off.
 
 | Time | Screen | The one point |
 |---|---|---|
-| 0:00 | . | I threw away the first version because it was wrong |
+| 0:00 | . | one number: The Ordinary cited on 1 of 6 questions, and nothing reports it |
 | 1:30 | BOARD, live run | six real assistants, real citations |
 | 4:00 | BOARD, the WHY | named without being cited: the lever isn't your own page |
 | 6:00 | AUDIT | the dark space is the score you're missing |
