@@ -21,6 +21,8 @@ export interface MarketPlan {
   runnerUp: string;
   headline: string;
   body: string[];
+  /** The market's own questions, carried through to the CMS payload as its headings. */
+  sections?: { q: string; a: string }[];
   score: number;
   flags: { line: string; why: string }[];
   /** The plagiarism and AI-detection half of the gate. Never a verdict, always evidence. */

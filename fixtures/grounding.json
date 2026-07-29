@@ -29,52 +29,52 @@
     "SE": {
       "term": "c-vitaminserum",
       "monthlyVolume": 6600,
-      "note": "The literal translation 'vitamin c serum' gets 480 searches. Swedes compound the noun: c-vitaminserum wins 14 to 1. Translating the English term would target the wrong page.",
+      "note": "Den bokstavliga översättningen 'vitamin c serum' får 480 sökningar. Svenskar sätter samman substantivet: c-vitaminserum vinner 14 mot 1. Att översätta den engelska termen skulle rikta in sig på fel sida.",
       "runnerUp": "bästa c-vitaminserum",
       "sections": [
         {
           "q": "Vad menas egentligen med {term}?",
-          "a": "Sammansattningen ar inte kosmetisk. {term} skrivs i ett ord och far 6 600 sokningar i manaden, medan den engelska formen 'vitamin c serum' far 480. En sida som targetar oversattningen targetar fel sokord och rankar pa en term ingen anvander. Sjalva innehallsamnet ar L-askorbinsyra eller ett stabiliserat derivat, och i en meta-analys fran 2023 over 31 studier (PubMed 37298401) minskade pigmentflackar med 29 procent inom 12 veckor."
+          "a": "Sammansättningen är inte kosmetisk. {term} skrivs i ett ord och får 6 600 sökningar i månaden, medan den engelska formen 'vitamin c serum' får 480. En sida som riktar in sig på översättningen rankar på en term ingen använder. Det aktiva ämnet är L-askorbinsyra eller ett stabiliserat derivat, och i en metaanalys från 2023 över 31 studier (PubMed 37298401) minskade pigmentfläckar med 29 procent inom 12 veckor."
         },
         {
           "q": "Hur snabbt syns resultat?",
-          "a": "Ljusare hy syns vid atta veckor. Kollagenforandring ar matbar fran vecka tolv, vilket ar skalet till att hudlakare beskriver det som ett atagande pa tre manader snarare an en snabb losning. En biopsibekraftad studie fran 2024 med 84 deltagare matte 22 procent hogre kollagentathet efter 90 dagars daglig anvandning. Under de forsta veckorna handlar forandringen om ytlig ljushet, inte om struktur."
+          "a": "Ljusare hy syns vid åtta veckor. Kollagenförändring är mätbar från vecka tolv, vilket är skälet till att hudläkare beskriver det som ett åtagande på tre månader snarare än en snabb lösning. En biopsibekräftad studie från 2024 med 84 deltagare mätte 22 procent högre kollagentäthet efter 90 dagars daglig användning. De första veckorna handlar om ytlig ljushet, inte om struktur."
         },
         {
-          "q": "Vilken koncentration ska man valja?",
-          "a": "Tre kriterier avgor om ett serum behaller sin styrka: 10 till 20 procent L-askorbinsyra, opak och lufttat forpackning, samt pH mellan 3,0 och 3,5. Under 8 procent var den uppmatta effekten inte signifikant. Tetrahexyldecylaskorbat behaller 87 procent styrka efter sex manader, medan ren L-askorbinsyra i en genomskinlig pipettflaska behaller 41 procent och forlorar det mesta inom fyra veckor efter oppning."
+          "q": "Vilken koncentration ska man välja?",
+          "a": "Tre kriterier avgör om ett serum behåller sin styrka: 10 till 20 procent L-askorbinsyra, ogenomskinlig och lufttät förpackning, samt pH mellan 3,0 och 3,5. Under 8 procent var den uppmätta effekten inte signifikant. Tetrahexyldecylaskorbat behåller 87 procent styrka efter sex månader, medan ren L-askorbinsyra i en genomskinlig pipettflaska behåller 41 procent och förlorar det mesta inom fyra veckor efter öppning."
         },
         {
-          "q": "Hur paverkar den svenska vintern anvandningen?",
-          "a": "Med drygt fyra timmars dagsljus i Stockholm i december ar UV-argumentet svagare an i sydeuropeisk marknadsforing, dar samma produkt saljs som ett komplement till solskydd. Den svenska vinkeln ar pigmentering och hudton over aret, inte solskydd pa sommaren. Anvand tre till fyra droppar pa ren hud pa morgonen, fore fuktkram, och behall rutinen aven under vinterhalvaret."
+          "q": "Hur påverkar den svenska vintern användningen?",
+          "a": "Med drygt fyra timmars dagsljus i Stockholm i december är UV-argumentet svagare än i sydeuropeisk marknadsföring, där samma produkt säljs som ett komplement till solskydd. Den svenska vinkeln är pigmentering och hudton över året, inte solskydd på sommaren. Använd tre till fyra droppar på ren hud på morgonen, före fuktkräm."
         }
       ],
-      "marketNote": "Apotek och Lyko dominerar. Vinterhalvaret gor UV-argumentet svagt, vilket andrar vilken vinkel som fungerar."
+      "marketNote": "Apotek och Lyko dominerar. Vinterhalvåret gör UV-argumentet svagt, vilket ändrar vilken vinkel som fungerar."
     },
     "DK": {
       "term": "c-vitamin serum",
       "monthlyVolume": 3200,
-      "note": "Danish splits where Swedish compounds. Same ingredient, different orthography, separate page needed.",
+      "note": "Dansk deler hvor svensk sætter sammen. Samme ingrediens, anden ortografi, og derfor en selvstændig side.",
       "runnerUp": "c vitamin serum ansigt",
       "sections": [
         {
           "q": "Hvad er {term}?",
-          "a": "Dansk deler hvor svensk saetter sammen. Termen skrives {term} i to ord, ikke som det svenske c-vitaminserum, og det er samme ingrediens med anden ortografi. Derfor kraever markedet en selvstaendig side og ikke en oversaettelse. Det aktive stof er L-ascorbinsyre eller et stabiliseret derivat, og en meta-analyse fra 2023 over 31 studier (PubMed 37298401) malte 29 procent faerre pigmentpletter inden for 12 uger."
+          "a": "Dansk deler, hvor svensk sætter sammen. Termen skrives {term} i to ord, ikke som det svenske c-vitaminserum, og det er samme ingrediens med anden ortografi. Derfor kræver markedet en selvstændig side og ikke en oversættelse. Det aktive stof er L-ascorbinsyre eller et stabiliseret derivat, og en metaanalyse fra 2023 over 31 studier (PubMed 37298401) målte 29 procent færre pigmentpletter inden for 12 uger."
         },
         {
           "q": "Hvor lang tid tager det?",
-          "a": "Lysere hud efter otte uger. Kollagenforandring kan males fra uge tolv, hvilket er grunden til at hudlaeger beskriver det som et forlob pa tre maneder frem for en hurtig losning. Et biopsibekraeftet forsog fra 2024 med 84 deltagere malte 22 procent hojere kollagentaethed efter 90 dages daglig brug. De forste uger handler om overfladisk lysere hud, ikke om struktur."
+          "a": "Lysere hud efter otte uger. Kollagenforandring kan måles fra uge tolv, hvilket er grunden til, at hudlæger beskriver det som et forløb på tre måneder frem for en hurtig løsning. Et biopsibekræftet forsøg fra 2024 med 84 deltagere målte 22 procent højere kollagentæthed efter 90 dages daglig brug. De første uger handler om overfladisk lysere hud, ikke om struktur."
         },
         {
-          "q": "Hvordan vaelger man?",
-          "a": "Tre kriterier afgor om et serum holder styrken: 10 til 20 procent L-ascorbinsyre, uigennemsigtig og lufttaet emballage, og pH mellem 3,0 og 3,5. Under 8 procent var den malte effekt ikke signifikant. Tetrahexyldecylascorbat holder 87 procent styrke efter seks maneder, mens ren L-ascorbinsyre i en klar draabeflaske holder 41 procent og mister det meste inden for fire uger efter abning."
+          "q": "Hvordan vælger man?",
+          "a": "Tre kriterier afgør, om et serum holder styrken: 10 til 20 procent L-ascorbinsyre, uigennemsigtig og lufttæt emballage, og pH mellem 3,0 og 3,5. Under 8 procent var den målte effekt ikke signifikant. Tetrahexyldecylascorbat holder 87 procent styrke efter seks måneder, mens ren L-ascorbinsyre i en klar dråbeflaske holder 41 procent og mister det meste inden for fire uger efter åbning."
         },
         {
-          "q": "Hvad siger reglerne om paastande?",
-          "a": "EU-kosmetikforordningen tillader ikke laegemiddellignende paastande, sa formuleringer om at behandle eller kurere skal omskrives for det danske marked. Britiske sider bruger et friere sprog end det Forbrugerombudsmanden accepterer her, og en direkte overfoersel af den engelske tekst ville derfor vaere et compliance-problem og ikke kun et sprogligt. Brug tre til fire draaber pa ren hud om morgenen, for fugtighedscreme og solcreme."
+          "q": "Hvad siger reglerne om påstande?",
+          "a": "EU-kosmetikforordningen tillader ikke lægemiddellignende påstande, så formuleringer om at behandle eller kurere skal omskrives til det danske marked. Britiske sider bruger et friere sprog, end Forbrugerombudsmanden accepterer her, og en direkte overførsel af den engelske tekst ville derfor være et compliance-problem og ikke kun et sprogligt. Brug tre til fire dråber på ren hud om morgenen, før fugtighedscreme og solcreme."
         }
       ],
-      "marketNote": "Matas ejer kategorien. EU-reglerne om paastande er strengere end den britiske markedsforingstone."
+      "marketNote": "Matas ejer kategorien. EU-reglerne om påstande er strengere end den britiske markedsføringstone."
     }
   }
 }

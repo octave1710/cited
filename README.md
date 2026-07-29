@@ -202,6 +202,21 @@ questions as their own brief list, the corrected HTML, the JSON-LD block, the ro
 patch, and the ranked fix plan. Every row of the map can be checked by typing that question
 into ChatGPT.
 
+## Where this refuses to automate
+
+The brief asks for it by name. Each line is enforced by code, not by a disabled button.
+
+| Refusal | Enforced at |
+|---|---|
+| Nothing publishes without a **named** human, per market | `pipeline/run.ts` `publish()` throws `GateError`; the route answers **409** |
+| An anonymous sign-off is not a sign-off | `app/api/pipeline/[id]/approve/route.ts` answers **400** on a blank name |
+| No market is guessed. Missing grounding is a hard stop | `pipeline/run.ts`, the run fails with the reason instead of translating from English |
+| A localisation is proposed, never deployed | `hreflang` is emitted into the payload and never pushed |
+| No figure, quote or author is invented | `engine/fixes.ts` emits a `[SOURCED STAT]` slot and counts the fix as refused |
+| No claim about authorship from a classifier | `pipeline/originality.ts` reports measured overlap and quoted phrases, never a verdict |
+| Volume cap per run | `app/api/pipeline/route.ts` refuses more than six markets |
+
+
 ## Stack
 
 Next 16, React 19, Tailwind v4, TypeScript, vitest. GSAP for the two moments that carry

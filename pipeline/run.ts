@@ -14,13 +14,14 @@ import { audit } from "../engine/score";
 export * from "./nodes";
 import type { GateDecision, MarketPlan, NodeId, NodeState, PipelineRun } from "./nodes";
 import { checkOriginality, OVERLAP_REVIEW } from "./originality";
+import { marketOf } from "../citationmap/markets";
 import { NODES } from "./nodes";
 
 /** One headline shape per market, written in that market's language, never translated. */
 const HEADLINES: Record<string, (t: string) => string> = {
   UK: (t) => `${t}: what it does, how long it takes, and how to choose one`,
-  SE: (t) => `${t}: vad det gor, hur lang tid det tar och hur du valjer`,
-  DK: (t) => `${t}: hvad det gor, hvor lang tid det tager, og hvordan du vaelger`,
+  SE: (t) => `${t}: vad det gör, hur lång tid det tar och hur du väljer`,
+  DK: (t) => `${t}: hvad det gør, hvor lang tid det tager, og hvordan du vælger`,
 };
 
 const MIN_SCORE = 55;
@@ -137,9 +138,9 @@ export function runToGate(input: { id: string; topic: string; markets: string[];
     const headline = HEADLINES[m] ? HEADLINES[m](g.term) : `${g.term}: what it does, how long it takes, and how to choose one`;
     const body = sections.map((sec: GroundSection) => sec.a);
 
-    const html = `<!DOCTYPE html><html lang="${m.toLowerCase()}"><head><title>${headline}</title>
+    const html = `<!DOCTYPE html><html lang="${marketOf(m).locale}"><head><title>${headline}</title>
 <meta name="description" content="${body[0].slice(0, 150)}">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(headline)},"inLanguage":"${m.toLowerCase()}","datePublished":"${new Date().toISOString().slice(0, 10)}","dateModified":"${new Date().toISOString().slice(0, 10)}","author":{"@type":"Person","name":"[SUPPLIED BY CLIENT]"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(headline)},"inLanguage":"${marketOf(m).locale}","datePublished":"${new Date().toISOString().slice(0, 10)}","dateModified":"${new Date().toISOString().slice(0, 10)}","author":{"@type":"Person","name":"[SUPPLIED BY CLIENT]"}}</script>
 </head><body><article><h1>${headline}</h1>
 ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join("")}
 </article></body></html>`;
@@ -161,6 +162,7 @@ ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join(
       runnerUp: g.runnerUp,
       headline,
       body,
+      sections,
       score: scored.overall,
       flags,
     });
@@ -238,7 +240,13 @@ export function publish(run: PipelineRun): PipelineRun {
 
   run.output = run.plans.map((p) => ({
     market: p.market,
-    markdown: [`# ${p.headline}`, "", ...p.body.flatMap((b, i) => [`## ${["What does it do?", "How long does it take?", "How do you choose one?", "How should you apply it?"][i]}`, "", b, ""])].join("\n"),
+    /**
+     * Headings come from the market's own question set. They were hardcoded English and
+     * indexed by position, so a Swedish article shipped under English subheadings and a
+     * fifth section would have emitted "## undefined". Headings are what an engine
+     * matches, which makes this the worst place to lose the localisation.
+     */
+    markdown: [`# ${p.headline}`, "", ...(p.sections ?? []).flatMap((sec) => [`## ${sec.q}`, "", sec.a, ""])].join(String.fromCharCode(10)),
     metadata: {
       title: p.headline,
       description: p.body[0].slice(0, 155),
@@ -247,7 +255,18 @@ export function publish(run: PipelineRun): PipelineRun {
       status: "ready for CMS, not published",
       approvedBy: run.decisions.find((d) => d.market === p.market)?.approvedBy ?? "",
     },
-    hreflang: run.markets.map((m) => `<link rel="alternate" hreflang="${m.toLowerCase()}" href="/${m.toLowerCase()}/${slug(run.plans.find((x) => x.market === m)!.term)}" />`),
+    /**
+     * hreflang takes a LANGUAGE subtag, not a country code. Lowercasing the market code
+     * emitted uk for the United Kingdom, which is Ukrainian, and se for Sweden, which is
+     * Northern Sami. dk is not a valid subtag at all. The right values already existed in
+     * citationmap/markets.ts and were never imported here.
+     */
+    hreflang: [
+      ...run.markets.map(
+        (m) => `<link rel="alternate" hreflang="${marketOf(m).locale}" href="/${m.toLowerCase()}/${slug(run.plans.find((x) => x.market === m)!.term)}" />`,
+      ),
+      `<link rel="alternate" hreflang="x-default" href="/${run.markets[0].toLowerCase()}/${slug(run.plans.find((x) => x.market === run.markets[0])!.term)}" />`,
+    ],
   }));
 
   run.nodes.publish = { state: "done", note: `${run.output.length} CMS payloads written. hreflang proposed, never pushed.` };

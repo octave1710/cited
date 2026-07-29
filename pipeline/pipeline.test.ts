@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { GateError, publish, runToGate } from "./run";
 
@@ -18,7 +20,7 @@ describe("pipeline to the gate", () => {
     const uk = run.plans.find((p) => p.market === "UK")!;
     expect(se.term).toBe("c-vitaminserum");
     expect(se.term).not.toBe(uk.term);
-    expect(se.groundingNote).toMatch(/translation/i);
+    expect(se.groundingNote).toMatch(/översättning/i);
   });
 
   it("hard-stops when grounding is missing rather than guessing", () => {
@@ -65,5 +67,36 @@ describe("the gate refuses in the domain logic, not in the UI", () => {
     expect(done.output!.flatMap((o) => o.hreflang).join(" ")).toContain("/se/c-vitaminserum");
     expect(done.output!.every((o) => o.metadata.status.includes("not published"))).toBe(true);
     expect(done.output!.every((o) => o.metadata.approvedBy.length > 0)).toBe(true);
+  });
+});
+
+/**
+ * Nothing in 237 tests caught Swedish and Danish copy written without diacritics, so
+ * "vad det gör" shipped as "vad det gor" to a Stockholm agency. These are the guards.
+ */
+describe("the Nordic markets read as their own languages", () => {
+  const grounding = JSON.parse(readFileSync(join(process.cwd(), "fixtures/grounding.json"), "utf8")) as Record<
+    string,
+    Record<string, { term: string; note: string; marketNote?: string; sections?: { q: string; a: string }[] }>
+  >;
+  const topic = grounding["vitamin c serum"];
+
+  it("writes Swedish with a, a and o, not stripped ASCII", () => {
+    const text = [topic.SE.note, topic.SE.marketNote ?? "", ...(topic.SE.sections ?? []).flatMap((s) => [s.q, s.a])].join(" ");
+    expect(text).toMatch(/[åäö]/);
+  });
+
+  it("writes Danish with ae, o and a, not stripped ASCII", () => {
+    const text = [topic.DK.note, topic.DK.marketNote ?? "", ...(topic.DK.sections ?? []).flatMap((s) => [s.q, s.a])].join(" ");
+    expect(text).toMatch(/[æøå]/);
+  });
+
+  it("gives every non-UK market its own question set rather than the English one", () => {
+    for (const m of ["SE", "DK"]) {
+      const qs = (topic[m].sections ?? []).map((s) => s.q);
+      expect(qs.length).toBeGreaterThan(0);
+      const english = (topic.UK.sections ?? []).map((s) => s.q);
+      for (const q of qs) expect(english).not.toContain(q);
+    }
   });
 });
