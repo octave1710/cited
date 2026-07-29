@@ -36,5 +36,9 @@
   "license": "MIT",
   "engines": {
     "node": ">=22"
+  },
+  "_comment_optionalDependencies": "@emnapi/runtime is a peer of sharp wasm32 that npm on Windows does not resolve, so npm ci on a Linux runner reported it missing from the lock. Pinned explicitly so the lockfile is platform-complete.",
+  "optionalDependencies": {
+    "@emnapi/runtime": "1.11.3"
   }
 }
