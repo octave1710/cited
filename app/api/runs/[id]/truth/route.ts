@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { productionTruth } from "../../../../../adapters/profound";
-import { getRun, saveRun } from "../../../../../lib/db";
+import { saveRun } from "../../../../../lib/db";
+import { resolveRun } from "../../../../../lib/rehydrate";
 import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib/run-helpers";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const run = getRun(id);
+  const run = await resolveRun(id, await req.json().catch(() => ({})));
   if (!run) return NextResponse.json({ error: `No run "${id}".` }, { status: 404 });
 
   markRunning(run, "truth");

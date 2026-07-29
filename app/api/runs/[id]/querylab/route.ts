@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse } from "../../../../../engine/parse";
-import { getRun, saveRun } from "../../../../../lib/db";
+import { saveRun } from "../../../../../lib/db";
+import { resolveRun } from "../../../../../lib/rehydrate";
 import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib/run-helpers";
 import { getLLM } from "../../../../../adapters/llm";
 import { fanout, userQueries } from "../../../../../querylab/fanout";
 import { toLabDoc } from "../../../../../querylab/detect";
 import { runLab } from "../../../../../querylab/run";
+import type { Run } from "../../../../../lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -16,11 +18,10 @@ const COMPETITORS = ["fixtures/pages/competitor-1.html", "fixtures/pages/competi
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const run = getRun(id);
+  const body = (await req.json().catch(() => ({}))) as { topic?: string; queries?: string[]; run?: Run; html?: string };
+  const run = await resolveRun(id, body);
   if (!run) return NextResponse.json({ error: `No run "${id}".` }, { status: 404 });
   if (!run.html) return NextResponse.json({ error: "This run has no stored page." }, { status: 409 });
-
-  const body = (await req.json().catch(() => ({}))) as { topic?: string; queries?: string[] };
   const topic = (body.topic ?? "").trim().slice(0, 200) || guessTopic(run.url);
 
   // one billed engine call per element, so the array is bounded at the boundary rather

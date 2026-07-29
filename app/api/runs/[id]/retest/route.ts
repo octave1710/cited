@@ -5,7 +5,8 @@ import { parse } from "../../../../../engine/parse";
 import { audit } from "../../../../../engine/score";
 import { generateFixes } from "../../../../../engine/fixes";
 import { applyFixes, type SuppliedFacts } from "../../../../../engine/apply";
-import { getRun, saveRun } from "../../../../../lib/db";
+import { saveRun } from "../../../../../lib/db";
+import { resolveRun } from "../../../../../lib/rehydrate";
 import { markDone, markFailed, markRunning, stripHtml } from "../../../../../lib/run-helpers";
 import { getLLM } from "../../../../../adapters/llm";
 import { fanout } from "../../../../../querylab/fanout";
@@ -37,9 +38,9 @@ function suppliedFor(run: { demoId?: string; supplied?: SuppliedFacts }): Suppli
   }
 }
 
-export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const run = getRun(id);
+  const run = await resolveRun(id, await req.json().catch(() => ({})));
   if (!run) return NextResponse.json({ error: `No run "${id}".` }, { status: 404 });
   if (!run.html) return NextResponse.json({ error: "This run has no stored page." }, { status: 409 });
   if (!run.lab) {

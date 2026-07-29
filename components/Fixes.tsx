@@ -27,7 +27,25 @@ function withSlots(text: string) {
   );
 }
 
-export function FixesPanel({ run, busy, onSchema }: { run: Run; busy: string | null; onSchema: () => void }) {
+/**
+ * The bundle is built from the run posted up, not looked up by id: a hosted build keeps
+ * nothing between two requests, so every download link answered "No run on file".
+ */
+async function downloadBundle(run: Run): Promise<void> {
+  const res = await fetch("/api/bundle", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ run }),
+  });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(await res.blob());
+  a.download = res.headers.get("content-disposition")?.match(/filename="(.+)"/)?.[1] ?? "cited-bundle.zip";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+export function FixesPanel({ run, busy, onSchema, onRun }: { run: Run; busy: string | null; onSchema: () => void; onRun: (r: Run) => void }) {
   const fixes = run.fixes ?? [];
   const needSlots = fixes.filter((f) => needsSuppliedFact(f.after)).length;
 
@@ -63,7 +81,7 @@ export function FixesPanel({ run, busy, onSchema }: { run: Run; busy: string | n
 
       {run.schema && <SchemaBlock run={run} />}
 
-      <FactSheet run={run} />
+      <FactSheet run={run} onRun={onRun} />
       <BundleBox run={run} />
     </div>
   );
@@ -74,7 +92,7 @@ export function FixesPanel({ run, busy, onSchema }: { run: Run; busy: string | n
  * lift it. This hands over one sheet with an empty answer column and takes it back
  * filled. A row left blank stays a visible empty slot on the page.
  */
-function FactSheet({ run }: { run: Run }) {
+function FactSheet({ run, onRun }: { run: Run; onRun: (r: Run) => void }) {
   const [sheet, setSheet] = useState("");
   const [result, setResult] = useState<{ asked: number; answered: number; stillEmpty: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -90,11 +108,15 @@ function FactSheet({ run }: { run: Run }) {
       const res = await fetch(`/api/runs/${run.id}/facts`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ csv: sheet }),
+        // same reason as the step calls in app/page.tsx: the run travels with the request
+        body: JSON.stringify({ csv: sheet, run }),
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error ?? `Request failed (${res.status}).`);
       setResult({ asked: j.asked, answered: j.answered, stillEmpty: j.stillEmpty });
+      /* the answers have to reach the run the re-test will be given, or they are read
+         once and dropped: the server holds nothing between two requests */
+      if (j.run) onRun(j.run);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -112,9 +134,9 @@ function FactSheet({ run }: { run: Run }) {
       </p>
 
       <div style={{ display: "flex", gap: 14, marginTop: 22, alignItems: "center", flexWrap: "wrap" }}>
-        <a className="btn btn--primary" href={`/api/bundle?run=${encodeURIComponent(run.id)}`} download>
+        <button className="btn btn--primary" onClick={() => void downloadBundle(run).catch((e) => setError((e as Error).message))}>
           Get facts-needed.csv
-        </a>
+        </button>
         <span className="m-sm meta">IN THE BUNDLE, ONE ROW PER REFUSAL</span>
       </div>
 
@@ -153,6 +175,7 @@ function FactSheet({ run }: { run: Run }) {
  * what this run actually holds, so a thin bundle is visibly thin instead of a surprise.
  */
 export function BundleBox({ run }: { run: Run }) {
+  const [err, setErr] = useState<string | null>(null);
   const files: [boolean, string, string][] = [
     [Boolean(run.fixedHtml), "corrected.html", "your page with the structural fixes applied"],
     [Boolean(run.schema?.blocks?.length), "schema.jsonld", "paste into a script tag in the head"],
@@ -186,9 +209,12 @@ export function BundleBox({ run }: { run: Run }) {
             </div>
           ))}
         </div>
-        <a className="btn btn--primary" href={`/api/bundle?run=${encodeURIComponent(run.id)}`} download>
-          Download {ready.length} file{ready.length > 1 ? "s" : ""}
-        </a>
+        <div>
+          <button className="btn btn--primary" onClick={() => void downloadBundle(run).catch((e) => setErr((e as Error).message))}>
+            Download {ready.length} file{ready.length > 1 ? "s" : ""}
+          </button>
+          {err && <p style={{ fontSize: 15, color: "var(--red)", marginTop: 10, maxWidth: "36ch" }}>{err}</p>}
+        </div>
       </div>
     </div>
   );

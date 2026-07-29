@@ -23,6 +23,8 @@ export default function Page() {
   const [error, setError] = useState<string | null>(null);
   const [active, setActive] = useState<StepId>("score");
   const [target, setTarget] = useState<{ url: string; mode: "live" | "demo" }>({ url: "", mode: "live" });
+  /* pasted source has no other holder: a fixture can be re-read and a URL re-fetched */
+  const [pasted, setPasted] = useState<string | null>(null);
 
   const start = useCallback(async (input: { url?: string; demoId?: string; html?: string; sourceUrl?: string; brand: string; market: string }) => {
     setBusy("run");
@@ -34,6 +36,7 @@ export default function Page() {
     setAccess([]);
     setPatch(null);
     setActive("score");
+    setPasted(input.html?.trim() ? input.html : null);
     setTarget({ url: input.html ? input.sourceUrl?.trim() || "pasted HTML" : input.url || "", mode: input.demoId ? "demo" : "live" });
 
     try {
@@ -86,7 +89,12 @@ export default function Page() {
         const res = await fetch(`/api/runs/${run.id}/${name}`, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({}),
+          /**
+           * The run travels with every step. A hosted build gives each request its own
+           * instance, so the server cannot be relied on to still hold what the previous
+           * click produced; it holds the page, and the client holds the state.
+           */
+          body: JSON.stringify({ run, html: pasted ?? undefined }),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status}).`);
@@ -98,7 +106,7 @@ export default function Page() {
         setBusy(null);
       }
     },
-    [run],
+    [run, pasted],
   );
 
   const showFixes = active === "fixes" && run?.fixes;
@@ -147,7 +155,7 @@ export default function Page() {
               onRetest={() => step("retest")}
             />
           )}
-          {!showTruth && !showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} />}
+          {!showTruth && !showLab && showFixes && <FixesPanel run={run!} busy={busy} onSchema={() => step("schema")} onRun={setRun} />}
           {!showTruth && !showLab && !showFixes && (trace.length > 0 || run) && (
             <>
               <AuditPanel
