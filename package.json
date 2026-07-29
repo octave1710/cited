@@ -2,14 +2,14 @@
   "name": "cited",
   "version": "0.1.0",
   "private": true,
-  "description": "CITED — AEO page auditor and multi-market content engine (Precis case)",
+  "description": "Measures which sites six real answer engines cite for a category, explains why, and writes the fixes.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run test && npm run build",
+    "verify": "tsc --noEmit && vitest run && next build",
     "audit": "tsx cli.ts audit"
   },
   "devDependencies": {
@@ -32,5 +32,9 @@
     "next": "^16.2.12",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
   }
 }

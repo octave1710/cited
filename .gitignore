@@ -13,3 +13,10 @@ nul
 _probe_tmp.ts
 .shot.mjs
 .case-brief.txt
+
+# working notes and rejected design variants, not part of the deliverable
+GOAL.md
+MASTER_PROMPT*.md
+SPEC_V2.md
+HANDOFF_*.md
+design/mockups/

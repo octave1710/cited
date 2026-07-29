@@ -1,412 +1,408 @@
-# CITED — script d'entretien
+# CITED, interview script
 
-Pour le call avec les deux managers. Tout ce qui suit est mesuré sur cette machine et
-vérifiable en direct. Les chiffres cités sont réels, pas des exemples.
-
----
-
-# PARTIE 0 — l'ouverture, 90 secondes
-
-> « Le brief dit que vous voulez voir mon jugement, pas mon volume. Donc je commence par
-> la décision qui a coûté le plus cher : j'ai jeté la première version de la partie qui
-> mesure la visibilité, parce qu'elle était fausse. Je vais vous montrer pourquoi. »
-
-**La première version** demandait à `gpt-4o-mini` : *« quels sites citerais-tu pour cette
-question ? »*. Ça produisait un site par question, et rien n'était vérifiable. C'est un
-modèle qui décrit son comportement imaginaire.
-
-**Ce qui l'a tuée** : une vraie réponse d'assistant cite **plusieurs** sources, et elles
-diffèrent d'un moteur à l'autre. Mesuré sur une seule question : AI Overview 3 domaines,
-AI Mode 27, Perplexity 12, ChatGPT 11, Gemini 3. Un propriétaire unique par question est
-donc faux par construction.
-
-**Ce que j'ai fait à la place** : interroger les six vrais moteurs.
-
-Si on ne retient qu'une phrase de l'entretien, c'est celle-là.
+For the call with the two managers. Everything below is measured on this machine and can be
+checked live. The figures quoted are real, not illustrations.
 
 ---
 
-# PARTIE 1 — l'architecture, avant de cliquer
+# PART 0. The opening, 90 seconds
 
-## Le principe qui gouverne tout le code
+> "The brief says you want to see my judgement, not my volume. So I'll start with the
+> decision that cost the most: I threw away the first version of the part that measures
+> visibility, because it was wrong. I'll show you why."
 
-**Tout ce qui est affiché doit être vérifiable en dehors de l'outil.** Trois conséquences
-concrètes, et elles sont dans le code, pas dans le discours :
+**The first version** asked `gpt-4o-mini`: *"which sites would you cite for this
+question?"*. That produced one site per question, and nothing was verifiable. It's a model
+describing its own imaginary behaviour.
 
-1. Une question est une phrase qu'on retape dans un assistant.
-2. Une ligne de `robots.txt` est citée mot pour mot depuis un fichier public.
-3. Une phrase de comparaison est extraite de la page telle quelle, jamais paraphrasée.
+**What killed it**: a real assistant answer cites **several** sources, and they differ from
+one engine to the next. Measured on a single question: AI Overview 3 domains, AI Mode 27,
+Perplexity 12, ChatGPT 11, Gemini 3. So a single owner per question is wrong by
+construction.
 
-Corollaire : **quand une donnée manque, le trou reste visible**. Le générateur de
-corrections émet un emplacement `[SOURCED STAT]` et compte la correction comme *refusée*
-plutôt que d'inventer un chiffre.
+**What I did instead**: query the six real engines.
 
-## La carte du dépôt
+If only one sentence from this interview sticks, it's that one.
+
+---
+
+# PART 1. The architecture, before clicking anything
+
+## The principle that governs all the code
+
+**Everything displayed has to be verifiable outside the tool.** Three concrete
+consequences, and they live in the code, not in the pitch:
+
+1. A question is a sentence you can retype into an assistant.
+2. A `robots.txt` line is quoted word for word from a public file.
+3. A comparison sentence is pulled from the page as is, never paraphrased.
+
+Corollary: **when data is missing, the hole stays visible**. The fix generator emits a
+`[SOURCED STAT]` placeholder and counts the fix as *refused* rather than inventing a
+number.
+
+## The repo map
 
 ```
-engines/     la mesure : six moteurs, le tableau, le teardown, les exports
-engine/      le Case 1 : ingestion, parsing, neuf facteurs, corrections, schema
-autopsy/     le bonus du Case 1 : résolution de la page concurrente, comparaison
-pipeline/    le Case 2 : sept nœuds, la porte, le contrôle d'originalité
-adapters/    la frontière LLM, avec ses modes réel / rejeu / auto
-lib/         zip sans dépendance, sqlite, sujet partagé, persistance d'écran
-app/         Next 16, quatre écrans et les routes API
+engines/     the measurement: six engines, the board, the teardown, the exports
+engine/      Case 1: ingestion, parsing, nine factors, fixes, schema
+autopsy/     the Case 1 bonus: resolving the competitor page, comparison
+pipeline/    Case 2: seven nodes, the gate, the originality check
+adapters/    the LLM boundary, with its live / replay / auto modes
+lib/         dependency-free zip, sqlite, shared topic, screen persistence
+app/         Next 16, four screens and the API routes
 ```
 
-## Le stack, et pourquoi
+## The stack, and why
 
-| Choix | Raison |
+| Choice | Reason |
 |---|---|
-| Next 16 App Router | routes API et écrans dans un dépôt, streaming NDJSON natif |
-| `node:sqlite` | pas de `better-sqlite3` : pas de toolchain de compilation sur cette machine, et une dépendance native est une dette pour qui reprend le projet |
-| Écrivain ZIP maison | 120 lignes, CRC32 et en-têtes locaux. Une dépendance de moins pour produire un livrable |
-| vitest | 240 tests, chacun échouant si le défaut qu'il documente revient |
-| GSAP + Motion | animation d'arrivée qui porte l'information, pas de la décoration |
-| Playwright | second recours de lecture, voir plus bas |
+| Next 16 App Router | API routes and screens in one repo, native NDJSON streaming |
+| `node:sqlite` | no `better-sqlite3`: no compilation toolchain on this machine, and a native dependency is a debt for whoever picks the project up |
+| In-house ZIP writer | 120 lines, CRC32 and local headers. One less dependency to produce a deliverable |
+| vitest | 240 tests, each failing if the defect it documents comes back |
+| GSAP + Motion | entrance animation that carries information, not decoration |
+| Playwright | second-resort read path, see below |
 
 ---
 
-# PARTIE 2 — la démo, écran par écran
+# PART 2. The demo, screen by screen
 
-## Écran 1 — BOARD. « Qui est cité, réellement »
+## Screen 1. BOARD, "who actually gets cited"
 
-### Ce que tu tapes
-Un sujet. Un domaine, facultatif. Un marché parmi neuf. Le nombre de questions à poser.
+### What you type
+A topic. A domain, optional. One market out of nine. The number of questions to ask.
 
-### Ce que tu dis en tapant
-> « Le sujet peut être n'importe quelle catégorie. Le champ marque est optionnel : l'outil
-> répond même sans marque, parce que la question "qui gagne dans ma catégorie" se pose
-> avant d'avoir un client. »
+### What you say while typing
+> "The topic can be any category. The brand field is optional, the tool still answers
+> without one, because the question 'who wins in my category' comes up before you have a
+> client."
 
-### Ce qui se passe, dans l'ordre
+### What happens, in order
 
-**Étape 1, les questions.** Huit angles d'achat, chacun demandant N questions au modèle,
-dédupliquées sur une forme normalisée. Coût mesuré : **1,3 cent** pour ~160 questions.
+**Step 1, the questions.** Eight buying angles, each asking the model for N questions,
+deduplicated on a normalized form. Measured cost: **1.3 cents** for around 160 questions.
 
-> **Si on te demande pourquoi un LLM ici et pas ailleurs :** écrire les questions qu'un
-> acheteur pose est exactement ce pour quoi un modèle de langue est bon, et personne ne
-> prétend que ce sont des volumes de recherche. Elles sont lisibles et éditables à l'écran.
-> Mesurer qui est cité est l'inverse : ça demande une observation, pas une génération.
+> **If you're asked why an LLM here and not elsewhere:** writing the questions a buyer asks
+> is exactly what a language model is good at, and nobody is claiming these are search
+> volumes. They're readable and editable on screen. Measuring who gets cited is the
+> opposite: it takes observation, not generation.
 
-**Étape 2, les six moteurs.** Cinq passent par un seul acteur Apify qui les expose en
-add-ons : `aiOverview`, `aiModeSearch`, `perplexitySearch`, `chatGptSearch`, `geminiSearch`.
+**Step 2, the six engines.** Five go through a single Apify actor that exposes them as
+add-ons: `aiOverview`, `aiModeSearch`, `perplexitySearch`, `chatGptSearch`, `geminiSearch`.
 
-> **Détail technique à garder sous le coude :** chaque add-on est un **objet**, pas un
-> booléen. Passer `true` renvoie un HTTP 400. Ça m'a coûté un aller-retour.
+> **Technical detail to keep in your back pocket:** each add-on is an **object**, not a
+> boolean. Passing `true` returns an HTTP 400. That cost me one round trip.
 
-**Claude est le sixième** et n'est pas un add-on de cet acteur. Il est appelé à la source,
-sur l'API Anthropic Messages avec l'outil `web_search`, **en parallèle** de l'acteur :
-l'acteur prend des minutes, ces appels prennent des secondes, les enchaîner n'ajouterait
-que de l'attente. C'est la seule lecture de première main des six.
+**Claude is the sixth** and is not an add-on of that actor. It's called at the source, on
+the Anthropic Messages API with the `web_search` tool, **in parallel** with the actor: the
+actor takes minutes, these calls take seconds, chaining them would only add waiting. It's
+the only first-hand read of the six.
 
-**Étape 3, le tableau.**
+**Step 3, the board.**
 
-### Le dispositif, et pourquoi il encode trois choses séparément
+### The device, and why it encodes three things separately
 
-> « Un total unique cacherait le constat central. »
+> "A single total would hide the main finding."
 
-| Encodage | Ce qu'il dit |
+| Encoding | What it says |
 |---|---|
-| **Blocs verts** à gauche | combien de moteurs citent ce site |
-| **Carrés bleus**, aire en racine carrée | combien de fois, par moteur |
-| **Traits ambre** à droite | combien de fois ce site **ouvre** la réponse |
+| **Green blocks** on the left | how many engines cite this site |
+| **Blue squares**, area on a square root | how many times, per engine |
+| **Amber ticks** on the right | how many times this site **opens** the answer |
 
-**Le constat qui justifie la séparation, mesuré :** `youtube.com` a la plus grosse part de
-citations d'un panel et **zéro première place**. Être cité et être la source sur laquelle
-le moteur s'appuie sont deux résultats différents.
+**The finding that justifies the split, measured:** `youtube.com` has the largest citation
+share in one panel and **zero first positions**. Being cited and being the source the
+engine leans on are two different outcomes.
 
-> **Pourquoi la racine carrée :** l'aire est lue comme une quantité. Un côté linéaire fait
-> lire un 9 comme neuf fois un 1 alors que l'œil lit le carré.
+> **Why the square root:** area reads as a quantity. A linear side makes a 9 read as nine
+> times a 1, when the eye is reading the square.
 
-### Les chiffres d'en-tête
-`5/10`, `19/65` : le premier est ce que les lignes affichées contiennent, le second est
-tout ce que ce moteur a donné. **Additionne la colonne, tu tombes sur le premier chiffre.**
-Invite le recruteur à le faire.
+### The header numbers
+`5/10`, `19/65`: the first is what the displayed rows contain, the second is everything
+that engine returned. **Add up the column and you land on the first number.** Invite the
+interviewer to do it.
 
-### Le consensus
-Les domaines cités par **tous les moteurs qui ont répondu**. Pas tous les moteurs définis :
-Gemini se tait souvent, et exiger sa voix viderait l'ensemble pour une raison sans rapport
-avec les domaines comparés.
+### The consensus
+The domains cited by **every engine that answered**. Not every engine defined: Gemini often
+stays silent, and requiring its vote would empty the set for a reason unrelated to the
+domains being compared.
 
-### La section WHY
+### The WHY section
 
-**Comment la cible est choisie**, et c'est écrit à l'écran : **premières places d'abord**,
-puis portée moteur, puis volume. Pas le plus gros volume.
+**How the target is chosen**, and it's written on screen: **first positions first**, then
+engine reach, then volume. Not the biggest volume.
 
-> **Anecdote à raconter :** le tri initial était sur la portée. Sur un panel réel il a
-> désigné `smytten.com`, huit citations et **zéro** première place. Un domaine sur lequel
-> les moteurs ne s'appuient jamais n'apprend rien sur comment être choisi.
+> **Anecdote to tell:** the initial sort was on reach. On a real panel it picked
+> `smytten.com`, eight citations and **zero** first positions. A domain the engines never
+> lean on teaches you nothing about how to get picked.
 
-**Trois facteurs, trois dispositifs différents**, chacun nommant son dénominateur :
-- **Portée moteur** — un coin, aire en racine carrée
-- **Premières places par intention** — un escalier, en ambre
-- **Nommé sans être cité** — un peigne de 22 traits
+**Three factors, three different devices**, each naming its denominator:
+- **Engine reach**: a corner, area on a square root
+- **First positions by intent**: a staircase, in amber
+- **Named without being cited**: a comb of 22 ticks
 
-**Le troisième est le plus commercial.** Mesuré : *Simple* est nommée dans 8 réponses sur
-les 5 moteurs, avec son propre domaine cité **1 fois**. *CeraVe* nommée dans 5, cité **0**.
-Sur un autre panel, **5 marques sur 6** nommées dans les réponses l'étaient avec zéro
-citation de leur site.
+**The third is the most commercial.** Measured: *Simple* is named in 8 answers across the 5
+engines, with its own domain cited **1 time**. *CeraVe* named in 5, cited **0**. On another
+panel, **5 brands out of 6** named in the answers had zero citations of their own site.
 
-> **Ce que ça prouve, et c'est le cœur de l'argument :** le levier n'est pas le balisage
-> on-page. C'est d'être nommé sur la page de quelqu'un d'autre.
+> **What that proves, and it's the heart of the argument:** the lever is not on-page
+> markup. It's being named on somebody else's page.
 
-**Les deux colonnes du bas.** Ce qu'un client peut copier, et ce qu'aucune page n'achètera.
-La seconde existe pour qu'on ne vende jamais à un client un plan pour devenir Reddit.
+**The two bottom columns.** What a client can copy, and what no page will ever buy. The
+second one exists so we never sell a client a plan to become Reddit.
 
-**La ligne d'honnêteté, qui reste visible :** *« This teardown answers 3 of the 9 designed
-factors. The other 6 need a page fetch, a second engine run, or are not measurable at all »*,
-avec les six nommés.
+**The honesty line, which stays on screen:** *"This teardown answers 3 of the 9 designed
+factors. The other 6 need a page fetch, a second engine run, or are not measurable at all"*,
+with the six named.
 
-> « Je préfère qu'un outil déclare ce qu'il n'a pas mesuré plutôt qu'il donne un score sur
-> neuf facteurs dont six sont devinés. »
+> "I'd rather a tool declare what it didn't measure than hand you a score across nine
+> factors when six of them are guesses."
 
-### Le téléchargement
-`citations.csv`, `board.csv`, `gaps.csv`, `brief.md`, `README.txt`. Tout construit depuis
-les chiffres du run.
+### The download
+`citations.csv`, `board.csv`, `gaps.csv`, `brief.md`, `README.txt`. All built from the
+numbers of the run.
 
 ---
 
-## Écran 2 — AUDIT. Le Case 1
+## Screen 2. AUDIT, Case 1
 
-### L'ingestion
-Une URL, **ou du HTML collé**. Le brief le demande explicitement.
+### Ingestion
+A URL, **or pasted HTML**. The brief asks for it explicitly.
 
-**Le garde SSRF, à raconter si on te demande la sécurité.** J'ai trouvé trois
-contournements en me testant :
-- `[::ffff:127.0.0.1]` et `2130706433` sont des écritures légales de localhost
-- une URL publique répondant `302` vers `169.254.169.254`, l'endpoint de métadonnées cloud
+**The SSRF guard, worth telling if they ask about security.** I found three bypasses
+testing myself:
+- `[::ffff:127.0.0.1]` and `2130706433` are legal spellings of localhost
+- a public URL answering `302` to `169.254.169.254`, the cloud metadata endpoint
 
-Donc : parsing réel de l'adresse, résolution DNS, et **redirections suivies à la main**
-avec revalidation de l'hôte à **chaque** saut. `redirect: "follow"` valide la première URL
-puis va où on l'envoie.
+So: real parsing of the address, DNS resolution, and **redirects followed by hand** with
+host revalidation on **every** hop. `redirect: "follow"` validates the first URL then goes
+wherever it's sent.
 
-### Le second recours, et pourquoi ce n'est pas de la triche
+### The fallback read path, and why it isn't cheating
 
-Trois sites répondaient 403 à toute lecture automatique, y compris leur propre robots.txt.
-**Mesuré, dans cet ordre :**
+Three sites answered 403 to any automated read, including their own robots.txt.
+**Measured, in this order:**
 
 | Route | mayoclinic.org | bmj.com | nutrition.org |
 |---|---|---|---|
-| `fetch` déclaré CITEDBot | 403 | 403 | 403 |
-| Navigateur **headless** | 403 | 403 | 403 |
-| **Chrome fenêtré** | **200, 1 151 mots** | **200, 3 915 mots** | **200, 482 mots** |
+| `fetch` declared as CITEDBot | 403 | 403 | 403 |
+| **Headless** browser | 403 | 403 | 403 |
+| **Windowed Chrome** | **200, 1,151 words** | **200, 3,915 words** | **200, 482 words** |
 
-> « Le mur ne détecte pas "es-tu un robot", il détecte "es-tu headless". Falsifier le
-> user-agent n'aurait rien donné. Ouvrir la page dans Chrome n'est pas une usurpation :
-> c'est Chrome qui est Chrome. Et la route utilisée est affichée sur chaque résultat,
-> parce qu'un site qui sert les humains et refuse les lecteurs automatiques est
-> probablement invisible pour les moteurs aussi. C'est un constat, pas un contournement. »
+> "The wall isn't detecting 'are you a bot', it's detecting 'are you headless'. Faking the
+> user-agent would have done nothing. Opening the page in Chrome isn't impersonation:
+> Chrome is Chrome. And the route used is shown on every result, because a site that serves
+> humans and refuses automated readers is probably invisible to the engines too. That's a
+> finding, not a workaround."
 
-Le garde DNS est appliqué sur **chaque requête que le navigateur émet**, pas seulement sur
-la navigation principale.
+The DNS guard is applied to **every request the browser makes**, not just the main
+navigation.
 
-### Les neuf facteurs
+### The nine factors
 
-Chacun porte **son poids et sa source publiée**. Structure de réponse 24 %, citations
-sourcées 20 %, spécificité chiffrée 18 %, fraîcheur 14 %, autorité hors site 12 %, fan-out
-8 %, rang Google 3 %, données structurées **1 %**.
+Each one carries **its weight and its published source**. Answer structure 24%, sourced
+citations 20%, numeric specificity 18%, freshness 14%, off-site authority 12%, fan-out 8%,
+Google rank 3%, structured data **1%**.
 
-> **Le 1 % est le détail qui montre le jugement.** Une étude sur 1 885 pages n'a trouvé
-> aucun effet causal du balisage. Je le génère quand même pour l'hygiène, et je le pèse à
-> 1 % au lieu de raconter que c'est important.
+> **The 1% is the detail that shows judgement.** A study across 1,885 pages found no causal
+> effect from markup. I still generate it for hygiene, and I weight it at 1% instead of
+> claiming it matters.
 
-Et la **crawlabilité est une porte binaire**, pas un facteur pondéré. Un moteur qui ne peut
-pas lire la page ne peut pas la citer, quels que soient les huit autres.
+And **crawlability is a binary gate**, not a weighted factor. An engine that can't read the
+page can't cite it, whatever the other eight say.
 
-### Le dispositif : l'échelle de poids
-La largeur d'une bande est ce que vaut le facteur, le remplissage est ce que la page a
-gagné. **Le vide EST le score manquant, à l'échelle.** Sur `healthline.com`, l'œil tombe sur
-la bande de 20 % entièrement sombre avant de lire un chiffre : citations sourcées à 0/100,
-qui coûte exactement 20 des 54 points manquants.
+### The device: the weight scale
+A band's width is what the factor is worth, the fill is what the page earned. **The empty
+space IS the missing score, to scale.** On `healthline.com`, the eye lands on the fully dark
+20% band before reading a single number: sourced citations at 0/100, which costs exactly 20
+of the 54 missing points.
 
-### Les corrections
-Chacune nomme la phrase qu'elle remplace. **Celles qui réclament un chiffre ou un expert
-nommé ne sont pas inventées** : elles reviennent dans `facts-needed.csv`, une ligne par
-refus, avec la phrase de sa propre page que la réponse remplacerait.
+### The fixes
+Each one names the sentence it replaces. **The ones that call for a number or a named
+expert are not invented**: they come back in `facts-needed.csv`, one row per refusal, with
+the sentence from the page itself that the answer would replace.
 
-> **Détail à assumer si on te le demande :** l'ordre est `impact × (6 − effort)`, donc
-> impact contre effort, pas impact seul. C'est le bon arbitrage commercial, et les deux
-> colonnes sont affichées pour qu'on puisse en juger.
+> **Detail to own if they ask:** the ordering is `impact × (6 − effort)`, so impact against
+> effort, not impact alone. That's the right commercial trade-off, and both columns are
+> displayed so it can be judged.
 
-### La boucle fermée
-Sur la page échantillon du dépôt : **33 → 81**, avec **toutes** les corrections de fond
-refusées faute de fait fourni. Le refus est la fonctionnalité.
+### The closed loop
+On the sample page in the repo: **33 → 81**, with **every** substance fix refused for lack
+of a supplied fact. The refusal is the feature.
 
-> **Pourquoi une page du dépôt et pas une vraie :** on ne peut pas publier un correctif sur
-> `nhs.uk`. La boucle appliquer-puis-re-tester ne peut se fermer que sur une page qu'on
-> contrôle. C'est étiqueté comme tel à l'écran.
-
----
-
-## Écran 3 — AUTOPSY. Le bonus du Case 1
-
-### Comment la page concurrente est trouvée
-**Le sitemap du site d'abord.** Chaque URL qu'il contient est une page que le site a publiée.
-
-> **L'anecdote qui explique la décision :** la première version demandait au modèle de
-> nommer l'URL. Pour une question GLP-1 sur BMJ il a produit trois chemins
-> `/content/377/bmj.n246x`. **Aucun n'existe.** Un modèle retient la *forme* des URL d'un
-> éditeur, pas lesquelles existent.
-
-**Trois faux positifs, chacun pire qu'un échec**, et les trois gardes qui en sortent :
-- « work » a matché `worksop-pharmacy` → correspondance sur **segment entier**
-- « effects », sept lettres, a matché `/antibiotics/side-effects/` → un jeu de mots
-  **génériques** que la longueur ne suffit pas à écarter
-- « vitamin C » a perdu son C et matché `vitamin-b` → **paires adjacentes**, et si une URL
-  porte le composé, celles qui ne portent que « vitamin » sont écartées
-
-Et si le modèle est quand même sollicité, `onTopic()` vérifie que le titre et l'adresse
-portent un mot discriminant. Il a refusé une page sur le **diabète de type 1** proposée
-pour une question vitamine C, qui se chargeait en 200 avec 736 mots.
-
-### La contradiction que j'ai corrigée
-Le titre disait « ils gagnent sur X » au-dessus de deux cartes montrant **41 pour notre
-page contre 27 pour la leur**. Les deux étaient vrais et rien ne les réconciliait.
-
-> « Un moteur cite un **passage**, pas une page. Une meilleure page peut donc perdre le
-> passage. C'est écrit à l'écran maintenant. »
-
-### Le dispositif : bandes affrontées
-Un axe, leur page pousse à droite, la tienne à gauche. Une égalité est un marqueur scindé,
-et une égalité **à zéro** est un talon fixe, parce qu'une bande de largeur nulle se lit
-comme une donnée manquante.
+> **Why a page from the repo and not a real one:** you can't publish a fix on `nhs.uk`. The
+> apply-then-retest loop can only close on a page you control. It's labelled as such on
+> screen.
 
 ---
 
-## Écran 4 — PIPELINE. Le Case 2
+## Screen 3. AUTOPSY, the Case 1 bonus
 
-### Les huit étapes du brief, et où elles vivent
+### How the competitor page is found
+**The site's sitemap first.** Every URL it contains is a page the site has published.
 
-| Étape | Où | Ce qui se passe |
+> **The anecdote that explains the decision:** the first version asked the model to name
+> the URL. For a GLP-1 question on BMJ it produced three paths like
+> `/content/377/bmj.n246x`. **None of them exist.** A model remembers the *shape* of a
+> publisher's URLs, not which ones exist.
+
+**Three false positives, each worse than a failure**, and the three guards that came out of
+them:
+- "work" matched `worksop-pharmacy` → matching on **whole segments**
+- "effects", seven letters, matched `/antibiotics/side-effects/` → a set of **generic**
+  words that length alone doesn't rule out
+- "vitamin C" lost its C and matched `vitamin-b` → **adjacent pairs**, and if one URL
+  carries the compound, the ones carrying only "vitamin" are dropped
+
+And if the model does get called anyway, `onTopic()` checks that the title and the address
+carry a discriminating word. It rejected a page about **type 1 diabetes** offered for a
+vitamin C question, which loaded 200 with 736 words.
+
+### The contradiction I fixed
+The heading said "they win on X" above two cards showing **41 for our page against 27 for
+theirs**. Both were true and nothing reconciled them.
+
+> "An engine cites a **passage**, not a page. So a better page can still lose the passage.
+> That's written on the screen now."
+
+### The device: facing bars
+One axis, their page pushes right, yours pushes left. A tie is a split marker, and a tie
+**at zero** is a fixed stub, because a bar of zero width reads as missing data.
+
+---
+
+## Screen 4. PIPELINE, Case 2
+
+### The eight steps in the brief, and where they live
+
+| Step | Where | What happens |
 |---|---|---|
-| Input | `app/pipeline/page.tsx` | sujet + marchés, plafond à six |
-| Ancrage par marché | `fixtures/grounding.json` | UK 40 500/mois, SE 6 600, DK 3 200 |
-| Brief | `pipeline/run.ts` | chaque angle cite sa ligne d'ancrage |
-| Rédaction | `pipeline/run.ts` | jeu de questions **par marché, dans sa langue** |
-| Optimisation | `engine/score.ts` | **le moteur du Case 1, importé** |
-| Localisation | `pipeline/run.ts` | hreflang + lignes marquées pour relecture |
-| Porte qualité | `pipeline/originality.ts` + gate | score, plagiat/IA, approbation nommée |
-| Sortie CMS | `pipeline/run.ts` | markdown, métadonnées, hreflang |
+| Input | `app/pipeline/page.tsx` | topic + markets, capped at six |
+| Per-market grounding | `fixtures/grounding.json` | UK 40,500/month, SE 6,600, DK 3,200 |
+| Brief | `pipeline/run.ts` | each angle cites its grounding row |
+| Drafting | `pipeline/run.ts` | question set **per market, in its own language** |
+| Optimization | `engine/score.ts` | **the Case 1 engine, imported** |
+| Localization | `pipeline/run.ts` | hreflang + lines flagged for review |
+| Quality gate | `pipeline/originality.ts` + gate | score, plagiarism/AI, named approval |
+| CMS output | `pipeline/run.ts` | markdown, metadata, hreflang |
 
-### Le point d'ancrage, à montrer lentement
-> « La traduction littérale *vitamin c serum* fait **480** recherches en Suède.
-> *c-vitaminserum*, en un mot, en fait **6 600**. **14 contre 1.** Une page qui cible la
-> traduction cible un terme que personne ne tape. Et le danois **sépare** là où le suédois
-> **compose**. Trois marchés, trois pages, pas une page traduite trois fois. »
+### The grounding point, to show slowly
+> "The literal translation *vitamin c serum* gets **480** searches in Sweden.
+> *c-vitaminserum*, one word, gets **6,600**. **14 to 1.** A page that targets the
+> translation targets a term nobody types. And Danish **splits** where Swedish
+> **compounds**. Three markets, three pages, not one page translated three times."
 
-### La porte qualité, et l'honnêteté du contrôle plagiat/IA
+### The quality gate, and being honest about the plagiarism/AI check
 
-Le brief demande « plagiarism / AI-detection checks ». **Ce que je refuse d'affirmer est le
-sujet.**
+The brief asks for "plagiarism / AI-detection checks". **What I refuse to claim is the
+point.**
 
-> « Il n'y a pas de vérification de plagiat honnête sans corpus, et aucun classifieur ne
-> peut dire qu'un passage a été écrit par une machine à un taux de faux positifs
-> présentable. Donc je n'affirme ni l'un ni l'autre. »
+> "There's no honest plagiarism check without a corpus, and no classifier can tell you a
+> passage was written by a machine at a false positive rate you'd want to defend. So I
+> claim neither."
 
-Ce qui est mesuré, local et vérifiable à la main :
-- **recouvrement en séquences de 8 mots** entre chaque brouillon et ses frères, avec la
-  plus longue suite partagée **citée**
-- **les tournures qui survivent à un brouillon non édité**, comptées, chacune avec sa phrase
+What is measured, local and checkable by hand:
+- **8-word shingle overlap** between each draft and its siblings, with the longest shared
+  run **quoted**
+- **the stock phrases that survive an unedited draft**, counted, each with its sentence
 
-**L'anecdote qui vaut de l'or :** le contrôle a immédiatement rapporté **95 % de
-recouvrement** entre UK, SE et DK. Il avait raison. Mon générateur produisait quatre
-paragraphes anglais identiques et changeait le mot-clé. *Adaptation, not translation* n'était
-ni l'un ni l'autre.
+**The anecdote worth gold:** the check immediately reported **95% overlap** between UK, SE
+and DK. It was right. My generator was producing four identical English paragraphs and
+swapping the keyword. *Adaptation, not translation* was neither.
 
-**Après correction : 95 % → 0 %.** Chaque marché a son jeu de questions, sa langue, son angle :
-- **SE** : quatre heures de jour en décembre, l'argument UV est faible, l'angle est la
-  pigmentation sur l'année
-- **DK** : le règlement cosmétique européen interdit les allégations médicamenteuses, donc
-  reprendre la copie britannique est un problème de **conformité**
+**After the fix: 95% → 0%.** Each market has its own question set, its own language, its own
+angle:
+- **SE**: four hours of daylight in December, the UV argument is weak, the angle is
+  year-round pigmentation
+- **DK**: the European cosmetics regulation bans drug claims, so reusing the UK copy is a
+  **compliance** problem
 
-> « L'outil a attrapé mon propre pipeline en train de faire exactement ce que le brief
-> reproche à "just use AI to generate it". C'est la meilleure preuve que le contrôle sert
-> à quelque chose. »
+> "The tool caught my own pipeline doing exactly what the brief holds against 'just use AI
+> to generate it'. That's the best proof the check is worth having."
 
-### Les trois refus, que le brief demande explicitement
+### The three refusals the brief explicitly asks for
 
-| Refus | Où c'est appliqué |
+| Refusal | Where it's enforced |
 |---|---|
-| Publier sans nom, par marché | `publish()` lève, la route renvoie **409** |
-| Signature anonyme | la route d'approbation renvoie **400** |
-| Deviner un marché | pas d'ancrage, arrêt net avec la raison |
-| Déployer une localisation | hreflang **proposé, jamais poussé** |
+| Publishing without a name, per market | `publish()` throws, the route returns **409** |
+| Anonymous sign-off | the approval route returns **400** |
+| Guessing a market | no grounding, hard stop with the reason |
+| Deploying a localization | hreflang **proposed, never pushed** |
 
-> « Le refus est dans la logique métier, pas derrière un bouton désactivé. Appelez
-> l'endpoint de publication directement, vous prenez un 409. »
-
----
-
-# PARTIE 3 — les questions qu'ils vont poser
-
-**« Pourquoi Apify et pas les API directes ? »**
-Perplexity et Gemini ont des API, mais AI Overview et AI Mode n'en ont pas. Un acteur qui
-expose les cinq en add-ons, c'est une intégration au lieu de cinq, et une seule facture.
-Claude n'y est pas, donc je l'appelle à la source. Le seam est `engines/run.ts` : remplacer
-l'acteur par des API directes ne touche pas le reste.
-
-**« Combien ça coûte, et est-ce que ça passe à l'échelle ? »**
-2,5 centimes par question sur les six moteurs, mesuré. Le panel est un sous-ensemble **par
-construction** : les 160 questions coûteraient quatre dollars et prendraient une heure.
-L'écran dit combien ont été posées et liste celles qui ne l'ont pas été.
-
-**« Qu'est-ce qui est réel et qu'est-ce qui est simulé ? »**
-Réel : les six moteurs, les fetch de page, le scoring, les corrections, le schema, le zip.
-Simulé : les volumes de recherche par marché, qui viennent d'un fixture étiqueté comme
-échantillon enregistré. Le brief autorise explicitement « real data or a realistic mock ».
-
-**« Qu'est-ce que vous feriez avec une semaine de plus ? »**
-1. Extraire un `GroundingClient` derrière une interface comme la frontière LLM, pour brancher
-   DataForSEO ou Semrush par configuration au lieu d'un `readFileSync`.
-2. Câbler le re-test sur les vraies questions de la carte et les vrais concurrents cités,
-   au lieu du jeu de requêtes gabarit actuel.
-3. Un facteur *clarté d'entité* dédié : le sujet du H1 apparaît-il dans les 100 premiers
-   mots, le nom est-il constant, y a-t-il un nœud `Organization` avec un `sameAs`.
-
-**« Comment vous avez utilisé l'IA pour construire ça ? »**
-Claude Code, en boucles courtes avec des sous-agents adverses : je fais relire chaque
-affirmation par un agent dont la consigne est de la **casser** en lisant le code. C'est
-comme ça que j'ai trouvé le hreflang ukrainien, les titres anglais sur les pages nordiques,
-et le fait que le titre d'un écran nommait un domaine pendant que la section en dessous en
-démontait un autre.
-
-**« Qu'est-ce qui est faible ? »**
-Trois choses, et je les dis avant qu'on me les demande :
-- La carte enregistre ce qu'un moteur **cite aujourd'hui**, pas ce qu'il indexera demain.
-- L'autorité hors site est un **indicateur de substitution** on-page, écrit à l'écran sur
-  la ligne concernée.
-- Le pipeline tourne sur **un sujet ancré**, sur trois marchés. Le plafond de six est dans
-  le code, pas dans les données.
+> "The refusal lives in the business logic, not behind a disabled button. Call the publish
+> endpoint directly and you get a 409."
 
 ---
 
-# PARTIE 4 — l'ordre de la démo, 12 minutes
+# PART 3. The questions they will ask
 
-| Temps | Écran | Le point à faire passer |
+**"Why Apify and not the direct APIs?"**
+Perplexity and Gemini have APIs, but AI Overview and AI Mode don't. One actor that exposes
+the five as add-ons is one integration instead of five, and a single bill. Claude isn't on
+it, so I call it at the source. The seam is `engines/run.ts`: swapping the actor for direct
+APIs doesn't touch the rest.
+
+**"What does it cost, and does it scale?"**
+2.5 cents per question across the six engines, measured. The panel is a subset **by
+design**: the full 160 questions would cost four dollars and take an hour. The screen says
+how many were asked and lists the ones that weren't.
+
+**"What's real and what's simulated?"**
+Real: the six engines, the page fetches, the scoring, the fixes, the schema, the zip.
+Simulated: the per-market search volumes, which come from a fixture labelled as a recorded
+sample. The brief explicitly allows "real data or a realistic mock".
+
+**"What would you do with another week?"**
+1. Pull a `GroundingClient` out behind an interface like the LLM boundary, so DataForSEO or
+   Semrush can be plugged in by configuration instead of a `readFileSync`.
+2. Wire the retest to the real questions from the board and the real competitors cited,
+   instead of the current template query set.
+3. A dedicated *entity clarity* factor: does the H1 subject appear in the first 100 words,
+   is the name consistent, is there an `Organization` node with a `sameAs`.
+
+**"How did you use AI to build this?"**
+Claude Code, in short loops with adversarial subagents: I have every claim reread by an
+agent whose instruction is to **break** it by reading the code. That's how I found the
+Ukrainian hreflang, the English titles on the Nordic pages, and the fact that one screen's
+heading named one domain while the section below it took apart another.
+
+**"What's weak?"**
+Three things, and I say them before anyone asks:
+- The board records what an engine **cites today**, not what it will index tomorrow.
+- Off-site authority is an on-page **proxy**, written on screen on the row concerned.
+- The pipeline runs on **one grounded topic**, across three markets. The cap of six is in
+  the code, not in the data.
+
+---
+
+# PART 4. The demo running order, 12 minutes
+
+| Time | Screen | The point to land |
 |---|---|---|
-| 0:00 | — | « J'ai jeté la première version parce qu'elle était fausse » |
-| 1:30 | **BOARD**, run live | six moteurs, vraies citations, le tableau se remplit |
-| 4:00 | **BOARD**, le WHY | nommé sans être cité : le levier n'est pas on-page |
-| 6:00 | **AUDIT** | l'échelle de poids, le vide EST le score manquant |
-| 8:00 | **AUDIT**, corrections | la correction refusée faute de fait fourni |
-| 9:30 | **PIPELINE** | 480 contre 6 600, puis le mur et le 409 |
-| 11:30 | — | ce que je ferais avec une semaine de plus |
+| 0:00 | . | "I threw away the first version because it was wrong" |
+| 1:30 | **BOARD**, live run | six engines, real citations, the board fills up |
+| 4:00 | **BOARD**, the WHY | named without being cited: the lever isn't on-page |
+| 6:00 | **AUDIT** | the weight scale, the empty space IS the missing score |
+| 8:00 | **AUDIT**, fixes | the fix refused for lack of a supplied fact |
+| 9:30 | **PIPELINE** | 480 against 6,600, then the wall and the 409 |
+| 11:30 | . | what I'd do with another week |
 
-**Ne pas montrer** : la route `/map`, retirée de la navigation. Elle porte l'ancienne
-méthode invalidée.
+**Do not show**: the `/map` route, taken out of the navigation. It carries the old,
+invalidated method.
 
 ---
 
-# ANNEXE — les chiffres à connaître par cœur
+# APPENDIX. The numbers to know by heart
 
 | | |
 |---|---|
-| Moteurs interrogés | **6** |
-| Coût par question, six moteurs | **~2,5 cents** |
-| Coût des ~160 questions écrites | **1,3 cent** |
-| Run de démo, 8 questions | **0,229 $**, ~4 min |
-| Tests | **240**, typecheck et build propres |
-| Boucle fermée sur la page échantillon | **33 → 81** |
-| Suédois : traduction littérale vs terme réel | **480 vs 6 600** |
-| Recouvrement inter-marchés, avant / après | **95 % → 0 %** |
-| Poids des données structurées | **1 %**, étude sur 1 885 pages |
+| Engines queried | **6** |
+| Cost per question, six engines | **~2.5 cents** |
+| Cost of the ~160 questions written | **1.3 cents** |
+| Demo run, 8 questions | **$0.229**, ~4 min |
+| Tests | **240**, typecheck and build clean |
+| Closed loop on the sample page | **33 → 81** |
+| Swedish: literal translation vs real term | **480 vs 6,600** |
+| Cross-market overlap, before / after | **95% → 0%** |
+| Weight of structured data | **1%**, study across 1,885 pages |
