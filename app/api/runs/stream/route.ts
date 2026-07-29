@@ -228,6 +228,9 @@ export async function POST(req: Request) {
           weight: cfg ? cfg.weight : null,
           gate: !cfg,
           partial: r.partial ?? false,
+          /* the gate's three states have to survive the stream, or the row prints OPEN on
+             a page the access section below proves half the crawlers are refused on */
+          state: r.state,
           inspected: c.inspected,
           evidence: r.evidence,
           reasoning: r.reasoning,

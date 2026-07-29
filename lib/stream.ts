@@ -16,6 +16,8 @@ export interface FactorEvent {
   weight: number | null;
   gate: boolean;
   partial: boolean;
+  /** Gate rows only: open, partial or shut. */
+  state?: "open" | "partial" | "shut";
   inspected: string;
   evidence: string[];
   reasoning: string;

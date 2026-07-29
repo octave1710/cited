@@ -36,6 +36,7 @@ const toRows = (factors: FactorEvent[]): LadderRow[] =>
     evidence: f.evidence,
     reasoning: MEASURES[f.key] ? `${MEASURES[f.key]} ${f.reasoning}` : f.reasoning,
     partial: f.partial,
+    state: f.state,
   }));
 
 export function AuditPanel({
