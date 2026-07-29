@@ -42,6 +42,8 @@ export interface Autopsy {
   ours?: PageSide;
   /** Absent when their page could not be fetched. The attempts say why. */
   theirs?: PageSide;
+  /** How their page was chosen: matched from the sitemap, given by URL, or pasted. */
+  theirSource?: "resolved" | "supplied" | "pasted";
   diffs: FactorDiff[];
   /** Set instead of `diffs` when there is no page of ours: the bar to clear. */
   brief?: BriefLine[];
@@ -286,6 +288,9 @@ export async function runAutopsy(
 
   let theirs: PageSide | undefined;
   let attempts: { url: string; outcome: string }[] = [];
+  /* the card used to assert THE PAGE BEING QUOTED whichever route produced it, so a page
+     picked by slug matching was announced as one the engines had cited */
+  let theirSource: "resolved" | "supplied" | "pasted" = "resolved";
 
   if (input.theirHtml?.trim()) {
     /**
@@ -305,11 +310,13 @@ export async function runAutopsy(
     attempts = [
       { url: input.theirUrl?.trim() || `(pasted source, ${input.domain})`, outcome: `pasted by hand, ${p.wordCount.toLocaleString("en-US")} words parsed` },
     ];
+    theirSource = "pasted";
   } else if (input.theirUrl) {
     const f = await fetchPage(normaliseUrl(input.theirUrl).toString());
     const p = parse(f.html, f.finalUrl);
     theirs = { url: f.finalUrl, title: p.title, words: p.wordCount, audit: audit(p) };
     attempts = [{ url: f.finalUrl, outcome: `supplied by hand, HTTP ${f.status}, ${p.wordCount.toLocaleString("en-US")} words` }];
+    theirSource = "supplied";
   } else {
     if (!input.question) throw new Error("Give a question to resolve the competitor page from, or paste their URL.");
     const r = await resolveCompetitorPage(llm, input.domain, input.question);
@@ -325,6 +332,7 @@ export async function runAutopsy(
     domain: input.domain,
     ours,
     theirs,
+    theirSource,
     diffs: theirs && ours ? diff(ours.audit, theirs.audit) : [],
     // with no page of ours, the winner's own factor scores become the bar to clear
     brief: theirs && !ours ? briefFrom(theirs) : undefined,

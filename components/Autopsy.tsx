@@ -19,12 +19,23 @@ const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
 /* the brand page the recorded panel actually cites, so the two screens describe one page */
 const OUR_PAGE = "https://theordinary.com/en-us/blog/vitamin-c-skincare.html";
 const WORKING = [
-  /* the question is the one the resolver answers with a page the panel cites; the old
-     one resolved to an oral-supplements listicle with "skin" in neither its title nor
-     its URL, and the whole teardown below it then measured the wrong page */
-  { domain: "healthline.com", question: "What is the best vitamin C serum?", ourUrl: OUR_PAGE },
-  { domain: "nhs.uk", question: "Is vitamin C good for skin?", ourUrl: OUR_PAGE },
-  { domain: "medicalnewstoday.com", question: "What does vitamin C do for the skin?", ourUrl: "" },
+  /**
+   * Pinned, and the label says so. healthline serves
+   * /health/beauty-skin-care/vitamin-c-serums at HTTP 200 and does not list it in its
+   * sitemap: 62 beauty pages are published and no serum page is among them. So no
+   * resolver reading that sitemap can find the page the panel actually cites, and the
+   * question resolved instead to an article about vitamin C in food. The exact-URL field
+   * exists for precisely this, and the card reports which of the two routes was used.
+   */
+  {
+    domain: "healthline.com",
+    question: "What is the best vitamin C serum?",
+    ourUrl: OUR_PAGE,
+    theirUrl: "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums",
+  },
+  /* left to resolve from the sitemap, so the resolver is still demonstrated */
+  { domain: "nhs.uk", question: "Is vitamin C good for skin?", ourUrl: OUR_PAGE, theirUrl: "" },
+  { domain: "medicalnewstoday.com", question: "What does vitamin C do for the skin?", ourUrl: "", theirUrl: "" },
 ] as const;
 
 /**
@@ -114,9 +125,9 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                 setOurUrl(w.ourUrl);
                 setDomain(w.domain);
                 setQuestion(w.question);
-                setTheirUrl("");
+                setTheirUrl(w.theirUrl);
                 setTheirHtml("");
-                run({ ourUrl: w.ourUrl, domain: w.domain, question: w.question, theirUrl: "", theirHtml: "" });
+                run({ ourUrl: w.ourUrl, domain: w.domain, question: w.question, theirUrl: w.theirUrl, theirHtml: "" });
               }}
               title={`${w.domain} — ${w.question}`}
             >
@@ -372,7 +383,15 @@ function Sides({ data }: { data: Autopsy }) {
     /* side by side, not stacked: two tall cards in a narrow column left ~220px of dead
        space under the headline, which is the void that gets reported every time */
     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, alignItems: "start" }}>
-      {side("THEIR CLOSEST PAGE TO THIS QUESTION", data.theirs, "var(--d3)")}
+      {side(
+        data.theirSource === "supplied"
+          ? "THEIR PAGE, THE URL YOU GAVE ME"
+          : data.theirSource === "pasted"
+            ? "THEIR PAGE, THE SOURCE YOU PASTED"
+            : "THEIR CLOSEST PAGE TO THIS QUESTION",
+        data.theirs,
+        "var(--d3)",
+      )}
       {data.ours ? (
         side("YOUR PAGE", data.ours, "var(--brand)")
       ) : (
