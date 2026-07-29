@@ -110,14 +110,20 @@ BOARD, AUTOPSY, AUDIT, PIPELINE.
 >
 > And this last one is how many questions actually go to the assistants."
 
-**[DO NOT CLICK RUN YET.]** Explain the cost first, it makes the wait feel deliberate.
+**[CLICK]** **Load the recorded run**. It appears in under a second.
 
-> "Each question costs about two and a half cents across all six assistants, and about ten
-> seconds. So asking all hundred and sixty would be four dollars and most of an hour. Six
-> is enough to show you the shape, and the screen tells you exactly how many it asked and
-> lists the ones it didn't, so nothing is hidden."
+> "I'm loading a run I did earlier rather than making you watch one happen, and I want to
+> be clear about why. A live panel is about forty seconds per question, so eight questions
+> is five minutes. This is that exact run: same eight questions, same six assistants, four
+> hundred and thirty-eight citations, twenty-three cents actually spent. The screen says
+> RECORDED PANEL rather than MEASURED LIVE so you can see which one you're looking at.
+>
+> The Run live button is right there and I'm happy to start one in the background if you
+> want to see it land."
 
-**[CLICK]** the orange **RUN** button.
+**[OPTIONAL, only if there is time]** **[CLICK]** **Run live** and let it run while talking
+over the other screens. Come back to it at the end. **[IF IT STALLS]** click **Cancel**,
+the previous result stays on screen.
 
 ### While it runs, about 4 minutes
 
