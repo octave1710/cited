@@ -9,7 +9,7 @@ import type { PanelRun } from "../engines/types";
 import type { Board } from "../engines/board";
 import type { FactorFinding, Teardown } from "../engines/why";
 import { MARKETS } from "../citationmap/markets";
-import { Entity, Label, Num, Panel as Surface, Section, useEntry } from "./da";
+import { Awaiting, Entity, Label, Num, Panel as Surface, Section, useEntry } from "./da";
 import { readSubject, writeSubject, toHost, DEFAULT_SUBJECT } from "../lib/subject";
 
 /**
@@ -137,6 +137,12 @@ export function PanelScreen() {
       <div className="gut shell">
         {!run && <Intro steps={steps} busy={busy} questions={questions} asked={asked} />}
         {run && board && <Result run={run} board={board} teardown={teardown} questions={questions} />}
+        {run && !board && (
+          <Awaiting
+            title="The run finished without a board."
+            what="The engines answered but nothing could be counted from it. Run it again, and if it repeats the panel came back empty rather than the screen failing."
+          />
+        )}
       </div>
     </div>
   );
@@ -166,13 +172,13 @@ function Intro({ steps, busy, questions, asked }: { steps: Step[]; busy: boolean
 
         <div style={{ display: "flex", gap: 44, marginTop: 52, flexWrap: "wrap" }}>
           <Stat n={ENGINES.length} label="ENGINES QUERIED LIVE" />
-          <Stat n={5} label="SOURCES PER ANSWER, TYPICAL" />
-          <Stat n={0} label="CITATIONS INVENTED" />
+          <Stat n={MARKETS.length} label="MARKETS, EACH IN ITS OWN LANGUAGE" />
+          <Stat n={8} label="BUYING ANGLES PER CATEGORY" />
         </div>
 
         {/* the engines, named, so the claim is concrete before anything runs */}
         {!busy && questions.length === 0 && (
-          <div style={{ marginTop: 56, display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 2 }}>
+          <div style={{ marginTop: 56, display: "grid", gridTemplateColumns: `repeat(${ENGINES.length},1fr)`, gap: 2 }}>
             {ENGINES.map((e, i) => (
               <div key={e.key} data-engine style={{ background: "var(--s1)", borderTop: "2px solid var(--d3)", padding: "18px 16px 22px" }}>
                 <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--meta)" }}>{String(i + 1).padStart(2, "0")}</span>
@@ -243,7 +249,12 @@ function Stat({ n, label }: { n: number; label: string }) {
 
 function Result({ run, board, teardown, questions }: { run: PanelRun; board: Board; teardown: Teardown | null; questions: string[] }) {
   const ref = useRef<HTMLDivElement>(null);
-  const target = board.rows.find((r) => !r.isBrand);
+  /**
+   * The same domain the section below takes apart. This read the reach-sorted top row
+   * while <Why> renders primaryTarget, which sorts on lead slots, so the headline could
+   * name one site while the teardown under it dismantled another.
+   */
+  const target = (teardown ? board.rows.find((r) => r.domain === teardown.domain) : undefined) ?? board.rows.find((r) => !r.isBrand);
   const brandCited = board.brandRow;
 
   useEffect(() => {

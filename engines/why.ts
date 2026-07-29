@@ -447,7 +447,7 @@ function engineReachFinding(
     ...base,
     verdict:
       row.engineReach === engineCount
-        ? `Every engine reaches for ${target}, so what it carries transfers across five different retrieval stacks.`
+        ? `Every engine reaches for ${target}, so what it carries transfers across ${engineCount} different retrieval stacks.`
         : `${target} is reached by ${row.engineReach} of the ${engineCount} engines, so part of its standing is one stack's behaviour rather than a property all of them select for.`,
     evidence: [
       `${target} is cited by ${row.engineReach} of ${engineCount} engines: ${per.join(", ")}.`,
