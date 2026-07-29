@@ -1,6 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { writableDbPath } from "./dbpath";
 import type { PipelineRun } from "../pipeline/run";
 
 const PATH = process.env.DATABASE_PATH ?? "./data/cited.db";
@@ -8,8 +7,7 @@ let db: DatabaseSync | null = null;
 
 function conn(): DatabaseSync {
   if (db) return db;
-  mkdirSync(dirname(PATH), { recursive: true });
-  db = new DatabaseSync(PATH);
+  db = new DatabaseSync(writableDbPath(PATH));
   db.exec(`CREATE TABLE IF NOT EXISTS pipelines (
     id TEXT PRIMARY KEY, created_at TEXT NOT NULL, topic TEXT NOT NULL, payload TEXT NOT NULL);`);
   return db;

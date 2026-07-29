@@ -1,6 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { writableDbPath } from "./dbpath";
 import type { Run } from "./types";
 
 // ponytail: node:sqlite instead of better-sqlite3 — stdlib, no node-gyp toolchain on
@@ -14,8 +13,7 @@ let db: DatabaseSync | null = null;
 
 function conn(): DatabaseSync {
   if (db) return db;
-  mkdirSync(dirname(PATH), { recursive: true });
-  db = new DatabaseSync(PATH);
+  db = new DatabaseSync(writableDbPath(PATH));
   db.exec(`
     CREATE TABLE IF NOT EXISTS runs (
       id         TEXT PRIMARY KEY,
