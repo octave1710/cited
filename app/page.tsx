@@ -23,7 +23,7 @@ export default function Page() {
   const [active, setActive] = useState<StepId>("score");
   const [target, setTarget] = useState<{ url: string; mode: "live" | "demo" }>({ url: "", mode: "live" });
 
-  const start = useCallback(async (input: { url?: string; demoId?: string; brand: string; market: string }) => {
+  const start = useCallback(async (input: { url?: string; demoId?: string; html?: string; sourceUrl?: string; brand: string; market: string }) => {
     setBusy("run");
     setError(null);
     setRun(null);
@@ -33,7 +33,7 @@ export default function Page() {
     setAccess([]);
     setPatch(null);
     setActive("score");
-    setTarget({ url: input.url || "", mode: input.demoId ? "demo" : "live" });
+    setTarget({ url: input.html ? input.sourceUrl?.trim() || "pasted HTML" : input.url || "", mode: input.demoId ? "demo" : "live" });
 
     try {
       const res = await fetch("/api/runs/stream", {

@@ -13,6 +13,7 @@ import { audit } from "../engine/score";
 
 export * from "./nodes";
 import type { GateDecision, MarketPlan, NodeId, NodeState, PipelineRun } from "./nodes";
+import { checkOriginality, OVERLAP_REVIEW } from "./originality";
 import { NODES } from "./nodes";
 
 const MIN_SCORE = 55;
@@ -146,14 +147,42 @@ export function runToGate(input: { id: string; topic: string; markets: string[];
     note: `${run.plans.reduce((s, p) => s + p.flags.length, 0)} lines flagged for human eyes`,
   };
 
-  // ---- 6. the wall
+  /**
+   * ---- 6a. plagiarism and AI-detection, the half of the gate the case names
+   *
+   * Every draft is compared against every sibling draft and against its own grounding
+   * row. Near-duplicate market pages are the real damage when someone asks AI to write
+   * the same article three times, and this measures exactly that on 8-word shingles.
+   * It reports evidence, never a verdict, and it never blocks on its own.
+   */
+  const reports = checkOriginality(
+    run.plans.map((p) => ({ market: p.market, text: [p.headline, ...p.body].join(" ") })),
+    run.plans.map((p) => ({ market: p.market, text: p.groundingNote })),
+  );
+  for (const p of run.plans) p.originality = reports.find((r) => r.market === p.market);
+
+  const flaggedOriginality = reports.filter((r) => r.needsReview);
+  for (const r of flaggedOriginality) {
+    run.trace.push({
+      step: "gate",
+      claim: `${r.market}: ${r.reasons.join(" ")}`,
+      source: "pipeline/originality.ts, 8-word shingle overlap and unedited-output phrases",
+    });
+  }
+
+  // ---- 6b. the wall
   const below = run.plans.filter((p) => p.score < MIN_SCORE);
+  const worst = reports.length ? Math.max(...reports.map((r) => r.worstOverlap)) : 0;
   run.nodes.gate = {
     state: "blocked",
     note:
-      below.length > 0
-        ? `${below.map((p) => p.market).join(", ")} below the ${MIN_SCORE} minimum. Approval required per market.`
-        : `All markets clear the ${MIN_SCORE} minimum. Approval still required per market.`,
+      (below.length > 0
+        ? `${below.map((p) => p.market).join(", ")} below the ${MIN_SCORE} minimum. `
+        : `All markets clear the ${MIN_SCORE} minimum. `) +
+      (flaggedOriginality.length
+        ? `${flaggedOriginality.length} flagged for overlap or unedited phrasing, worst overlap ${Math.round(worst * 100)}%. `
+        : `Highest overlap between markets ${Math.round(worst * 100)}%, under the ${Math.round(OVERLAP_REVIEW * 100)}% review line. `) +
+      "Approval still required per market.",
   };
   run.nodes.publish = { state: "queued", note: "unreachable until every market is approved" };
 

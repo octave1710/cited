@@ -25,7 +25,7 @@ export const runtime = "nodejs";
  * appearing out of nowhere. Durations are measured, never invented.
  */
 export async function POST(req: Request) {
-  let body: { url?: string; demoId?: string; brand?: string; market?: string };
+  let body: { url?: string; demoId?: string; brand?: string; market?: string; html?: string; sourceUrl?: string };
   try {
     body = await req.json();
   } catch {
@@ -66,6 +66,21 @@ export async function POST(req: Request) {
             group: "ingest",
             name: "Load bundled page",
             what: `${demo.file} · ${html.length.toLocaleString("en-US")} bytes`,
+            ms: +(performance.now() - t0).toFixed(1),
+          });
+        } else if (body.html?.trim()) {
+          /**
+           * Pasted source. The case asks for ingestion "from a URL (fetch and parse) OR
+           * pasted HTML", and it is also the only route a firewall cannot refuse: the
+           * user opens the page they can already see, presses Ctrl+U and pastes.
+           */
+          html = body.html.slice(0, 4_000_000);
+          run.url = (body.sourceUrl ?? "").trim() || "pasted HTML";
+          send({
+            type: "check",
+            group: "ingest",
+            name: "Read the pasted source",
+            what: `${html.length.toLocaleString("en-US")} bytes pasted by hand, no fetch made`,
             ms: +(performance.now() - t0).toFixed(1),
           });
         } else {
@@ -113,7 +128,7 @@ export async function POST(req: Request) {
         bytes: html.length,
         fetchedAt: new Date().toISOString(),
         source: body.demoId ? "demo" : "live",
-        route,
+        route: body.html?.trim() ? undefined : route,
         title: page.title,
         words: page.wordCount,
         sections: page.sections.length,
@@ -132,7 +147,7 @@ export async function POST(req: Request) {
       send({ type: "step", id: "ingest", state: "done", note: run.steps.ingest.note });
 
       // ---------- crawler access: verifiable by the client in their own robots.txt ----------
-      if (!body.demoId) {
+      if (!body.demoId && !body.html?.trim()) {
         const ta = performance.now();
         const access = await checkCrawlerAccess(run.url);
         run.access = access;

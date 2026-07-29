@@ -1,0 +1,154 @@
+===== PAGE 1 =====
+SEO & AEO Marketing Engineer
+Case Material
+===== PAGE 2 =====
+Guidelines
+Congratulations for coming as far as the case interviews at Precis! 
+In this document, youʼll be presented with some challenges to solve and subsequently present at your next visit to 
+Precis. Please find below some general guidelines for these cases:
+●
+Preferably, youʼll put together your material in a presentation for the interview. The presentation should be in 
+English.
+●
+This case is your chance to show us how you think and how you build. It's deliberately close to the real 
+work: taking a marketing problem and turning it into something automated, useful, and commercially 
+sensible.
+●
+Please read the whole brief before you start — especially the two short sections on how we think about this 
+and how we'll evaluate it, because they'll change how you spend your time.
+===== PAGE 3 =====
+How we think about this case
+Two things matter more than anything else.
+We care about your judgement, not your output volume. This case is intentionally larger than you can finish in the 
+time we're suggesting. That's on purpose. We want to see what you choose to build first, what you deliberately 
+leave out, and whether you can explain why. A smaller, well-reasoned build with clear guardrails will beat a 
+sprawling one that does everything shallowly.
+We want something that runs, not a plan for something that could run. A working prototype — even a rough one — 
+tells us far more than a polished deck of ideas. Mock or stub anything expensive, flaky, or access-gated LLM calls, 
+paid APIs, credentials) rather than letting it block you. We're testing engineering judgement, not who's willing to 
+spend money on API credits.
+You're encouraged to use AI-native tools throughout — Claude Code, Cursor, Google AI Studio, MCPs, whatever you 
+actually work with. We'd rather see how you wield them than watch you avoid them. If they helped you move fast, 
+tell us how in the walkthrough.
+Time: Aim for a focused 68 hours total across both parts. Please don't exceed that — if you run out of time, stop 
+and write down what you'd have done next. 
+Part A is the tighter, more defined build (roughly a third of your time); Part B is the open-ended one.
+===== PAGE 4 =====
+Case 1 Background
+AEO Page Optimiser
+The scenario
+A client has a page that ranks perfectly well in 
+classic Google search but essentially never shows 
+up when someone asks an AI assistant — 
+ChatGPT, Perplexity, Gemini, Google's AI 
+Overviews — a question it should be the perfect 
+answer to. They want to understand why, and 
+what to change.
+===== PAGE 5 =====
+A tool that takes a page and tells the client, concretely, how to make it answer-engine-ready.
+At minimum it should:
+●
+Ingest a page — from a URL (fetch and parse) or pasted HTML.
+●
+Assess it against the factors that make content citable by answer engines. That's your call to define and defend, but we'd 
+expect things like: entity and topic clarity, question-and-answer structure, the presence of clean extractable/quotable 
+statements, factual density, schema.org markup, freshness signals, how well the content "chunks," and signals of source 
+authority.
+●
+Produce a score or breakdown a strategist can read at a glance.
+●
+Output specific, prioritised edits. Not "improve clarity" — actual suggested rewrites, additions, and restructures, ordered by 
+expected impact.
+●
+Generate valid structured data (e.g. FAQPage, Article, HowTo) that the client could drop in and validate.
+●
+Wrap it in a simple interface — a small web app, a CLI with clean output, a Sheet write-back. The interface layer is part of what 
+we're assessing, but keep it thin.
+If you have time (you may well not — that's fine):
+●
+Compare the page against whatever is currently being cited for the target questions, and reason about the gap.
+●
+Actually test the page: put its content to a live LLM and see whether it gets cited or paraphrased before and after your 
+suggested edits.
+Build
+===== PAGE 6 =====
+Case 2 Background
+Multi-Market Content Engine
+The scenario
+The same client wants to scale content across 
+several markets — say the UK plus two of the 
+Nordics, or any market set you prefer. They've 
+heard "just use AI to generate it." A good engineer 
+doesn't just say yes to that. We want the workflow 
+a strategist operates: reliable, grounded, and 
+quality-controlled — not a button that sprays out 
+articles.
+===== PAGE 7 =====
+A pipeline that takes a topic and a set of target markets and produces market-ready, optimised, localised content — passing through a 
+quality gate before a human approves it.
+A sensible pipeline looks roughly like:
+1.
+Input — a topic and target markets (optionally a target page or seed keyword).
+2.
+Per-market grounding — keyword and SERP research per market, from real data or a realistic mock. Crucial point: the 
+best-performing term in Swedish is rarely the literal translation of the English one. Ground each market on its own.
+3.
+Brief generation — a content brief built from that grounding, not from thin air.
+4.
+Draft generation — the content itself.
+5.
+Optimise — for classic SEO and for answer engines. This is where you reuse your Part A optimiser.
+6.
+Localise — cultural and market adaptation, not translation. Consider hreflang and i18n, and the fact that each market's SERP is 
+different. Flag clearly where machine localisation needs a human's eyes.
+7.
+Quality gate — quality scoring, plagiarism / AI-detection checks, and a human-in-the-loop approval step. Decide what must 
+never publish without a human.
+8.
+Output — structured and close-to-publishable, with the metadata a CMS or strategist would need.
+This is bigger than the time allows. Build the spine end-to-end before you polish any single node. Tell us what you prioritised and 
+why.
+One thing we're genuinely looking for: where do you refuse to automate? Mass-generating AI content at volume can hurt a client's 
+site. A senior engineer pushes back on the naive version of this request and designs controls instead of just throughput. Show us that 
+judgement.
+Build
+===== PAGE 8 =====
+What to hand in?
+Both parts.
+A GitHub repo — with a README that explains what it does, how to run it, what's real vs. mocked, and 
+what you'd do next. Commit history is welcome; we like seeing how you work.
+A short demo recording 35 min) of the thing actually running.
+A one-page write-up aimed at the client — not at an engineer. What did you build, what's it worth to 
+them, and what are its limits? Plain language.
+A live walkthrough 3045 min, scheduled separately) where you show the code, explain your 
+architecture and trade-offs, and tell us what you'd build next with another week.
+===== PAGE 9 =====
+How we’ll evaluate.
+We're a transparent bunch, so here's exactly what we're weighting..
+●
+Commercial framing — did you connect the build to real client value, or just make a clever tool?
+●
+Prioritisation — what you chose to build first and cut, and whether you can defend it.
+●
+Systems thinking — is it architected to run with minimal supervision and be maintained by 
+someone else, or is it a one-off script? We'll look at error handling, config, secrets, and the 
+README.
+●
+Grounding and guardrails — especially in Part B: is the output built on real data, and are there 
+quality controls and human-in-the-loop gates where they matter?
+●
+Localisation judgement — adaptation per market vs. literal translation.
+●
+AI-native fluency — how you used AI tooling to move fast.
+●
+Communication — could a non-technical client understand your one-pager?
+A candidate who builds less but reasons clearly about trade-offs, guardrails, and where a human must 
+stay in the loop will score higher than one who ships more with no controls and no rationale.
+Good luck — and have fun with it. We're looking forward to seeing how you think.
+===== PAGE 10 =====
+Thank you!
+Talent Acquisition
+Precis
+Åsögatan 121
+SE116 24 Stockholm
+precis.com

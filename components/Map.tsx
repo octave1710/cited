@@ -8,6 +8,7 @@ import { INTENTS } from "../citationmap/questions";
 import { isInstitutional } from "../citationmap/classify";
 import { deriveSignals, type EntryPoint, type MapSignals } from "../citationmap/signals";
 import { MARKETS } from "../citationmap/markets";
+import { readSubject, writeSubject, toHost, DEFAULT_SUBJECT } from "../lib/subject";
 import { DeltaPanel, History } from "./History";
 import { Favicon } from "./Territory";
 import {
@@ -47,6 +48,7 @@ import {
 
 /** The screen remembers the run you were on; only the id, so nothing cached goes stale. */
 const LAST = "cited.lastMap";
+
 
 /**
  * The scaffold is a shape, not a promise. The generator asks for 20 per angle and
@@ -114,9 +116,16 @@ interface AngleColumn {
  * ------------------------------------------------------------------ */
 
 export function MapScreen() {
-  const [topic, setTopic] = useState("vitamin c serum");
+  const [topic, setTopic] = useState(DEFAULT_SUBJECT.topic);
   const [brand, setBrand] = useState("The Ordinary");
-  const [domain, setDomain] = useState("theordinary.com");
+  /* the same subject the board ran on: two screens must not disagree about the category */
+  useEffect(() => {
+    const sub = readSubject();
+    setTopic(sub.topic);
+    setDomain(sub.domain);
+    setMarket(sub.market);
+  }, []);
+  const [domain, setDomain] = useState(DEFAULT_SUBJECT.domain);
   const [market, setMarket] = useState("UK");
 
   const [questions, setQuestions] = useState<MapQuestion[]>([]);
@@ -136,6 +145,7 @@ export function MapScreen() {
   const final = map !== null;
 
   const run = useCallback(async () => {
+    writeSubject({ topic, market, domain: toHost(domain) });
     setBusy(true);
     setError(null);
     setMap(null);

@@ -1,9 +1,14 @@
 # CITED
 
-Finds the questions in a category where an answer engine quotes somebody else, explains why
-that page wins, writes the fixes, and re-measures on the same engine.
+Asks **six real answer engines** a category's buyer questions, records every source they
+actually cite, explains why the winners win, and writes the fixes for the client's page.
 
-Built for the Precis technical case, July 2026.
+Built for the Precis technical case, July 2026. Part A is the page optimiser, Part B is
+the multi-market content engine, and they share one scoring engine.
+
+**The correction that shaped this build.** The first version asked a model *which sites it
+would cite*. That is a model describing its own imagined behaviour: one site per question,
+nothing checkable. It was replaced with live calls to the engines themselves.
 
 ---
 
@@ -15,17 +20,18 @@ cp .env.example .env
 npm run dev
 ```
 
-Four screens at http://localhost:3000
+Five screens at http://localhost:3000
 
 | Route | What it does |
 |---|---|
+| `/board` | **The entry point.** Writes ~160 buyer questions for a category, puts a panel of them to six live engines, and counts who each one cites. Reach, volume and first-position are kept as three separate encodings. Then it takes the widest-reaching rival apart on the same citations and exports the run as spreadsheets plus a brief. |
 | `/map` | Generates 120 to 160 real buyer questions for a category, asks a live engine each one, records which domains it names, and routes each question at the weakest site holding a seat in that answer. |
 | `/autopsy` | Runs the same nine factors on the page that is being quoted and on yours, ordered by weighted gap. |
 | `/` | Audits any public URL: crawler access with the deciding line quoted, nine factors with the extracts, fix plan, the fact sheet, JSON-LD, llms.txt and a robots.txt diff, apply and re-test. |
 | `/pipeline` | Seven-node multi-market content run with a gate that structurally blocks on a named human approval. |
 
 ```bash
-npm run verify   # typecheck + 144 tests + production build
+npm run verify   # typecheck + 237 tests + production build
 ```
 
 ---
@@ -54,13 +60,36 @@ domain that owns 118 questions is a year. Taking the seat next to it is a page.
 
 ---
 
+## The six engines, and how each is reached
+
+| Engine | Route |
+|---|---|
+| Google AI Overview | Apify actor `apify/google-search-scraper`, add-on `aiOverview` |
+| Google AI Mode | same actor, `aiModeSearch` |
+| Perplexity | same actor, `perplexitySearch` |
+| ChatGPT search | same actor, `chatGptSearch` |
+| Gemini | same actor, `geminiSearch` |
+| **Claude** | **Anthropic Messages API with the `web_search` tool, called at the source** |
+
+Claude is not one of the actor's add-ons, so it is called directly and runs in parallel
+with the actor. It is the only first-party read of the six.
+
+Every add-on is an **object**, not a boolean. Passing `true` returns HTTP 400.
+
+**Measured, live, on 2026-07-28.** Four questions across six engines: `$0.0985`, about
+four minutes, 254 citations over 136 domains. AI Mode 72, Perplexity 61, Claude 57,
+ChatGPT 37, Gemini 18, AI Overview 9. Roughly 2.5 cents per question across all six.
+
+The panel is a subset **by design**: all ~160 questions across six engines would be about
+four dollars and most of an hour. The screen states how many were asked and lists the rest.
+
 ## Real against mocked, and the switch
 
-One environment variable decides, and it is the only one that does.
-
 ```
-LLM_MODE=mock   # replays recorded answers, no network, the default
-LLM_MODE=real   # live OpenAI calls, needs OPENAI_API_KEY
+APIFY_TOKEN         # five of the six engines. Absent, the panel replays a recorded run and says so.
+ANTHROPIC_API_KEY   # Claude. Absent, its column reads "not asked" rather than silently empty.
+OPENAI_API_KEY      # writes the questions
+LLM_MODE=mock       # replays recorded question sets by prompt hash
 ```
 
 **Real.** Every engine answer in this repository was produced by a live `gpt-4o-mini`

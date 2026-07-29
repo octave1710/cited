@@ -109,13 +109,17 @@ export function InputBar({
   busy,
   disabled,
 }: {
-  onRun: (input: { url?: string; demoId?: string; brand: string; market: string }) => void;
+  onRun: (input: { url?: string; demoId?: string; html?: string; sourceUrl?: string; brand: string; market: string }) => void;
   busy: boolean;
   disabled?: boolean;
 }) {
   const [url, setUrl] = useState("");
   const [brand, setBrand] = useState("The Ordinary");
   const [market, setMarket] = useState("UK");
+  /* the case asks for ingestion from a URL OR pasted HTML, and paste is also the only
+     route a firewall cannot refuse */
+  const [html, setHtml] = useState("");
+  const [showPaste, setShowPaste] = useState(false);
 
   return (
     /* paddingTop/Bottom only: the shorthand would wipe the gutter that .gut owns */
@@ -123,7 +127,7 @@ export function InputBar({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!busy) onRun({ url, brand, market });
+          if (!busy) onRun(html.trim() ? { html, sourceUrl: url, brand, market } : { url, brand, market });
         }}
         className="bar"
       >
@@ -158,10 +162,40 @@ export function InputBar({
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          className={`btn ${showPaste || html ? "btn--primary" : "btn--ghost"}`}
+          onClick={() => setShowPaste((v) => !v)}
+          disabled={disabled}
+        >
+          {html ? `Source pasted, ${Math.round(html.length / 1024)} KB` : "Paste HTML instead"}
+        </button>
         <button className="btn btn--primary" type="submit" disabled={busy || disabled}>
-          {busy ? "Running…" : "Run audit"}
+          {busy ? "Running…" : html.trim() ? "Score the pasted page" : "Run audit"}
         </button>
       </form>
+
+      {showPaste && (
+        <div style={{ marginTop: 12 }}>
+          <p style={{ fontSize: 16, lineHeight: 1.5, marginBottom: 8, maxWidth: "84ch" }}>
+            Open the page, press Ctrl+U for the source, select all and paste it here. The same nine factors run on
+            it and no server can refuse this route. The URL field above becomes the label, nothing is fetched.
+          </p>
+          <textarea
+            className="field"
+            value={html}
+            onChange={(e) => setHtml(e.target.value)}
+            placeholder="Paste the page source here"
+            aria-label="Page source"
+            style={{ width: "100%", height: 120, padding: 12, lineHeight: 1.5, resize: "vertical" }}
+          />
+          {html && (
+            <button className="btn btn--ghost btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => setHtml("")}>
+              Clear the pasted source
+            </button>
+          )}
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 16, flexWrap: "wrap" }}>
         <span style={LABEL}>Live pages</span>

@@ -23,6 +23,8 @@ export interface MarketPlan {
   body: string[];
   score: number;
   flags: { line: string; why: string }[];
+  /** The plagiarism and AI-detection half of the gate. Never a verdict, always evidence. */
+  originality?: import("./originality").OriginalityReport;
 }
 
 export interface GateDecision {

@@ -344,6 +344,48 @@ function MarketGate({
 
       <p style={{ fontSize: 16.5, lineHeight: 1.5, marginTop: 18, fontVariantNumeric: "tabular-nums" }}>{plan.groundingNote}</p>
 
+      {/* the plagiarism and AI-detection half of the gate: measured, quoted, never a verdict */}
+      {plan.originality && (
+        <div style={{ marginTop: 18, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
+          <div style={{ display: "flex", gap: 14, alignItems: "baseline", justifyContent: "space-between" }}>
+            <Label tone={plan.originality.needsReview ? "d1" : "d2"}>
+              OVERLAP WITH THE OTHER MARKETS
+            </Label>
+            <Num size={15} tone={plan.originality.needsReview ? "var(--d1)" : "var(--d2)"}>
+              {Math.round(plan.originality.worstOverlap * 100)}%
+            </Num>
+          </div>
+          <div style={{ marginTop: 8, height: 8, background: "var(--s2)", position: "relative" }}>
+            <span
+              data-meter
+              style={{
+                display: "block",
+                height: 8,
+                width: `${Math.min(100, Math.round(plan.originality.worstOverlap * 100))}%`,
+                background: plan.originality.needsReview ? "var(--d1)" : "var(--d2)",
+                transformOrigin: "left center",
+              }}
+            />
+            {/* the review line, drawn, so the number has something to be measured against */}
+            <span style={{ position: "absolute", left: "25%", top: -3, width: 2, height: 14, background: "var(--ink)" }} />
+          </div>
+          <div style={{ marginTop: 6 }}>
+            <Label>25% IS THE REVIEW LINE · 8-WORD SEQUENCES SHARED</Label>
+          </div>
+          {plan.originality.needsReview ? (
+            plan.originality.reasons.map((r, j) => (
+              <p key={j} style={{ fontSize: 16, lineHeight: 1.45, marginTop: 10, color: "var(--ink)" }}>{r}</p>
+            ))
+          ) : (
+            <p style={{ marginTop: 10 }}>
+              <Label tone="d2">
+                WRITTEN INDEPENDENTLY OF THE OTHER MARKETS · {plan.originality.tells.length} UNEDITED PHRASES
+              </Label>
+            </p>
+          )}
+        </div>
+      )}
+
       {plan.flags.length > 0 ? (
         <div style={{ marginTop: 16 }}>
           {plan.flags.slice(0, 3).map((f, j) => (
