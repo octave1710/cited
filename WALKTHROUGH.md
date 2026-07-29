@@ -8,24 +8,33 @@ something specific.
 
 ---
 
-# BEFORE THE CALL, 5 minutes
+# BEFORE RECORDING, 5 minutes
 
-**[TERMINAL]** `npm run dev` in `C:\Users\octav\Documents\precis-case`
+Use the deployed app, `https://cited-precis.vercel.app`. Every screen below was run
+click by click on it on 29 July and every step landed. Nothing has to start on my
+machine, which removes the one thing that can go wrong while recording.
 
-**[CHECK]** Open `http://localhost:3000/board`. The top bar should read **ENGINE LIVE** in
-green. If it reads REPLAY, my `.env` is not loading and the live run will not work.
+**[FALLBACK]** If the deployed app is ever down, `npm run dev` in the project folder
+serves the same thing at `localhost:3000`.
+
+**[CHECK]** Open `/board`. The top bar reads **ENGINE LIVE** in green.
 
 **[TABS]** Open these five and leave them:
 
 | Tab | URL | Why |
 |---|---|---|
-| 1 | `localhost:3000/board` | where I start |
-| 2 | `localhost:3000/` | the audit |
-| 3 | `localhost:3000/autopsy` | the comparison |
-| 4 | `localhost:3000/pipeline` | Case 2 |
+| 1 | `cited-precis.vercel.app/board` | where I start |
+| 2 | `cited-precis.vercel.app/` | the audit |
+| 3 | `cited-precis.vercel.app/autopsy` | the comparison |
+| 4 | `cited-precis.vercel.app/pipeline` | Case 2 |
 | 5 | `healthline.com/robots.txt` | the raw file, it lands better if it is already open |
 
-**[SHARE]** Browser window only, not the whole screen. Nothing else visible.
+**[RECORD]** Browser window only, not the whole screen. Nothing else visible.
+
+**[TIMING]** Measured on the deployed app, so I know what a pause means: the recorded
+panel under a second, the audit under a second, the fix plan under a second, the
+citation test about 4 seconds, apply-and-re-test under a second, the autopsy about 6
+seconds, the pipeline about 40 seconds. Nothing here makes me wait on camera.
 
 ---
 
@@ -39,10 +48,10 @@ built anything.
 
 > "Before I show you anything, one number from a run I did last night.
 >
-> I took vitamin C serum in the UK, and I asked six assistants six of the questions a
-> buyer actually types. Three hundred and forty-three citations came back. The Ordinary,
-> which is one of the biggest brands in that category, was cited on one of those six
-> questions.
+> I took vitamin C serum in the UK, and I asked six assistants eight of the questions a
+> buyer actually types. Four hundred and thirty-eight citations came back. The Ordinary,
+> which is one of the biggest brands in that category, was cited on two of those eight.
+> A hospital site was on six.
 >
 > And the part I find interesting is that nothing in their reporting would ever tell them
 > that. Because a click that doesn't happen leaves no trace. It's not in analytics, it's
@@ -87,7 +96,7 @@ BOARD, AUTOPSY, AUDIT, PIPELINE.
 
 ---
 
-## Screen 1. BOARD, about 6 minutes
+## Screen 1. BOARD, about 4 minutes
 
 **[SCREEN]** Tab 1, `/board`
 
@@ -125,9 +134,9 @@ BOARD, AUTOPSY, AUDIT, PIPELINE.
 over the other screens. Come back to it at the end. **[IF IT STALLS]** click **Cancel**,
 the previous result stays on screen.
 
-### While it runs, about 4 minutes
+### What that run did, about 90 seconds
 
-**[SCREEN]** Three steps appear on the left and turn amber then green. Talk over it.
+**[SCREEN]** The three steps on the left are all green. Talk through them.
 
 > "Two things are happening. First it's writing the questions a buyer of this thing
 > actually asks, split across eight buying angles: what is it, does it work, how do I
@@ -139,22 +148,21 @@ the previous result stays on screen.
 > is exactly what a language model is good at. I'm not pretending these are search
 > volumes. They're just questions, and you can read every one of them on this screen.
 >
-> Then it takes six of those and puts them to six real assistants: Google's AI Overview,
+> Then it takes eight of those and puts them to six real assistants: Google's AI Overview,
 > Google's AI Mode, Perplexity, ChatGPT, Gemini and Claude. Five of those come through one
 > scraping service, Claude I call directly at Anthropic, and those two run at the same
 > time so we're not waiting twice.
 >
 > And it records every single source each assistant gives back."
 
-**[IF THE SILENCE GETS LONG]** point at the amber progress line under the form, which says
-what it is doing right now.
+### The board
 
-### When the board appears
+**[POINT]** at the meta line above the headline: `RECORDED PANEL · UK · 8 QUESTIONS · 438
+CITATIONS · $0.229`
 
-**[POINT]** at the meta line above the headline: `MEASURED LIVE · UK · 6 QUESTIONS · 343
-CITATIONS · $0.1635`
-
-> "So that's live, six questions, three hundred and forty-three citations, sixteen cents."
+> "Eight questions, four hundred and thirty-eight citations, twenty-three cents. And the
+> headline underneath is the whole point in one line: The Ordinary is cited on two of the
+> eight, and a hospital site is on six."
 
 **[POINT]** at the column headers.
 
@@ -242,7 +250,7 @@ CITATIONS · $0.1635`
 
 ## Screen 2. AUDIT, about 3 minutes
 
-**[CLICK]** **AUDIT** in the top navigation. That is tab 2, `localhost:3000/`
+**[CLICK]** **AUDIT** in the top navigation. That is tab 2, `cited-precis.vercel.app/`
 
 **[POINT]** at the row of buttons labelled `LIVE PAGES`.
 
@@ -324,11 +332,40 @@ CITATIONS · $0.1635`
 
 > "And this is the part I'm most attached to. Some fixes need a real number or a real named
 > expert, and the tool refuses to invent them. It leaves a marked gap and puts that fix on
-> a separate list, which comes out as a spreadsheet the client fills in.
+> a separate list, which comes out as a spreadsheet the client fills in. Five of these
+> eight are waiting on the client, not on me."
+
+### Then I prove it, on a page I can actually change
+
+**[CLICK]** **the left rail, step 5, Test citations on a live engine**, then **Test
+citations now**. About four seconds.
+
+**[POINT]** at `0/5 queries cite this page`.
+
+> "Before anything is changed: five buyer questions, this page is cited on none of them.
+> That's the before, and it's measured, not asserted."
+
+**[CLICK]** **Apply the fixes and re-test**.
+
+**[POINT]** at `0/5 → 2/5 cited · score 33 → 78`.
+
+> "Same page with the rewrites applied, re-tested on the same five questions: two out of
+> five now. And the score goes thirty-three to seventy-eight.
 >
-> On the sample page in the repo the automatic fixes take it from thirty-three to
-> eighty-one out of a hundred, and every single substantive fix is refused for lack of a
-> supplied fact. That refusal is the feature."
+> One thing about that number, because it's the honest version. The fixes the tool can make
+> on its own get it from thirty-three to fifty-three. Seventy-eight is with the client's
+> fact sheet filled in, because the two heaviest factors, sourced quotes at twenty percent
+> and hard numbers at eighteen, need a fact I will not invent. So most of the gain is
+> unlocked by the client answering seven questions, and I think that's the right split.
+>
+> And this loop only closes on a page held in the repo, on purpose. I can't publish a fix
+> to healthline.com, so the before-and-after would be a claim rather than a measurement."
+
+**[CLICK]** **Download 4 files**.
+
+> "And it leaves as files, not as a report. The corrected HTML, the structured data, the
+> robots.txt block, and the fix plan as a spreadsheet. A developer can deploy that without
+> me in the room."
 
 ---
 
@@ -576,9 +613,9 @@ Panel     6 to the engines
 
 | | |
 |---|---|
-| Cost | $0.1635 |
-| Time | about 4 minutes |
-| Citations | 343 across 162 domains |
+| Cost | $0.2285 |
+| Time | 5 min 18 s live, under a second recorded |
+| Citations | 438 across 206 domains |
 | Engines that answered | 5 of 6, Gemini silent and the screen says so |
 | Per engine | AI Mode 112, Perplexity 92, ChatGPT 75, Claude 53, AI Overview 11, Gemini 0 |
 | Cited by every engine that answered | health.harvard.edu, health.clevelandclinic.org, skincare.com |
@@ -644,9 +681,10 @@ takes the page source and nobody can block that route.
 | Assistants queried | 6 |
 | Cost per question, all six | about 2.5 cents |
 | Cost of writing 160 questions | about 1 cent |
-| The demo run | $0.1635, 6 questions, 4 minutes |
+| The demo run | $0.2285, 8 questions, six engines |
 | Tests | 240, typecheck and build clean |
-| Sample page, before and after fixes | 33 to 81 |
+| Sample page, automatic fixes only | 33 to 53 |
+| Sample page, with the fact sheet filled | 33 to 78 |
 | Swedish, literal translation against real term | 480 against 6,600 |
 | Cross-market overlap, before and after | 95 percent to 0 |
 | Structured data weight | 1 percent, from a study of 1,885 pages |
