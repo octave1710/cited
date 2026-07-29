@@ -145,7 +145,7 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
 
   // the domain column is capped: at 1.5fr it swallowed the slack and shoved the engine
   // headers into each other, so PERPLEXITY and CHATGPT overlapped on a 1280 viewport
-  const cols = `minmax(170px, 280px) 62px ${SPINE * ENGINES.length + 8}px repeat(${ENGINES.length}, ${CELL}px) 116px`;
+  const cols = `minmax(170px, 280px) 62px ${SPINE * ENGINES.length + 8}px repeat(${ENGINES.length}, ${CELL}px) 152px`;
 
   return (
     <div ref={ref}>
