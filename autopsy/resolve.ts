@@ -89,11 +89,29 @@ export interface Candidate {
   matched: string[];
 }
 
+/**
+ * A trailing plural is not a different subject.
+ *
+ * "What is the best vitamin C serum?" scored /nutrition/vitamin-c-foods above
+ * /health/beauty-skin-care/vitamin-c-serums, because "serum" and "serums" were two
+ * different tokens, so the serum page matched on "vitamin-c" alone and lost the tie to a
+ * page about food. Both forms go in the set. Four letters is the floor so "is" and "as"
+ * are left alone.
+ */
+const depluralise = (w: string) => (w.length >= 5 && /[^s]s$/.test(w) ? w.slice(0, -1) : w);
+
 const segmentsOf = (path: string): Set<string> => {
   const parts = path.split(/[/\-_.]+/).filter(Boolean);
-  const out = new Set(parts);
+  const out = new Set<string>();
+  for (const p of parts) {
+    out.add(p);
+    out.add(depluralise(p));
+  }
   // keep hyphenated pairs so "glp-1" can match a "glp-1" slug segment
-  for (let i = 0; i < parts.length - 1; i++) out.add(`${parts[i]}-${parts[i + 1]}`);
+  for (let i = 0; i < parts.length - 1; i++) {
+    out.add(`${parts[i]}-${parts[i + 1]}`);
+    out.add(`${depluralise(parts[i])}-${depluralise(parts[i + 1])}`);
+  }
   return out;
 };
 
@@ -118,7 +136,7 @@ export function rankSitemapCandidates(entries: SitemapEntry[], question: string,
       continue;
     }
     const segments = segmentsOf(path);
-    const matched = words.filter((w) => segments.has(w.word)).map((w) => w.word);
+    const matched = words.filter((w) => segments.has(w.word) || segments.has(depluralise(w.word))).map((w) => w.word);
     if (!matched.length) continue;
 
     // the discriminating term has to be there. Without it, this is a coincidence.

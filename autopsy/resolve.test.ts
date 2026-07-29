@@ -94,4 +94,24 @@ describe("adjacent pairs keep a one-letter qualifier alive", () => {
         .map((x) => x.loc),
     ).toEqual([]);
   });
+
+  it("does not lose the right page to a plural in the slug", () => {
+    /**
+     * "What is the best vitamin C serum?" used to resolve to /nutrition/vitamin-c-foods.
+     * The serum page is /vitamin-c-serums, and "serum" and "serums" were two different
+     * tokens, so the right page matched on "vitamin-c" alone and lost the tie to a page
+     * about food. The demo then compared a serum question against an article on oranges.
+     */
+    const got = rankSitemapCandidates(
+      [
+        { loc: "https://www.healthline.com/nutrition/vitamin-c-foods" },
+        { loc: "https://www.healthline.com/health/beauty-skin-care/vitamin-c-serums" },
+        { loc: "https://www.healthline.com/nutrition/vitamin-c-benefits" },
+      ],
+      "What is the best vitamin C serum?",
+      3,
+    );
+    expect(got[0].loc).toContain("vitamin-c-serums");
+    expect(got[0].matched).toContain("serum");
+  });
 });
