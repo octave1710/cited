@@ -207,10 +207,13 @@ export function EngineBoard({ board, limit = 14 }: { board: Board; limit?: numbe
         </span>
       </div>
 
-      <p style={{ fontSize: 16, lineHeight: 1.5, maxWidth: "76ch", marginBottom: 16 }}>
-        Under each engine the first number is the citations in the rows below, the second is everything
-        that engine gave on this panel. Add a column and you get the first number.
-      </p>
+      {/* a full-width sentence ran across the matrix and broke the column rhythm; it sits
+          under the domain column now, where there is no data to collide with */}
+      <div style={{ display: "grid", gridTemplateColumns: cols, gap: 10, paddingBottom: 14 }}>
+        <p style={{ fontSize: 16, lineHeight: 1.45, gridColumn: "1 / 3", margin: 0 }}>
+          Read each engine as <strong>shown / total</strong>. Add its column and you get the first number.
+        </p>
+      </div>
 
       <div style={{ borderTop: "1px solid var(--line-strong)" }}>
         {rows.map((r) => (

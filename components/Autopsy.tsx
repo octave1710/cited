@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import type { Autopsy, BriefLine, PageSide } from "../autopsy/run";
 import { Favicon } from "./Territory";
 import { FacingBands } from "./Facing";
+import { useKept } from "../lib/keep";
 
 /** Factor names are written for the ledger. A headline needs the first clause only. */
 const shortName = (name: string) => name.split(/\s*[&/(]\s*/)[0].trim();
@@ -35,7 +36,8 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
   const [theirHtml, setTheirHtml] = useState("");
   const [showPaste, setShowPaste] = useState(false);
 
-  const [data, setData] = useState<Autopsy | null>(null);
+  /* the same reset: leaving the tab threw the comparison away */
+  const [data, setData] = useKept<Autopsy | null>("cited.autopsy", null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const barsRef = useRef<HTMLDivElement>(null);
@@ -77,7 +79,15 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
     return () => ctx.revert();
   }, [data]);
 
-    const top = data?.diffs.find((d) => d.impact > 0);
+  const top = data?.diffs.find((d) => d.impact > 0);
+  /**
+   * The overall totals and the biggest single gap are different facts and the screen
+   * showed them in different places without reconciling them: the headline read "they
+   * win on quantified factual specificity" above two cards reading 41 against 27, so a
+   * viewer could not tell which of the two the tool believed.
+   */
+  const ourScore = data?.ours?.audit.overall;
+  const theirScore = data?.theirs?.audit.overall;
 
   return (
     <div style={{ paddingBottom: 140 }}>
@@ -164,7 +174,7 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                     : !data.ours
                       ? "Here is the page you have to beat."
                       : top
-                        ? `They win on ${shortName(top.name).toLowerCase()}.`
+                        ? `You lose ${shortName(top.name).toLowerCase()} to them.`
                         : "Your page already matches theirs on every factor."}
                 </h1>
                 <p className="lede" style={{ marginTop: 22, maxWidth: "58ch" }}>
@@ -186,7 +196,22 @@ export function AutopsyScreen({ initialDomain, initialQuestion }: { initialDomai
                       URL above at any time and it becomes a side-by-side instead.
                     </>
                   ) : top ? (
-                    `They sit at ${top.theirs} out of 100 on it and you sit at ${top.ours}, on a factor carrying ${Math.round((top.weight ?? 0) * 100)}% of the score. ${top.theirReasoning}`
+                    <>
+                      {typeof ourScore === "number" && typeof theirScore === "number" && (
+                        <>
+                          <strong>
+                            {ourScore > theirScore
+                              ? `Your page scores higher overall, ${ourScore} against ${theirScore}, and still loses this factor.`
+                              : ourScore < theirScore
+                                ? `Their page scores ${theirScore} against your ${ourScore} overall.`
+                                : `Both pages score ${ourScore} overall.`}
+                          </strong>{" "}
+                          {ourScore > theirScore &&
+                            "The engine quotes a passage, not a page, so a better page can still lose the passage. "}
+                        </>
+                      )}
+                      {`They sit at ${top.theirs} out of 100 on it and you sit at ${top.ours}, on a factor carrying ${Math.round((top.weight ?? 0) * 100)}% of the score. ${top.theirReasoning}`}
+                    </>
                   ) : (
                     "The gap is not on the page. It is off-site authority, and no edit inside a CMS closes that."
                   )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { InputBar, TopBar } from "../components/Chrome";
+import { useKept } from "../lib/keep";
 import { RunRail } from "../components/Run";
 import { AuditPanel } from "../components/Audit";
 import { FixesPanel } from "../components/Fixes";
@@ -12,10 +13,10 @@ import { readStream, type AccessEvent, type FactorEvent, type PatchEvent, type S
 import type { Run, StepId } from "../lib/types";
 
 export default function Page() {
-  const [run, setRun] = useState<Run | null>(null);
-  const [trace, setTrace] = useState<TraceEvent[]>([]);
-  const [factors, setFactors] = useState<FactorEvent[]>([]);
-  const [summary, setSummary] = useState<SummaryEvent | null>(null);
+  const [run, setRun] = useKept<Run | null>("cited.audit.run", null);
+  const [trace, setTrace] = useKept<TraceEvent[]>("cited.audit.trace", []);
+  const [factors, setFactors] = useKept<FactorEvent[]>("cited.audit.factors", []);
+  const [summary, setSummary] = useKept<SummaryEvent | null>("cited.audit.summary", null);
   const [access, setAccess] = useState<AccessEvent[]>([]);
   const [patch, setPatch] = useState<PatchEvent | null>(null);
   const [busy, setBusy] = useState<string | null>(null);

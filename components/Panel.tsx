@@ -11,6 +11,7 @@ import type { FactorFinding, Teardown } from "../engines/why";
 import { MARKETS } from "../citationmap/markets";
 import { Awaiting, Entity, Label, Num, Panel as Surface, Section, useEntry } from "./da";
 import { readSubject, writeSubject, toHost, DEFAULT_SUBJECT } from "../lib/subject";
+import { useKept } from "../lib/keep";
 
 /**
  * The run screen. A topic goes in, five real answer engines come back with what they
@@ -50,11 +51,12 @@ export function PanelScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
-  const [questions, setQuestions] = useState<string[]>([]);
+  const [questions, setQuestions] = useKept<string[]>("cited.panel.questions", []);
   const [asked, setAsked] = useState<string[]>([]);
-  const [run, setRun] = useState<PanelRun | null>(null);
-  const [board, setBoard] = useState<Board | null>(null);
-  const [teardown, setTeardown] = useState<Teardown | null>(null);
+  /* a four-minute paid run must survive a click on another tab and back */
+  const [run, setRun] = useKept<PanelRun | null>("cited.panel.run", null);
+  const [board, setBoard] = useKept<Board | null>("cited.panel.board", null);
+  const [teardown, setTeardown] = useKept<Teardown | null>("cited.panel.teardown", null);
 
   const go = useCallback(async () => {
     writeSubject({ topic, market, domain: toHost(brand) });
@@ -601,13 +603,18 @@ function Why({ teardown }: { teardown: Teardown }) {
     <Section>
       <div ref={ref}>
         <div style={{ marginBottom: 12 }}>
-          <Label>WHY THAT DOMAIN, MEASURED ON THE SAME CITATIONS</Label>
+          <Label>WHY THIS DOMAIN AND NOT ANOTHER · PICKED ON LEAD SLOTS, THEN ENGINE REACH, THEN VOLUME</Label>
         </div>
         <h2>
           <Entity size={44} style={{ display: "block", fontSize: "clamp(30px,2.6vw,46px)", letterSpacing: "-0.015em", lineHeight: 1.08 }}>
             {teardown.domain}
           </Entity>
         </h2>
+        {/* the criterion, stated: he asked why this one was chosen and nothing on screen said */}
+        <p style={{ fontSize: 16.5, lineHeight: 1.5, marginTop: 12, maxWidth: "72ch" }}>
+          Of every site on this board, this one is named <strong>first</strong> most often. Being quoted and
+          being the source an engine leans on are different outcomes, and the second is the one worth copying.
+        </p>
         <p style={{ marginTop: 14, maxWidth: "70ch" }}>
           <Rich text={facts} size={17.5} />
         </p>

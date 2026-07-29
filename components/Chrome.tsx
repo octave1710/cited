@@ -15,9 +15,16 @@ const LABEL: React.CSSProperties = {
 };
 
 /** The funnel in order: map the category, autopsy and fix a page, ship across markets. */
+/**
+ * Four screens, in the order the argument is made.
+ *
+ * MAP is gone from the nav. It asked a model which sites it WOULD cite, which is the
+ * method the board replaced with six live engines, so shipping both meant demonstrating
+ * the invalidated one next to the real one. The route still resolves for anyone with the
+ * link; it is simply not part of the walkthrough.
+ */
 const ROUTES = [
   { href: "/board", label: "BOARD" },
-  { href: "/map", label: "MAP" },
   { href: "/autopsy", label: "AUTOPSY" },
   { href: "/", label: "AUDIT" },
   { href: "/pipeline", label: "PIPELINE" },
@@ -140,28 +147,8 @@ export function InputBar({
           aria-label="Page URL to audit"
           disabled={disabled}
         />
-        <input
-          className="field"
-          style={{ width: 200 }}
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          aria-label="Brand"
-          disabled={disabled}
-        />
-        <select
-          className="field"
-          style={{ width: 110 }}
-          value={market}
-          onChange={(e) => setMarket(e.target.value)}
-          aria-label="Market"
-          disabled={disabled}
-        >
-          {["UK", "SE", "DK", "US", "FR"].map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
+        {/* the brand name and the market only labelled the run and never touched the
+            score, so they were two fields asking for input that changed nothing */}
         <button
           type="button"
           className={`btn ${showPaste || html ? "btn--primary" : "btn--ghost"}`}
