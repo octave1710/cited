@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { PipelineRun } from "../../../../../pipeline/run";
 import { GateError, publish } from "../../../../../pipeline/run";
 import { getPipeline, savePipeline } from "../../../../../lib/pipedb";
 
@@ -7,18 +8,22 @@ export const runtime = "nodejs";
 /** Records one named approval per market. Publishing is attempted only when all are in. */
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const run = getPipeline(id);
-  if (!run) return NextResponse.json({ error: `No pipeline "${id}".` }, { status: 404 });
+  /**
+   * The stored run first, and the one the client is holding as the fallback.
+   *
+   * A hosted build gives a fresh instance per request, so a run kept in memory on the
+   * instance that created it is gone by the time this call lands and the chain answered
+   * 404. The client has the run on screen, so it sends it back and the gate logic is
+   * unchanged either way.
+   */
+  const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
+  const run = getPipeline(id) ?? ((body.run as PipelineRun | undefined) ?? null);
+  if (!run || run.id !== id) {
+    return NextResponse.json({ error: `No pipeline "${id}". Re-run it, or send the run in the body.` }, { status: 404 });
+  }
 
-  const body = (await req.json().catch(() => ({}))) as {
-    market?: string;
-    approvedBy?: string;
-    note?: string;
-    /** Required when the draft is below the floor or the originality check flagged it. */
-    override?: boolean;
-  };
-  const market = (body.market ?? "").toUpperCase();
-  const approvedBy = (body.approvedBy ?? "").trim();
+  const market = ((body.market as string) ?? "").toUpperCase();
+  const approvedBy = ((body.approvedBy as string) ?? "").trim();
 
   if (!market || !run.markets.includes(market)) {
     return NextResponse.json({ error: `"${market}" is not a market in this run.` }, { status: 400 });
@@ -39,7 +44,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const plan = run.plans.find((p) => p.market === market);
   const belowFloor = plan ? plan.score < 55 : false;
   const flaggedOriginality = plan?.originality?.needsReview ?? false;
-  if ((belowFloor || flaggedOriginality) && !body.override) {
+  if ((belowFloor || flaggedOriginality) && !(body.override as boolean | undefined)) {
     return NextResponse.json(
       {
         error:
@@ -54,7 +59,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       { status: 409 },
     );
   }
-  if ((belowFloor || flaggedOriginality) && !(body.note ?? "").trim()) {
+  if ((belowFloor || flaggedOriginality) && !((body.note as string | undefined) ?? "").trim()) {
     return NextResponse.json(
       { error: "An override needs a reason. It is stored with your name and travels to the CMS payload." },
       { status: 400 },
@@ -67,7 +72,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       market,
       approvedBy,
       at: new Date().toISOString(),
-      note: body.override ? `OVERRIDE: ${body.note}` : body.note,
+      note: (body.override as boolean | undefined) ? `OVERRIDE: ${(body.note as string | undefined)}` : (body.note as string | undefined),
     },
   ];
 

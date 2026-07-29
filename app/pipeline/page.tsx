@@ -68,7 +68,8 @@ function PipelineScreen() {
       const res = await fetch(`/api/pipeline/${run.id}/${path}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(body ?? {}),
+        // the run travels with the call: a hosted instance will not have it in memory
+        body: JSON.stringify({ ...(body as object ?? {}), run }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
