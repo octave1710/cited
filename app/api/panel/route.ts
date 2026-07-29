@@ -62,7 +62,18 @@ export async function POST(req: Request) {
           all = body.questions.map((q) => q.trim()).filter(Boolean);
           send({ type: "questions", questions: all, generated: false });
         } else {
-          const generated = await generateQuestions(getLLM({ cache: true, record: true, json: false }), topic, market, perIntent);
+          /**
+           * The floor is the panel size, not the map's 40. The board asks a subset, so a
+           * run of four questions must not fail on a rule written for a full category map.
+           */
+          const generated = await generateQuestions(
+            getLLM({ cache: true, record: true, json: false }),
+            topic,
+            market,
+            perIntent,
+            undefined,
+            Math.max(panelSize, Math.min(8, perIntent)),
+          );
           all = generated.map((q) => q.text);
           send({ type: "questions", questions: all, generated: true });
         }

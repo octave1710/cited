@@ -172,6 +172,6 @@ describe("runCitationMap", () => {
   it("refuses to build a map from too few questions", async () => {
     await expect(
       runCitationMap(stub(), { topic: "t", brand: "Us", brandDomain: "us.com", market: "UK", perIntent: 1 }),
-    ).rejects.toThrow(/at least 40/);
+    ).rejects.toThrow(/usable questions came back/);
   });
 });

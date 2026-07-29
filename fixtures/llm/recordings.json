@@ -5683,5 +5683,120 @@
     "answer": "{\"urls\": []}",
     "model": "gpt-4o-mini",
     "recordedAt": "2026-07-29T02:51:44.244Z"
+  },
+  "82ece57117fc5ad2ce12abca98325cdb7741f8b1": {
+    "answer": "{\"questions\": [\"Vad är marknadsföringsattributionsprogramvara?\", \"Vad gör marknadsföringsattributionsprogramvara?\", \"Hur fungerar marknadsföringsattributionsprogramvara?\", \"Vilka fördelar ger marknadsföringsattributionsprogramvara?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.115Z"
+  },
+  "c91c275d911380b27e645bd334fed65ce2e9ad18": {
+    "answer": "{\"questions\": [\"Hur väljer jag rätt programvara för marknadsföringsattribution?\", \"Vilka funktioner bör jag leta efter i en marknadsföringsattributionsprogramvara?\", \"Vad ska jag undvika när jag väljer programvara för marknadsföringsattribution?\", \"Hur kan jag utvärdera olika alternativ för marknadsföringsattribution?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.125Z"
+  },
+  "6454a3c3f580783a1cb06594db45bbad91576292": {
+    "answer": "{\"questions\": [\"Hur använder jag marknadsföringsattributionsprogramvara?\", \"När bör jag använda marknadsföringsattributionsprogramvara?\", \"Hur ofta ska jag använda marknadsföringsattributionsprogramvara?\", \"I vilken ordning bör jag använda funktionerna i marknadsföringsattributionsprogramvara?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.214Z"
+  },
+  "184050e8cdafb57a070ccdbc2f54b1ee1cc676c0": {
+    "answer": "{\"questions\": [\"Vilka biverkningar kan uppstå vid användning av marknadsföringsattributionsprogramvara?\", \"Finns det några interaktioner med andra program eller verktyg som jag bör vara medveten om?\", \"Vem bör undvika att använda marknadsföringsattributionsprogramvara?\", \"Är det några specifika branscher eller företagstyper som inte rekommenderas att använda denna typ av programvara?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.308Z"
+  },
+  "83b7190608075e0e36df3edc0ecd2e73890f18f1": {
+    "answer": "{\"questions\": [\"Vilka är de största skillnaderna mellan olika program för marknadsföringsattribution?\", \"Hur presterar marknadsföringsattributionsprogrammet jämfört med andra alternativ på marknaden?\", \"Vilka fördelar och nackdelar har de olika programmen för marknadsföringsattribution?\", \"Vilket marknadsföringsattributionsprogram ger bäst värde för pengarna jämfört med sina konkurrenter?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.680Z"
+  },
+  "751ccf47eefa8684a457c2c0c9141f20dadfca6e": {
+    "answer": "{\"questions\": [\"Fungerar marknadsföringsattributionsprogramvara verkligen?\", \"Vad säger studier om effektiviteten av marknadsföringsattributionsprogramvara?\", \"Hur starka är bevisen för att marknadsföringsattributionsprogramvara ger korrekta resultat?\", \"Vilka faktorer påverkar noggrannheten i marknadsföringsattributionsprogramvara?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.797Z"
+  },
+  "6c70482306afe3fa723a32b8b573fe5178685624": {
+    "answer": "{\"questions\": [\"Hur lång tid tar det att se resultat från marknadsföringsattributionsprogramvara?\", \"Vad kan jag realistiskt förvänta mig av resultaten från marknadsföringsattributionsprogramvara?\", \"Finns det faktorer som påverkar hur snabbt jag ser resultat?\", \"Hur kan jag mäta framgången av marknadsföringsattributionsprogramvara över tid?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:47.936Z"
+  },
+  "016852852768d512185ae48dd6f49b22d3471235": {
+    "answer": "{\"questions\": [\"Vad kostar marknadsföringsattributionsprogramvara?\", \"Är marknadsföringsattributionsprogramvara värt priset?\", \"Finns det billiga alternativ till marknadsföringsattributionsprogramvara?\", \"Vad är skillnaden mellan billig och dyr marknadsföringsattributionsprogramvara?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:09:48.527Z"
+  },
+  "9f5ccd02c94cb20c2ce22abd16a0794a4216e425": {
+    "answer": "{\"urls\": [\"https://www.nhs.uk/conditions/tonsillitis/treatment/\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:11:14.749Z"
+  },
+  "c20ad1470aad9758f26fcfca83c5bb4b7ec2ca2d": {
+    "answer": "{\"urls\": [\"https://www.nhs.uk/medicines/ibuprofen/ibuprofen-in-pregnancy/\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:11:19.712Z"
+  },
+  "a1b38083c8f73925f060f189eed62097062513ef": {
+    "answer": "{\"urls\": [\"https://www.bmj.com/content/377/bmj.n2260\", \"https://www.bmj.com/content/377/bmj.n2261\", \"https://www.bmj.com/content/377/bmj.n2262\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:12:19.714Z"
+  },
+  "22cfe55251c414924a66b9623145e3998d1a00e9": {
+    "answer": "{\"urls\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:12:56.048Z"
+  },
+  "0dc3d9e240f2621f2293b04d478abc3c19d04d0d": {
+    "answer": "{\"urls\": [\"https://www.nhs.uk/using-the-nhs/how-the-nhs-works/\", \"https://www.nhs.uk/nhs-services/what-is-the-nhs/\", \"https://www.nhs.uk/nhs-services/what-to-expect-from-the-nhs/\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:13:30.452Z"
+  },
+  "843fce167b875e8b306d87f0913da24e920188ed": {
+    "answer": "{\"urls\": [\"https://www.healthline.com/health/how-does-it-work\", \"https://www.healthline.com/health/how-does-therapy-work\", \"https://www.healthline.com/health/how-does-acupuncture-work\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:13:53.731Z"
+  },
+  "2b6f6fff9ee5c4e6faac2e1c3ddc504a970ab4ca": {
+    "answer": "{\"questions\": [\"What is marketing attribution software?\", \"What does marketing attribution software do?\", \"How does marketing attribution software work?\", \"What are the key features of marketing attribution software?\", \"How can marketing attribution software improve my marketing strategy?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.016Z"
+  },
+  "b0108b1af148a079690c3e294b592ca8d20acd16": {
+    "answer": "{\"questions\": [\"How much does marketing attribution software typically cost?\", \"Is it worth investing in marketing attribution software for my business?\", \"What are the differences in features between cheap and expensive marketing attribution software?\", \"Can I find affordable marketing attribution software that still meets my needs?\", \"What factors should I consider when evaluating the price of marketing attribution software?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.151Z"
+  },
+  "bdbb6842a55a45f9cbd54cce85e124ce370388e8": {
+    "answer": "{\"questions\": [\"What are common pitfalls or challenges when using marketing attribution software?\", \"What specific problems does marketing attribution software not address?\", \"Who might not benefit from using marketing attribution software?\", \"What are the potential downsides or limitations of marketing attribution software?\", \"Are there scenarios where investing in marketing attribution software could be a waste of resources?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.214Z"
+  },
+  "2fedc2926201a8cd1825b34e7167c08cd529dc3b": {
+    "answer": "{\"questions\": [\"What features should I look for in marketing attribution software?\", \"How do I determine which marketing attribution software is best for my business?\", \"What are common pitfalls to avoid when choosing marketing attribution software?\", \"How can I evaluate the accuracy of marketing attribution software?\", \"What pricing models should I consider when selecting marketing attribution software?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.261Z"
+  },
+  "5fc72e8715443743ef41cf36557f35889bd20abb": {
+    "answer": "{\"questions\": [\"How do I use marketing attribution software effectively?\", \"When is the best time to implement marketing attribution software?\", \"How often should I review the data from my marketing attribution software?\", \"In what order should I analyze the different channels in my marketing attribution software?\", \"What steps should I follow to set up my marketing attribution software for optimal results?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.296Z"
+  },
+  "80a3ca1ecc32d075f10a46bd54aab1501fe3c72e": {
+    "answer": "{\"questions\": [\"How does this marketing attribution software compare to Google Analytics?\", \"What are the key differences between this software and HubSpot's attribution tools?\", \"Is this marketing attribution software more effective than Adobe Analytics for tracking ROI?\", \"What advantages does this software have over other popular attribution solutions?\", \"How does the pricing of this software stack up against its main competitors?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.302Z"
+  },
+  "c9216894e9703640735be1fcc825433eb6f42e70": {
+    "answer": "{\"questions\": [\"Does marketing attribution software really improve campaign performance?\", \"What do studies say about the effectiveness of marketing attribution software?\", \"How strong is the evidence supporting the use of marketing attribution software?\", \"Are there any case studies that demonstrate the impact of marketing attribution software?\", \"What metrics should I look at to evaluate the success of marketing attribution software?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.350Z"
+  },
+  "0b833acaf6c6afd4d26f7701ddc2710a8e8cd6d2": {
+    "answer": "{\"questions\": [\"How long does it typically take to see results from marketing attribution software?\", \"What kind of results can I realistically expect after implementing marketing attribution software?\", \"Are there any factors that can affect the time it takes to see results from marketing attribution software?\", \"What should I look for in the first few weeks of using marketing attribution software?\", \"How can I measure the effectiveness of marketing attribution software over time?\"]}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:17:47.378Z"
+  },
+  "5bf1d93e99e19ec7e9cf2920dd94f4cab28409ee": {
+    "answer": "{\"urls\": []}",
+    "model": "gpt-4o-mini",
+    "recordedAt": "2026-07-29T03:18:16.335Z"
   }
 }

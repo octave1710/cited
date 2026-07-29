@@ -11,14 +11,16 @@ export const INTENTS = [
   { id: "evidence", label: "does it work", brief: "whether it works, what the studies say, how strong the evidence is" },
   { id: "choose", label: "how to choose", brief: "how to pick one, what to look for, what to avoid on a label" },
   { id: "compare", label: "versus", brief: "head-to-head comparisons against the obvious alternatives" },
-  { id: "safety", label: "safety", brief: "side effects, interactions, who should not use it" },
+  { id: "risk", label: "risks", brief: "what goes wrong with it, what it does not solve, who it is a bad fit for, and any downside a buyer should know before committing" },
   { id: "usage", label: "how to use", brief: "how to use it, when, how often, in what order" },
   { id: "results", label: "results", brief: "how long results take, what to realistically expect" },
   { id: "value", label: "price and value", brief: "price, whether it is worth it, cheap versus expensive" },
 ] as const;
 
 const system = (language: string) =>
-  "You generate the sub-questions a consumer AI assistant decomposes a shopping topic into. " +
+  "You generate the sub-questions an AI assistant decomposes a buying topic into. The topic may be "
+  + "a consumer product, a service, or business software; write the questions a buyer of THAT kind of "
+  + "thing actually asks, and never force a consumer-health framing onto something that is not one. " +
   "Real questions in the wording a person types, sentence case, no numbering, no brand names " +
   `unless the topic names one. Write every question in ${language}, because that is the language ` +
   "buyers in this market actually type. Translate the topic into that language if it arrives in " +
@@ -50,6 +52,12 @@ export async function generateQuestions(
   market: string,
   perIntent = 20,
   onUsage?: (u: LLMUsage | undefined, replayed: boolean) => void,
+  /**
+   * The floor exists so a category map is not built on a handful of questions. The board
+   * asks a panel of four to twenty, so inheriting a floor of 40 made a small run fail
+   * with a message about a map it was not building. It is the caller's number now.
+   */
+  minimum = 40,
 ): Promise<MapQuestion[]> {
   const batches = await Promise.all(
     INTENTS.map(async (intent) => {
@@ -74,8 +82,10 @@ export async function generateQuestions(
       out.push({ id: `q${String(out.length + 1).padStart(3, "0")}`, text, intent: intent.label });
     }
   }
-  if (out.length < 40) {
-    throw new Error(`Only ${out.length} usable questions came back. A map needs at least 40 to mean anything.`);
+  if (out.length < minimum) {
+    throw new Error(
+      `Only ${out.length} usable questions came back and ${minimum} were needed. The generator deduplicates across the eight angles, so ask for more per angle.`,
+    );
   }
   return out;
 }
