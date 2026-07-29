@@ -272,6 +272,12 @@ export function publish(run: PipelineRun): PipelineRun {
       primaryTerm: p.term,
       status: "ready for CMS, not published",
       approvedBy: run.decisions.find((d) => d.market === p.market)?.approvedBy ?? "",
+      /* the refusal promises the override reason "travels to the CMS payload"; it was
+         stored on the decision and never carried here, so the promise was not kept.
+         Omitted rather than emitted empty, since metadata is a string map. */
+      ...(run.decisions.find((d) => d.market === p.market)?.note
+        ? { approvalNote: run.decisions.find((d) => d.market === p.market)!.note! }
+        : {}),
     },
     /**
      * hreflang takes a LANGUAGE subtag, not a country code. Lowercasing the market code

@@ -243,6 +243,11 @@ function PipelineScreen() {
                 <div style={{ display: "flex", gap: 20, alignItems: "baseline", flexWrap: "wrap" }}>
                   <Entity size={30}>{o.market}</Entity>
                   <span style={{ fontSize: 16.5 }}>{o.metadata.approvedBy}</span>
+                  {o.metadata.approvalNote && (
+                    <span style={{ display: "block", fontSize: 15, lineHeight: 1.45, marginTop: 6 }}>
+                      {o.metadata.approvalNote}
+                    </span>
+                  )}
                   <Label tone="d2">SIGNED OFF</Label>
                   <Label tone="d1">{o.metadata.status.toUpperCase()}</Label>
                 </div>
