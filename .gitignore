@@ -22,3 +22,4 @@ HANDOFF_*.md
 design/mockups/
 
 .vercel
+.gstack/

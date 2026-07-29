@@ -137,17 +137,52 @@ export function Meter({ value, max = 100, accent = "var(--d3)", height = 6, trac
 }
 
 /** Runs the standing entry choreography for whatever marks a screen rendered. */
+/** Everything this hook reveals. Listed once so the cleanup can un-hide all of it. */
+const REVEALED = "[data-meter],[data-band],[data-tile],[data-row]";
+
+/**
+ * The entrance reveal, written so that failing leaves the content visible.
+ *
+ * It used to be four `gsap.from` calls. A `from` sets the hidden state on frame one and
+ * animates out of it, so anything that interrupts it, a revert, a re-render, a second
+ * context on the same scope, leaves the element exactly where it started: invisible. That
+ * is what happened on the pipeline. The seven node labels, the market names, the terms and
+ * the scores were all sitting at `opacity: 0` with `translateX(-12px)` on a screen whose
+ * whole point is to show where the run stops, and the text was in the DOM the entire time,
+ * so every check that read `innerText` said the screen was fine.
+ *
+ * Two changes make that unreachable. `fromTo` clears its own inline styles on completion,
+ * so a settled element carries no opacity at all. And the cleanup force-clears after the
+ * revert, so no interruption can leave anything hidden. The animation is now allowed to
+ * fail; the content is not.
+ */
 export function useEntry(deps: unknown[], ref: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
-    if (!ref.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ctx = gsap.context(() => {
-      gsap.from("[data-meter]", { scaleX: 0, transformOrigin: "left center", duration: 0.7, ease: "expo.out", stagger: 0.04 });
-      gsap.from("[data-band]", { scaleX: 0, duration: 0.65, ease: "expo.out", stagger: 0.035 });
-      gsap.from("[data-tile]", { scale: 0, transformOrigin: "center center", duration: 0.45, ease: "back.out(1.5)", stagger: 0.006 });
-      gsap.from("[data-row]", { opacity: 0, x: -12, duration: 0.4, ease: "expo.out", stagger: 0.03 });
-    }, ref);
-    return () => ctx.revert();
+    const scope = ref.current;
+    if (!scope) return;
+    const clear = () => gsap.set(scope.querySelectorAll(REVEALED), { clearProps: "opacity,transform" });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      clear();
+      return;
+    }
+
+    const ctx = gsap.context((self) => {
+      const reveal = (sel: string, from: gsap.TweenVars, to: gsap.TweenVars) => {
+        // gsap warns on an empty target, and several of these are legitimately absent
+        const els = self.selector?.(sel) ?? [];
+        if (!els.length) return;
+        gsap.fromTo(els, from, { ...to, clearProps: "opacity,transform", overwrite: "auto" });
+      };
+      reveal("[data-meter]", { scaleX: 0 }, { scaleX: 1, transformOrigin: "left center", duration: 0.7, ease: "expo.out", stagger: 0.04 });
+      reveal("[data-band]", { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: "expo.out", stagger: 0.035 });
+      reveal("[data-tile]", { scale: 0 }, { scale: 1, transformOrigin: "center center", duration: 0.45, ease: "back.out(1.5)", stagger: 0.006 });
+      reveal("[data-row]", { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out", stagger: 0.03 });
+    }, scope);
+
+    return () => {
+      ctx.revert();
+      clear();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

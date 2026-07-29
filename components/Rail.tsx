@@ -102,15 +102,22 @@ export function Rail({
   useEffect(() => {
     if (!ref.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const scope = ref.current;
+    /* same rule as useEntry: an interrupted reveal must not leave the wall invisible,
+       and this context shares a scope with that one */
+    const clear = () => gsap.set(scope.querySelectorAll("[data-wall],[data-door]"), { clearProps: "transform" });
     const ctx = gsap.context((self) => {
       // the wall drops after the track has laid itself, so the reader watches it stop.
       // both selectors are empty in legitimate states, and gsap warns on an empty target
       const wall = self.selector?.("[data-wall]") ?? [];
       const door = self.selector?.("[data-door]") ?? [];
-      if (wall.length) gsap.from(wall, { scaleY: 0, transformOrigin: "top center", duration: 0.55, ease: "expo.out", delay: 0.42, stagger: 0.06 });
-      if (door.length) gsap.from(door, { scaleX: 0, transformOrigin: "center center", duration: 0.5, ease: "back.out(1.7)", delay: 0.5, stagger: 0.06 });
-    }, ref);
-    return () => ctx.revert();
+      if (wall.length) gsap.fromTo(wall, { scaleY: 0 }, { scaleY: 1, transformOrigin: "top center", duration: 0.55, ease: "expo.out", delay: 0.42, stagger: 0.06, clearProps: "transform", overwrite: "auto" });
+      if (door.length) gsap.fromTo(door, { scaleX: 0 }, { scaleX: 1, transformOrigin: "center center", duration: 0.5, ease: "back.out(1.7)", delay: 0.5, stagger: 0.06, clearProps: "transform", overwrite: "auto" });
+    }, scope);
+    return () => {
+      ctx.revert();
+      clear();
+    };
   }, [stateKey, signKey]);
 
   /**
