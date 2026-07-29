@@ -12,6 +12,17 @@ nothing checkable. It was replaced with live calls to the engines themselves.
 
 ---
 
+## Live
+
+**https://cited-precis.vercel.app**
+
+The hosted build runs with no API keys, so the board replays a recorded six-engine panel
+and labels itself RECORDED. That is deliberate: a public URL that spends money on every
+visit is a bad idea, and the recorded panel is the real output of a real run. The page
+audit, the autopsy, the pipeline and every export run live there.
+
+Clone it and add your own keys to see the engines queried in front of you.
+
 ## Run it
 
 ```bash
