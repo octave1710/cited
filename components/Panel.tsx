@@ -49,6 +49,8 @@ export function PanelScreen() {
 
   const [steps, setSteps] = useState<Step[]>(STEPS);
   const [busy, setBusy] = useState(false);
+  /** Held so the run can be cancelled, and so a stuck request cannot own the screen. */
+  const abortRef = useRef<AbortController | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
   const [questions, setQuestions] = useKept<string[]>("cited.panel.questions", []);
@@ -58,22 +60,42 @@ export function PanelScreen() {
   const [board, setBoard] = useKept<Board | null>("cited.panel.board", null);
   const [teardown, setTeardown] = useKept<Teardown | null>("cited.panel.teardown", null);
 
+  const cancel = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setBusy(false);
+    setProgress("");
+    setError("Run cancelled. Nothing was charged for the questions that had not been asked yet.");
+  }, []);
+
   const go = useCallback(async () => {
     writeSubject({ topic, market, domain: toHost(brand) });
+    const controller = new AbortController();
+    abortRef.current = controller;
+    /**
+     * A ceiling, so a request that never resolves cannot leave the button dead. Twenty
+     * questions across six engines is comfortably under this; anything past it is a
+     * failure whatever the server thinks.
+     */
+    const ceiling = setTimeout(() => controller.abort(), 12 * 60 * 1000);
     setBusy(true);
     setError(null);
-    setRun(null);
-    setBoard(null);
-    setTeardown(null);
-    setQuestions([]);
     setAsked([]);
     setSteps(STEPS.map((s) => ({ ...s, state: "queued", note: undefined })));
+    /**
+     * The previous result stays on screen until the new one arrives.
+     *
+     * Clearing it here meant that starting a run by accident and cancelling it wiped a
+     * four-minute paid result with no way back. The progress line above is enough to show
+     * something is running, and `done` replaces everything at once.
+     */
 
     try {
       const res = await fetch("/api/panel", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ topic, market, brandDomain: brand, panelSize }),
+        signal: controller.signal,
       });
       if (!res.body) throw new Error("The server sent no stream.");
 
@@ -102,9 +124,14 @@ export function PanelScreen() {
         }
       }
     } catch (err) {
-      setError((err as Error).message);
-      setSteps((p) => p.map((s) => (s.state === "running" ? { ...s, state: "failed" } : s)));
+      // an abort is a decision, not a failure, and cancel() has already said so
+      if ((err as Error).name !== "AbortError") {
+        setError((err as Error).message);
+        setSteps((p) => p.map((s) => (s.state === "running" ? { ...s, state: "failed" } : s)));
+      }
     } finally {
+      clearTimeout(ceiling);
+      abortRef.current = null;
       setBusy(false);
       setProgress("");
     }
@@ -122,19 +149,41 @@ export function PanelScreen() {
           <select className="field" style={{ width: 150 }} value={panelSize} onChange={(e) => setPanelSize(Number(e.target.value))} aria-label="Questions to ask the engines" disabled={busy}>
             {[4, 6, 8, 12, 16, 20].map((n) => <option key={n} value={n}>{n} to the engines</option>)}
           </select>
-          <button className="btn btn--primary" type="submit" disabled={busy}>{busy ? "Asking…" : "Run"}</button>
+          {busy ? (
+            <button className="btn" type="button" onClick={cancel} title="Stop the run and give the screen back">
+              Cancel
+            </button>
+          ) : (
+            <button className="btn btn--primary" type="submit">Run</button>
+          )}
         </form>
         {busy && progress && (
           <div className="m-sm" style={{ color: "var(--d1)", marginTop: 10 }}>{progress.toUpperCase()}</div>
         )}
       </div>
 
-      {error && (
-        <div className="gut" style={{ background: "rgba(255,92,61,.09)", borderBottom: "1px solid var(--brand)", paddingTop: 16, paddingBottom: 16, display: "flex", gap: 16, alignItems: "center" }}>
-          <span className="m" style={{ color: "var(--brand)" }}>FAILED</span>
-          <span style={{ fontSize: 16.5, fontWeight: 500 }}>{error}</span>
-        </div>
-      )}
+      {error && (() => {
+        // a cancel is a decision the user made, not a failure of the tool
+        const cancelled = error.startsWith("Run cancelled");
+        const accent = cancelled ? "var(--d1)" : "var(--brand)";
+        return (
+          <div
+            className="gut"
+            style={{
+              background: cancelled ? "var(--s1)" : "rgba(255,92,61,.09)",
+              borderBottom: `1px solid ${accent}`,
+              paddingTop: 16,
+              paddingBottom: 16,
+              display: "flex",
+              gap: 16,
+              alignItems: "center",
+            }}
+          >
+            <span className="m" style={{ color: accent }}>{cancelled ? "STOPPED" : "FAILED"}</span>
+            <span style={{ fontSize: 16.5, fontWeight: 500 }}>{error}</span>
+          </div>
+        );
+      })()}
 
       <div className="gut shell">
         {!run && <Intro steps={steps} busy={busy} questions={questions} asked={asked} />}
@@ -832,6 +881,8 @@ function NotRun({ text }: { text: string }) {
 
 function Download({ run, target }: { run: PanelRun; target?: string }) {
   const [busy, setBusy] = useState(false);
+  /** Held so the run can be cancelled, and so a stuck request cannot own the screen. */
+  const abortRef = useRef<AbortController | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   const grab = async () => {
