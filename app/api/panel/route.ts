@@ -6,7 +6,12 @@ import { ENGINES } from "../../../engines/types";
 import { teardownFromCitations } from "../../../engines/why";
 
 export const runtime = "nodejs";
-export const maxDuration = 800;
+/**
+ * 300 is the ceiling on the deployed plan. A live twenty-question panel across six
+ * engines runs longer than that, so the hosted build is meant for the recorded panel and
+ * for small live runs; the full one is run locally. The screen says which it did.
+ */
+export const maxDuration = 300;
 
 /**
  * Two steps, one stream.

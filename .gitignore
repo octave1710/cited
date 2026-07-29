@@ -20,3 +20,5 @@ MASTER_PROMPT*.md
 SPEC_V2.md
 HANDOFF_*.md
 design/mockups/
+
+.vercel
