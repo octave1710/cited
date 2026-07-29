@@ -13,7 +13,7 @@ import { audit } from "../engine/score";
 
 export * from "./nodes";
 import type { GateDecision, MarketPlan, NodeId, NodeState, PipelineRun } from "./nodes";
-import { checkOriginality, OVERLAP_REVIEW } from "./originality";
+import { checkOriginality, OVERLAP_REVIEW, FACT_REVIEW, TELLS_REVIEW } from "./originality";
 import { marketOf } from "../citationmap/markets";
 import { NODES } from "./nodes";
 
@@ -205,7 +205,15 @@ ${sections.map((sec: GroundSection) => `<h2>${sec.q}</h2><p>${sec.a}</p>`).join(
     run.trace.push({
       step: "gate",
       claim: `${r.market}: ${r.reasons.join(" ")}`,
-      source: "pipeline/originality.ts, 8-word shingle overlap and unedited-output phrases",
+      /* the trace names the check that actually fired, not all three: a finding about
+         figure sequences was being credited to the word-shingle measure */
+      source: `pipeline/originality.ts, ${[
+        r.worstOverlap >= OVERLAP_REVIEW ? "8-word shingle overlap" : "",
+        r.worstFactOverlap >= FACT_REVIEW ? "ordered figure sequences" : "",
+        r.tells.length >= TELLS_REVIEW ? "unedited-output phrases" : "",
+      ]
+        .filter(Boolean)
+        .join(" and ")}`,
     });
   }
 

@@ -40,6 +40,8 @@ function PipelineScreen() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
+  /* the written reason a flagged market needs before anyone can sign it */
+  const [notes, setNotes] = useState<Record<string, string>>({});
 
   async function start() {
     setBusy("run");
@@ -196,7 +198,16 @@ function PipelineScreen() {
                   name={names[p.market] ?? ""}
                   busy={busy !== null}
                   onName={(v) => setNames({ ...names, [p.market]: v })}
-                  onSign={(approvedBy) => act("approve", { market: p.market, approvedBy })}
+                  note={notes[p.market] ?? ""}
+                  onNote={(v) => setNotes({ ...notes, [p.market]: v })}
+                  onSign={(approvedBy, note) =>
+                    act("approve", {
+                      market: p.market,
+                      approvedBy,
+                      // the API refuses a flagged market without both, and says so
+                      ...(note.trim() ? { override: true, note: note.trim() } : {}),
+                    })
+                  }
                 />
               ))}
             </div>
@@ -306,15 +317,21 @@ function MarketGate({
   busy,
   onName,
   onSign,
+  note,
+  onNote,
 }: {
   plan: MarketPlan;
   approver?: string;
   name: string;
   busy: boolean;
   onName: (v: string) => void;
-  onSign: (approvedBy: string) => void;
+  onSign: (approvedBy: string, note: string) => void;
+  note: string;
+  onNote: (v: string) => void;
 }) {
   const signed = (approver ?? "").trim().length > 0;
+  /* the API refuses this market without an override and a written reason */
+  const blocked = plan.score < 55 || Boolean(plan.originality?.needsReview);
   return (
     <Panel accent={signed ? "var(--d2)" : "var(--brand)"} style={{ padding: "20px 22px" }}>
       <div style={{ display: "flex", gap: 12, alignItems: "baseline", justifyContent: "space-between" }}>
@@ -434,16 +451,40 @@ function MarketGate({
             onChange={(e) => onName(e.target.value)}
             aria-label={`Approver for ${plan.market}`}
           />
+          {/*
+            A flagged market cannot be signed without a written reason. The API has always
+            demanded one and there was no field to type it in, so the refusal message told
+            the user to send override:true and a note and then gave them no way to do it.
+            A dead end that instructs you to do the impossible reads as a broken screen.
+          */}
+          {blocked && (
+            <input
+              className="field"
+              style={{ width: "100%", marginTop: 10 }}
+              placeholder={`Why are you signing ${plan.market} anyway? Stored with your name.`}
+              value={note}
+              onChange={(e) => onNote(e.target.value)}
+              aria-label={`Override reason for ${plan.market}`}
+            />
+          )}
           <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
-            <button className="btn btn--primary" disabled={busy || !name.trim()} onClick={() => onSign(name)}>
-              Sign {plan.market}
+            <button
+              className="btn btn--primary"
+              disabled={busy || !name.trim() || (blocked && !note.trim())}
+              onClick={() => onSign(name, note)}
+            >
+              {blocked ? `Sign ${plan.market} over the flag` : `Sign ${plan.market}`}
             </button>
-            <button className="btn btn--ghost btn--sm" disabled={busy} onClick={() => onSign("")}>
+            <button className="btn btn--ghost btn--sm" disabled={busy} onClick={() => onSign("", note)}>
               Send it unsigned
             </button>
           </div>
           <p style={{ marginTop: 12 }}>
-            <Label tone="brand">AN UNSIGNED APPROVAL IS REJECTED · HTTP 400</Label>
+            <Label tone="brand">
+              {blocked
+                ? "THIS MARKET IS FLAGGED · SIGNING IT NEEDS A REASON, AND THE REASON TRAVELS TO THE CMS"
+                : "AN UNSIGNED APPROVAL IS REJECTED · HTTP 400"}
+            </Label>
           </p>
         </div>
       )}
