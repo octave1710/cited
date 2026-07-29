@@ -9,12 +9,23 @@ import type { Run } from "./types";
 
 const PATH = process.env.DATABASE_PATH ?? "./data/cited.db";
 
+/**
+ * Same fallback as the pipeline store, for the same reason: node:sqlite is experimental
+ * and does not open on every runtime. An audit whose row cannot be written must still
+ * return its score, and the fix routes that read the run back a moment later are served
+ * from the Map when the database is not there.
+ */
 let db: DatabaseSync | null = null;
+let tried = false;
+const memory = new Map<string, Run>();
 
-function conn(): DatabaseSync {
+function conn(): DatabaseSync | null {
   if (db) return db;
-  db = new DatabaseSync(writableDbPath(PATH));
-  db.exec(`
+  if (tried) return null;
+  tried = true;
+  try {
+    const opened = new DatabaseSync(writableDbPath(PATH));
+    opened.exec(`
     CREATE TABLE IF NOT EXISTS runs (
       id         TEXT PRIMARY KEY,
       created_at TEXT NOT NULL,
@@ -24,29 +35,53 @@ function conn(): DatabaseSync {
       payload    TEXT NOT NULL
     );
     CREATE INDEX IF NOT EXISTS runs_created ON runs (created_at DESC);
-  `);
-  return db;
+    `);
+    db = opened;
+    return db;
+  } catch {
+    return null;
+  }
 }
 
 export function saveRun(run: Run): void {
-  conn()
-    .prepare(
+  const c = conn();
+  if (!c) {
+    memory.set(run.id, run);
+    return;
+  }
+  try {
+    c.prepare(
       `INSERT INTO runs (id, created_at, url, brand, market, payload)
        VALUES (?, ?, ?, ?, ?, ?)
        ON CONFLICT(id) DO UPDATE SET payload = excluded.payload`,
-    )
-    .run(run.id, run.createdAt, run.url, run.brand, run.market, JSON.stringify(run));
+    ).run(run.id, run.createdAt, run.url, run.brand, run.market, JSON.stringify(run));
+  } catch {
+    memory.set(run.id, run);
+  }
 }
 
 export function getRun(id: string): Run | null {
-  const row = conn().prepare(`SELECT payload FROM runs WHERE id = ?`).get(id) as
-    | { payload: string }
-    | undefined;
-  return row ? (JSON.parse(row.payload) as Run) : null;
+  const fromMemory = memory.get(id);
+  if (fromMemory) return fromMemory;
+  const c = conn();
+  if (!c) return null;
+  try {
+    const row = c.prepare(`SELECT payload FROM runs WHERE id = ?`).get(id) as { payload: string } | undefined;
+    return row ? (JSON.parse(row.payload) as Run) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function listRuns(limit = 12): Pick<Run, "id" | "createdAt" | "url" | "brand" | "market">[] {
-  const rows = conn()
+  const c = conn();
+  if (!c) {
+    return [...memory.values()]
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, limit)
+      .map((r) => ({ id: r.id, createdAt: r.createdAt, url: r.url, brand: r.brand, market: r.market }));
+  }
+  const rows = c
     .prepare(`SELECT id, created_at, url, brand, market FROM runs ORDER BY created_at DESC LIMIT ?`)
     .all(limit) as { id: string; created_at: string; url: string; brand: string; market: string }[];
   return rows.map((r) => ({
