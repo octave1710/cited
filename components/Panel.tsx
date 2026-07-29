@@ -76,6 +76,16 @@ export function PanelScreen() {
       setBoard(j.board);
       setTeardown(j.teardown ?? null);
       setQuestions(j.allQuestions ?? []);
+      /**
+       * The form has to say what the run says. Loading the recorded panel left the brand
+       * field empty while the headline read "You are cited on 2 of 8", which is the same
+       * class of contradiction as the screens disagreeing on the subject. Writing the
+       * subject carries it to the audit and the pipeline too.
+       */
+      setTopic(j.run.topic);
+      setMarket(j.run.market);
+      setBrand(j.run.brandDomain ?? "");
+      writeSubject({ topic: j.run.topic, market: j.run.market, domain: j.run.brandDomain ?? "" });
       setSteps(STEPS.map((st) => ({ ...st, state: "done", note: "from the recorded run" })));
     } catch (e) {
       setError((e as Error).message);

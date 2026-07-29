@@ -101,8 +101,10 @@ export function TopBar({ runId }: { runId?: string }) {
       </span>
       <span className="m-sm meta">PROFOUND {(mode?.profound ?? "…").toUpperCase()}</span>
       <span className="m-sm meta">WEIGHTS LOCKED</span>
+      {/* the id belongs to an audit run, so NO RUN read as a contradiction on a board
+          screen that was showing 438 citations. Absent when there is nothing to name. */}
       <span style={{ marginLeft: "auto" }} className="m-sm meta">
-        {runId ? `RUN ${runId.toUpperCase()}` : "NO RUN"}
+        {runId ? `RUN ${runId.toUpperCase()}` : ""}
       </span>
       <span className="m-sm meta" style={{ minWidth: 66, textAlign: "right" }}>
         {clock ? `${clock} UTC` : ""}
