@@ -26,7 +26,15 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
 
-      - run: npm ci
+      # npm install, not npm ci, and the reason is worth stating rather than hiding.
+      # The lockfile is resolved on Windows, where npm does not record the Linux-only
+      # optional peers that sharp's wasm32 fallback pulls in. npm ci is strict by design
+      # and refuses rather than resolving them, so it fails on the runner for a platform
+      # difference and not for a real dependency problem. Pinning the package explicitly
+      # did not help: npm on Windows still declines to write it to the lock.
+      # The lockfile is committed and still governs every version that CAN be resolved
+      # here; this only lets the runner add the platform packages it needs.
+      - run: npm install --no-audit --no-fund
 
       # no key is present in CI, so every adapter falls back to replay and the suite
       # must pass without touching a paid API. That is the contract, not a convenience.
